@@ -2,6 +2,7 @@
 import 'dart:ui';
 
 import 'package:bananokeeper/providers/localization_service.dart';
+import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/ui/pin/setup_pin.dart';
 import 'package:flutter/material.dart';
@@ -301,8 +302,10 @@ class InitialPageInformationState extends State<InitialPageInformation>
 
                       await services<WalletsService>().createNewWallet(seed);
                       print("${services<WalletsService>().wallets.length}");
+                      services<WalletsService>().setActiveWallet(0);
 
                       services<WalletsService>().wallets[0].setActiveIndex(0);
+                      services<SharedPrefsModel>().initliazeValues();
                       print(
                           "LATEST ID ${services<WalletsService>().latestWalletID}");
                       setState(() {

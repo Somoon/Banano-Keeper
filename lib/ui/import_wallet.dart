@@ -182,11 +182,12 @@ class ImportWalletPageState extends State<ImportWalletPage>
     );
   }
 
-  createWallet(String seed) {
-    services<WalletsService>().createNewWallet(seed);
-    setState(() {
+  createWallet(String seed) async {
+    await services<WalletsService>().createNewWallet(seed);
+    setState(() {});
+    if (context.mounted) {
       Navigator.of(context).pop(true);
-    });
+    }
   }
 
   TextFormField seedTextField(BaseTheme currentTheme) {

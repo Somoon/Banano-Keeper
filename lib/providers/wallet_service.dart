@@ -77,6 +77,7 @@ class WalletService extends ChangeNotifier {
     // print("wallet_service.dart: setActiveIndex: $index");
     activeIndex = index;
     currentAccount.value = accounts[index].getAddress();
+    services<SharedPrefsModel>().saveActiveAccount(index);
     notifyListeners();
   }
 

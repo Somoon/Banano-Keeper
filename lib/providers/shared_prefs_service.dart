@@ -35,12 +35,12 @@ class SharedPrefsModel {
     return stringValue;
   }
 
-  saveActiveWallet(int walletID) async {
-    sharedPref.setInt('activeWallet', walletID);
+  saveActiveWallet(String walletname) async {
+    sharedPref.setString('activeWallet', walletname);
   }
 
   getActiveWallet() async {
-    int stringValue = sharedPref.getInt('activeWallet') ?? 0;
+    String stringValue = sharedPref.getString('activeWallet') ?? "";
     return stringValue;
   }
 
@@ -84,7 +84,7 @@ class SharedPrefsModel {
     var isInit = sharedPref.containsKey('isInitialized');
     var lang = "English";
     var theme = "Yellow";
-    var activeWallet = 0;
+    var activeWallet = "";
     var activeAccount = 0;
     var latestWalletID = 0;
     String powSource = "Kalium";
@@ -122,7 +122,7 @@ class SharedPrefsModel {
     // if (!themeExist)
     saveTheme("Yellow");
     saveActiveAccount(0);
-    saveActiveWallet(0);
+    // saveActiveWallet(0);
     saveLatestWalletID(0);
     await sharedPref.setString("isInitialized", "true");
   }

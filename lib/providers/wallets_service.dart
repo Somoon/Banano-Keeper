@@ -21,6 +21,8 @@ class WalletsService extends ChangeNotifier {
 
   setActiveWallet(nID) {
     activeWallet = nID;
+    String orgName = wallets[activeWallet].original_name;
+    services<SharedPrefsModel>().saveActiveWallet(orgName);
     notifyListeners();
   }
 

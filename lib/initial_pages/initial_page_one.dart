@@ -44,14 +44,12 @@ class InitialPageOneState extends State<InitialPageOne> with GetItStateMixin {
     services.unregister<DBManager>();
     services.unregister<PoWSource>();
 
-
     // register services
     initServices();
 
     await services.allReady();
     await _initSharedPref();
     await setupUserData();
-    services<WalletsService>().setActiveWallet(0);
   }
 
   Future<void> _initSharedPref() async {

@@ -368,7 +368,7 @@ class _sideDrawer extends State<sideDrawer>
     return SizedBox(
       width: double.infinity,
       child: TextButton(
-        onPressed: () {
+        onPressed: () async {
           // showDialog(
           //   context: context,
           //   builder: (BuildContext context) => Dialog(
@@ -378,11 +378,15 @@ class _sideDrawer extends State<sideDrawer>
           //     child: dialogWidget, // -- CHANGE LATER
           //   ),
           // );
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => pageRoute,
-            ),
-          );
+
+          await Navigator.of(context)
+              .push(
+                MaterialPageRoute(
+                  builder: (context) => pageRoute,
+                ),
+              )
+              .then((value) => setState(() {}));
+          setState(() {});
         },
         child: Column(
           children: [

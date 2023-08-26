@@ -61,7 +61,10 @@ Future<void> setupUserData() async {
     services<WalletsService>().setLatestWalletID(userValues[5]);
 
     //load wallets from DB
-    await loadWalletsFromDB();
+    String activeWalletName = userValues[3];
+    int activeAccountIndex = userValues[4];
+
+    await loadWalletsFromDB(activeWalletName, activeAccountIndex);
 
     // services<WalletsService>()
     //     .wallets[userValues[3]]
@@ -69,20 +72,11 @@ Future<void> setupUserData() async {
     // ---- for testing purposed, import from encyrpted storage in prod
 
     //set active wallet after creating / loading the wallet(s)
-    int activeWalletIndex = userValues[3];
-    int activeAccountIndex = userValues[4];
-    services<WalletsService>().activeWallet = activeWalletIndex;
-    //lazy way of making sure we dont try to set active account to something doesnt exist
-    if (activeAccountIndex <
-        services<WalletsService>().wallets[activeWalletIndex].accounts.length) {
-      services<WalletsService>()
-          .wallets[activeWalletIndex]
-          .setActiveIndex(activeAccountIndex);
-    }
   }
 }
 
-Future<void> loadWalletsFromDB() async {
+Future<void> loadWalletsFromDB(
+    String activeWalletName, int activeAccountIndex) async {
   int index = 0;
   var walletsData = await services<DBManager>().getWallets();
   for (var walletData in walletsData) {
@@ -95,6 +89,11 @@ Future<void> loadWalletsFromDB() async {
       original_name,
       active_index,
     );
+    if (original_name == activeWalletName) {
+      int walletslen = services<WalletsService>().wallets.length - 1;
+      services<WalletsService>().activeWallet = walletslen;
+    }
+
     if (kDebugMode) {
       // print("done loading wallet ${walletData['name']}");
     }
@@ -108,6 +107,16 @@ Future<void> loadWalletsFromDB() async {
       services<WalletsService>()
           .wallets[index]
           .importAccount(row['index_id'], row['index_name'], row['address']);
+    }
+    if (original_name == activeWalletName) {
+      int walletslen = services<WalletsService>().wallets.length - 1;
+      //lazy way of making sure we dont try to set active account to something doesnt exist
+      if (activeAccountIndex <
+          services<WalletsService>().wallets[walletslen].accounts.length) {
+        services<WalletsService>()
+            .wallets[walletslen]
+            .setActiveIndex(activeAccountIndex);
+      }
     }
 
     index++;

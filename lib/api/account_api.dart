@@ -82,46 +82,12 @@ class AccountAPI {
       print("ERR $decoded");
     }
 
-    print(response.statusCode);
-    print(response.body);
-    return response;
+    // print(response.statusCode);
+    // print(response.body);
+    return response.body;
   }
 
   /*
-//OPEN NEW
-   onPressed: () async {
-                var recRes = await getReceivables(account);
-                // print(recRes.body);
-                var data = jsonDecode(recRes.body);
-
-                var sign = await createOpenBlock(
-                    account,
-                    previous,
-                    representative,
-                    data[0]['amountRaw'],
-                    data[0]['hash'],
-                    privateKey);
-
-                print(sign);
-
-                Map<String, dynamic> block = {
-                  "type": "state",
-                  "account": account,
-                  "previous": previous,
-                  "representative": representative,
-                  "balance": data[0]['amountRaw'],
-                  "link": data[0]['hash'],
-                  "signature": sign,
-                  // "private"
-                };
-                processRequest(block);
-                //
-                // await openBlock();
-                // var a = await getHistory();
-      },
-
-
-
       // RECEIVE
 
       onPressed: () async {

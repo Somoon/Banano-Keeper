@@ -2,6 +2,7 @@
 import 'dart:ui';
 
 import 'package:bananokeeper/providers/localization_service.dart';
+import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/ui/import_wallet.dart';
 import 'package:bananokeeper/ui/pin/setup_pin.dart';
@@ -186,9 +187,10 @@ class InitialPageImportState extends State<InitialPageImport>
             await services<WalletsService>()
                 .createNewWallet(importSeedTextController.text);
             importSeedTextController.clear();
+            services<WalletsService>().setActiveWallet(0);
 
             services<WalletsService>().wallets[0].setActiveIndex(0);
-
+            services<SharedPrefsModel>().initliazeValues();
             setState(() {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -396,9 +398,10 @@ class InitialPageImportState extends State<InitialPageImport>
 
                 await services<WalletsService>().createNewWallet(seed);
                 importMnemonicTextController.clear();
+                services<WalletsService>().setActiveWallet(0);
 
                 services<WalletsService>().wallets[0].setActiveIndex(0);
-
+                services<SharedPrefsModel>().initliazeValues();
                 setState(() {
                   Navigator.of(context).push(
                     MaterialPageRoute(

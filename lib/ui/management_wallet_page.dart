@@ -787,9 +787,8 @@ class WalletManagementPageState extends State<WalletManagementPage>
             print(result);
           }
           if (result ?? false) {
-            setState(() {
-              services<WalletsService>().createNewWallet(seed);
-            });
+            await services<WalletsService>().createNewWallet(seed);
+            setState(() {});
           }
         },
         child: Text(

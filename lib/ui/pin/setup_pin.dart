@@ -151,9 +151,6 @@ class SetupPinState extends State<SetupPin> with GetItStateMixin {
                                           Navigator.of(context).pop();
                                         } else if (widget.nextPage ==
                                             "initial") {
-                                          services<SharedPrefsModel>()
-                                              .initliazeValues();
-
                                           Navigator.pushAndRemoveUntil(
                                               context,
                                               MaterialPageRoute(

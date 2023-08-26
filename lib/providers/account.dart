@@ -5,6 +5,7 @@
 // ignore_for_file: unused_import, prefer_conditional_assignment
 
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:bananokeeper/api/account_api.dart';
@@ -276,25 +277,14 @@ class Account extends ChangeNotifier {
     StateBlock openBlock =
         StateBlock(address, previous, representative, amountRaw, hash, sign);
 
-    // Map<String, dynamic> block = {
-    //   "type": "state",
-    //   "account": address,
-    //   "previous": previous,
-    //   "representative": representative,
-    //   "balance": amountRaw,
-    //   "link": hash,
-    //   "signature": sign,
-    //   // "private"
-    // };
-
     String hashResponse =
         await AccountAPI().processRequest(openBlock.toJson(), "open");
     if (kDebugMode) {
       print(hashResponse);
     }
-    //
-    // await openBlock();
-    // var a = await getHistory();
+    // too add to list
+    onRefreshUpdateHistory();
+    opened = true;
   }
 
   toMap() {
