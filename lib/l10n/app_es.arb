@@ -1,0 +1,43 @@
+{
+  "helloWorld": "Hello World!",
+  "@helloWorld": {
+    "description": "The conventional newborn programmer greeting"
+  },
+  "receive": "Receive",
+  "@receive": {
+    "description": "The conventional newborn programmer greeting"
+  },
+  "send": "Send",
+  "@send": {
+    "description": "The conventional newborn programmer greeting"
+  },
+  "address": "address",
+  "wallet":  "المحفظة",
+  "manageAccounts": "Manage Accounts",
+  "manageWallets": "Manage Wallets",
+  "add": "Add",
+  "addNo":"Add #",
+  "yes": "Yes",
+  "no": "No",
+  "renameAccountName": "Rename account name",
+  "renameWalletName": "Rename wallet name",
+  "rename": "Rename",
+  "create": "Create",
+  "import": "Import",
+  "close": "Close",
+  "cancel": "Cancel",
+  "next": "Next",
+  "back": "Back",
+  "backedNewWalletMSG": "I have backed up the new wallet {state}.",
+  "@backedNewWalletMSG": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "seed"
+      }
+    }
+  },
+  "copy": "Copy",
+  "verifyPIN": "Verify PIN"
+  
+}

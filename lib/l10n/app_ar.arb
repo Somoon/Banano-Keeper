@@ -1,0 +1,43 @@
+{
+  "helloWorld": "مرحبا",
+  "@helloWorld": {
+    "description": "The conventional newborn programmer greeting"
+  },
+  "receive": "أستقبل",
+  "@receive": {
+    "description": "The conventional newborn programmer greeting"
+  },
+  "send": "أرسل",
+  "@send": {
+    "description": "The conventional newborn programmer greeting"
+  },
+  "address": "العنوان",
+  "wallet":  "المحفظة",
+  "manageAccounts": "إدارة العناوين",
+  "manageWallets": "إدارة المحافظ",
+  "add": "أضف",
+  "addNo":"أضف #",
+  "yes": "نعم",
+  "no": "لا",
+  "renameAccountName": "إعادة تسمية الحساب",
+  "renameWalletName": "إعادة تسمية المحفظة",
+  "rename": "إعادة تسمية",
+  "create": "أصدر",
+  "import": "إستيراد",
+  "close": "غلق",
+  "next": "التالي",
+  "cancel": "Cancel",
+  "back": "العودة",
+  "backedNewWalletMSG": "I have backed up the new wallet {state}.",
+  "@backedNewWalletMSG": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "seed"
+      }
+    }
+  },
+  "copy": "نسخ",
+  "verifyPIN": "التحقق من الرمز الخاص"
+
+}
