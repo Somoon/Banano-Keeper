@@ -171,15 +171,15 @@ class Utils {
             displayNums(activeAccountBalance),
             style: TextStyle(color: currentTheme.text),
           ),
-          GestureDetector(
-            onTap: () {
-              //change currency showing here ------------------------
-            },
-            child: Text(
-              " (\$5)",
-              style: TextStyle(color: currentTheme.offColor),
-            ),
-          ),
+          // GestureDetector(
+          //   onTap: () {
+          //     //change currency showing here ------------------------
+          //   },
+          //   child: Text(
+          //     " (\$5)",
+          //     style: TextStyle(color: currentTheme.offColor),
+          //   ),
+          // ),
         ]);
   }
 

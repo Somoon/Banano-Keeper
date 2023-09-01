@@ -8,6 +8,7 @@ import 'package:bananokeeper/providers/pow_source.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/ui/dialogs/pow_dialog.dart';
+import 'package:bananokeeper/ui/dialogs/security_dialog.dart';
 import 'package:bananokeeper/ui/dialogs/themes_dialog.dart';
 import 'package:bananokeeper/ui/management_address_page.dart';
 import 'package:bananokeeper/ui/management_page.dart';
@@ -78,7 +79,8 @@ class _sideDrawer extends State<sideDrawer>
                 ),
                 createPrimaryDrawerButton(
                   AppLocalizations.of(context)!.manageAccounts,
-                  Utils().shortenAccount(currentAccount),
+                  // Utils().shortenAccount(currentAccount),
+                  account.name,
                   ManagementPage(
                     AccountManagementPage(),
                     AppLocalizations.of(context)!.manageAccounts,
@@ -86,15 +88,15 @@ class _sideDrawer extends State<sideDrawer>
                 ),
 
 ///////////////////////////////////////////////
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => DBTest(),
-                        ),
-                      );
-                    },
-                    child: const Text("DB TEST")),
+//                 TextButton(
+//                     onPressed: () {
+//                       Navigator.of(context).push(
+//                         MaterialPageRoute(
+//                           builder: (context) => DBTest(),
+//                         ),
+//                       );
+//                     },
+//                     child: const Text("DB TEST")),
                 // Text(
                 //   "NFTs",
                 //   style: TextStyle(
@@ -112,7 +114,7 @@ class _sideDrawer extends State<sideDrawer>
                       color: currentTheme.offColor,
                     )),
                 createDialogButton(
-                    "Representative", account.getRep(), ThemesDialog()),
+                    "Representative", account.getRep(), Text("")),
                 const Divider(
                   height: 15,
                   thickness: 2,
@@ -126,23 +128,16 @@ class _sideDrawer extends State<sideDrawer>
                     )),
                 // createDialogButton("Currency", "1", ThemesDialog()),
                 // createDialogButton("Min. to receive", "1", ThemesDialog()),
-                createDialogButton("PoW Source", selectedPoWName, PoWDialog()),
+
+                // Already done and working.
+                // createDialogButton("PoW Source", selectedPoWName, PoWDialog()),
 
                 // createDialogButton("Block Explorer", "1", ThemesDialog()),
                 // createDialogButton("Data Source", "1", ThemesDialog()),
 
                 createDialogButton("Themes", activeTheme, ThemesDialog()),
-                createDialogButton(
-                    "Security - PIN/PASS/BIO", "1", ThemesDialog()),
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => SetupPin("homepage"),
-                        ),
-                      );
-                    },
-                    child: const Text("this changes pin")),
+                createDialogButton("Security", "", SecurityDialog()),
+
                 createDialogButton("Language", activeLanguage, LangDialog()),
                 // createDialogButton("Contacts/Bookmark", "1", ThemesDialog()),
                 // createDialogButton("Notifications", "1", ThemesDialog()),
@@ -183,9 +178,9 @@ class _sideDrawer extends State<sideDrawer>
   }
 
   resetFn() async {
-    if (kDebugMode) {
-      print("1111111111111111111111111111111111111111111111111111111");
-    }
+    // if (kDebugMode) {
+    //   print("1111111111111111111111111111111111111111111111111111111");
+    // }
     services<DBManager>().deleteDatabase();
     Navigator.pushAndRemoveUntil(
         context,

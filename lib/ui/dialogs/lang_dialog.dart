@@ -36,7 +36,7 @@ class LangDialogState extends State<LangDialog> with GetItStateMixin {
               children: [
                 createLangButton("Arabic"),
                 createLangButton("English"),
-                createLangButton("Spanish"),
+                // createLangButton("Spanish"),
               ],
             ),
             const SizedBox(height: 15),

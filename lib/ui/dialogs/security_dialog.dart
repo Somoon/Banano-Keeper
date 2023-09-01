@@ -1,3 +1,6 @@
+import 'package:bananokeeper/providers/auth_biometric.dart';
+import 'package:bananokeeper/ui/pin/setup_pin.dart';
+import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:flutter/material.dart';
 
 import '../../providers/get_it_main.dart';
@@ -5,14 +8,14 @@ import '../../providers/shared_prefs_service.dart';
 import '../../themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 
-class ThemesDialog extends StatefulWidget with GetItStatefulWidgetMixin {
-  ThemesDialog({super.key});
+class SecurityDialog extends StatefulWidget with GetItStatefulWidgetMixin {
+  SecurityDialog({super.key});
 
   @override
-  ThemesDialogState createState() => ThemesDialogState();
+  SecurityDialogState createState() => SecurityDialogState();
 }
 
-class ThemesDialogState extends State<ThemesDialog> with GetItStateMixin {
+class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
   @override
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
@@ -33,10 +36,9 @@ class ThemesDialogState extends State<ThemesDialog> with GetItStateMixin {
           children: <Widget>[
             Column(
               children: [
-                createThemeButton("Yellow"),
-                createThemeButton("Dark"),
-                // createThemeButton("Second"),
-                createThemeButton("Slate"),
+                createChangePINButton("Change PIN"),
+                // createThemeButton("Login Auth"),
+                // createThemeButton("Change PIN"),
               ],
             ),
             const SizedBox(height: 15),
@@ -58,37 +60,43 @@ class ThemesDialogState extends State<ThemesDialog> with GetItStateMixin {
     );
   }
 
-  Widget createThemeButton(label) {
+  Widget createChangePINButton(label) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     return SizedBox(
       width: double.infinity,
       child: TextButton(
-        onPressed: () {
-          _setTheme(label);
+        onPressed: () async {
+          bool canauth = await BiometricUtil().canAuth();
+          bool verified = false;
+
+          if (!canauth) {
+            verified = await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => VerifyPIN(),
+              ),
+            );
+          } else {
+            verified = await BiometricUtil()
+                .authenticate("Authenticate to change PIN.");
+          }
+
+          if (verified) {
+            setState(() {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SetupPin("homepage"),
+                ),
+              );
+            });
+          }
           setState(() {});
           // Navigator.pop(context);
         },
         child: Text(
           label,
-          style: TextStyle(
-              color: (getTextColor(label)
-                  ? currentTheme.text
-                  : currentTheme.textDisabled)),
+          style: TextStyle(color: currentTheme.text),
         ),
       ),
     );
-  }
-
-  getTextColor(themeName) {
-    var activeTheme = watchOnly((ThemeModel x) => x.activeTheme);
-    if (activeTheme == themeName) return false;
-    return true;
-  }
-
-  void _setTheme(String themeName) {
-    setState(() {
-      services<ThemeModel>().setTheme(themeName);
-      services<SharedPrefsModel>().saveTheme(themeName);
-    });
   }
 }

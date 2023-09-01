@@ -209,8 +209,12 @@ class _home_body extends State<home_body>
                           Expanded(
                             flex: 1,
                             child: Center(
-                              child: blurBalance(blurred,
-                                  displayBalance(account, currentTheme)),
+                              child: blurBalance(
+                                blurred,
+                                Utils().formatBalance(
+                                    account.getBalance(), currentTheme),
+                              ),
+                              // displayBalance(account, currentTheme)),
                             ),
                           )
                         ],
