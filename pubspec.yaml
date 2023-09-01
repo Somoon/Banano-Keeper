@@ -63,6 +63,9 @@ dependencies:
   json_annotation: ^4.8.1
   sqflite_common_ffi: ^2.3.0+2
   decimal: ^2.3.3
+  flutter_native_splash: ^2.3.2
+  flutter_launcher_icons: ^0.13.1
+  rename: ^2.1.1
 #  cryptography: ^2.5.0
 #   banano_library:
 #     path: local_packages/banano_library
@@ -95,6 +98,7 @@ flutter:
     - images/banano.png
     - images/nano.png
     - images/greymonkey.png
+    - images/icon.png
 
   generate: true
 

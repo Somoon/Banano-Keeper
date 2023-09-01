@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = bananokeeper
+PRODUCT_NAME = Banano Keeper;
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = app.moonano.bananokeeper.bananokeeper
+PRODUCT_BUNDLE_IDENTIFIER = app.moonano.bananokeeper;
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2023 app.moonano.bananokeeper. All rights reserved.

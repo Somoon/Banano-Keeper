@@ -178,7 +178,7 @@ class ActiveAccountState extends State<ActiveAccount>
     }
   }
 
-  Row displayBalance(Account account, BaseTheme currentTheme) {
+  Widget displayBalance(Account account, BaseTheme currentTheme) {
     num activeAccountBalance = watchOnly((WalletsService x) => x
         .wallets[x.activeWallet]
         .accounts[x.wallets[x.activeWallet].getActiveIndex()]
@@ -186,34 +186,7 @@ class ActiveAccountState extends State<ActiveAccount>
     if (kDebugMode) {
       print("ACTIVE ADDRESS: $activeAccountBalance");
     }
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        //Center Row contents horizontally,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        //Center Row contents vertically,
-        children: <Widget>[
-          // ------------------ change image Icons between BANANO/XNO
-          Image.asset(
-            width: 12,
-            'images/banano.png',
-          ),
-          const SizedBox(
-            width: 4,
-          ),
-          Text(
-            Utils().displayNums(activeAccountBalance),
-            style: TextStyle(color: currentTheme.text),
-          ),
-          GestureDetector(
-            onTap: () {
-              //change currency showing here ------------------------
-            },
-            child: Text(
-              " (\$5)",
-              style: TextStyle(color: currentTheme.offColor),
-            ),
-          ),
-        ]);
+    return Utils().formatBalance(activeAccountBalance, currentTheme);
   }
 
   List<PopupMenuEntry> createDropDownMenuItems() {

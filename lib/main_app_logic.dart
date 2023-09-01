@@ -74,7 +74,6 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
 
     return Scaffold(
       //--------------- Side Drawer -----------------------
-
       //make it width - (20% of width)
       drawerEdgeDragWidth: 300,
       drawer: SizedBox(

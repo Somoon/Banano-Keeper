@@ -84,5 +84,5 @@ class _SendMenu1 extends State<SendMenu1> with WidgetsBindingObserver {
     );
   }
 
-  // Widget buildMainSettings(BuildContext context) {}
+// Widget buildMainSettings(BuildContext context) {}
 }

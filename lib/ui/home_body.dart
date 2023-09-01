@@ -40,79 +40,86 @@ class _home_body extends State<home_body>
     String currentAccount =
         watchX((WalletsService x) => x.wallets[x.activeWallet].currentAccount);
     double width = MediaQuery.of(context).size.width;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        // ActiveAccount(),
-        FutureBuilder(
-          future: account.getOverview(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              if (account.overviewResp.isEmpty && account.getBalance() == 0) {
+    double height = MediaQuery.of(context).size.height;
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: height,
+        maxWidth: width,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          // ActiveAccount(),
+          FutureBuilder(
+            future: account.getOverview(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                if (account.overviewResp.isEmpty && account.getBalance() == 0) {
+                  return displayActiveCard(currentTheme, width, currentAccount,
+                      account, wallet, true);
+                }
+              } else if (snapshot.connectionState == ConnectionState.done) {
+                account.handleOverviewResponse();
+                // If we got an error
+                if (snapshot.hasError) {
+                  return displayActiveCard(currentTheme, width, currentAccount,
+                      account, wallet, true);
+                }
+              }
+              if (account.history.isEmpty) {
                 return displayActiveCard(
                     currentTheme, width, currentAccount, account, wallet, true);
+              } else {
+                return displayActiveCard(currentTheme, width, currentAccount,
+                    account, wallet, false);
               }
-            } else if (snapshot.connectionState == ConnectionState.done) {
-              account.handleOverviewResponse();
-              // If we got an error
-              if (snapshot.hasError) {
-                return displayActiveCard(
-                    currentTheme, width, currentAccount, account, wallet, true);
-              }
-            }
-            if (account.history.isEmpty) {
-              return displayActiveCard(
-                  currentTheme, width, currentAccount, account, wallet, true);
-            } else {
-              return displayActiveCard(
-                  currentTheme, width, currentAccount, account, wallet, false);
-            }
-          },
-        ),
-        // -------------TRANSACTIONS TEXT
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Transactions",
-                textDirection: TextDirection.ltr,
-                style: TextStyle(color: currentTheme.text, fontSize: 24),
-              ),
-              // if (account.hasReceivables) ...[
-              //   Container(
-              //     width: 30,
-              //     child: IconButton(
-              //       style: ButtonStyle(
-              //         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              //           RoundedRectangleBorder(
-              //             borderRadius: BorderRadius.circular(30.0),
-              //             side: BorderSide(color: currentTheme.text),
-              //           ),
-              //         ),
-              //       ),
-              //       splashRadius: 9,
-              //       onPressed: () {
-              //         print("i am supposed to be doing magic");
-              //       },
-              //       icon: Text(
-              //         "+",
-              //         style: TextStyle(
-              //           color: currentTheme.text,
-              //           fontSize: currentTheme.fontSize - 2,
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-              // ]
-            ],
+            },
           ),
-        ),
+          // -------------TRANSACTIONS TEXT
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Transactions",
+                  textDirection: TextDirection.ltr,
+                  style: TextStyle(color: currentTheme.text, fontSize: 24),
+                ),
+                // if (account.hasReceivables) ...[
+                //   Container(
+                //     width: 30,
+                //     child: IconButton(
+                //       style: ButtonStyle(
+                //         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                //           RoundedRectangleBorder(
+                //             borderRadius: BorderRadius.circular(30.0),
+                //             side: BorderSide(color: currentTheme.text),
+                //           ),
+                //         ),
+                //       ),
+                //       splashRadius: 9,
+                //       onPressed: () {
+                //         print("i am supposed to be doing magic");
+                //       },
+                //       icon: Text(
+                //         "+",
+                //         style: TextStyle(
+                //           color: currentTheme.text,
+                //           fontSize: currentTheme.fontSize - 2,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ]
+              ],
+            ),
+          ),
 
-        transactionsBody(),
-      ],
+          transactionsBody(),
+        ],
+      ),
     );
   }
 
@@ -173,7 +180,7 @@ class _home_body extends State<home_body>
                                 setState(() {});
                               },
                               itemBuilder: (BuildContext context) =>
-                                  createDropDownMenuItems(),
+                                  createDropDownMenuItems(wallet, currentTheme),
                               child: SizedBox(
                                 width: double.infinity,
                                 child: Center(
@@ -231,13 +238,6 @@ class _home_body extends State<home_body>
   }
 
   Row displayBalance(Account account, BaseTheme currentTheme) {
-    num activeAccountBalance = watchOnly((WalletsService x) => x
-        .wallets[x.activeWallet]
-        .accounts[x.wallets[x.activeWallet].getActiveIndex()]
-        .getBalance());
-    if (kDebugMode) {
-      print("ACTIVE ADDRESS: $activeAccountBalance");
-    }
     return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         //Center Row contents horizontally,
@@ -253,7 +253,7 @@ class _home_body extends State<home_body>
             width: 4,
           ),
           Text(
-            Utils().displayNums(activeAccountBalance),
+            Utils().displayNums(account.getBalance()),
             style: TextStyle(color: currentTheme.text),
           ),
           GestureDetector(
@@ -268,9 +268,10 @@ class _home_body extends State<home_body>
         ]);
   }
 
-  List<PopupMenuEntry> createDropDownMenuItems() {
-    var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-    var wallet = watchOnly((WalletsService x) => x.wallets[x.activeWallet]);
+  List<PopupMenuEntry> createDropDownMenuItems(
+      WalletService wallet, BaseTheme currentTheme) {
+    // var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
+    // var wallet = watchOnly((WalletsService x) => x.wallets[x.activeWallet]);
 
     var ddmi = <PopupMenuEntry>[];
     for (int i = 0; i < wallet.accounts.length; i++) {
@@ -278,7 +279,7 @@ class _home_body extends State<home_body>
         value: i,
         child: Text(
           wallet.accounts[i].getAddress().substring(0, 16),
-          style: currentTheme.textStyle.copyWith(fontSize: 14),
+          style: currentTheme.textStyle.copyWith(fontSize: 14.0),
         ),
       ));
     }

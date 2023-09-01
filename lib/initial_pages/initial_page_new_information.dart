@@ -76,15 +76,16 @@ class InitialPageInformationState extends State<InitialPageInformation>
       }
     }
     Widget mnemonicWidget = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: oddWords,
         ),
-        SizedBox(
-          width: 50,
-        ),
+        // SizedBox(
+        //   width: 30,
+        // ),
         Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,7 +233,7 @@ class InitialPageInformationState extends State<InitialPageInformation>
                       child: Row(
                         children: [
                           Checkbox(
-                            checkColor: currentTheme.textDisabled,
+                            checkColor: currentTheme.text,
                             fillColor:
                                 MaterialStateProperty.resolveWith(getColor),
                             value: isCheckedNewWallet,
@@ -338,6 +339,6 @@ class InitialPageInformationState extends State<InitialPageInformation>
   Color getColor(Set<MaterialState> states) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
 
-    return currentTheme.text;
+    return currentTheme.textDisabled;
   }
 }

@@ -48,40 +48,44 @@ class _transactionsBody extends State<transactionsBody>
               PointerDeviceKind.mouse,
             },
           ),
-          child: FutureBuilder(
-            future: account.getHistory(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                if (account.history.isEmpty) {
-                  return TransactionsPlaceholder();
-                }
-                //return const CircularProgressIndicator();
-              } else if (snapshot.connectionState == ConnectionState.done) {
-                if (!account.completed) {
-                  account.handleResponse();
-                }
-                // If we got an error
-                if (snapshot.hasError) {
-                  return TransactionsPlaceholder();
-                  // Center(
-                  //   child: Text(
-                  //     '${snapshot.error} occurred',
-                  //     style: const TextStyle(fontSize: 18),
-                  //   ),
-                  // );
-                }
-              }
-              if (account.history.isEmpty) {
-                return unopenedCard();
-              } else {
-                return _transListViewBuilder(account);
-              }
-              // else if (snapshot.hasData) {
-              //   return _transListViewBuilder();
-              // } else {
-              //   return const Text("No data available");
-              // }
-            },
+          child: Column(
+            children: [
+              FutureBuilder(
+                future: account.getHistory(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    if (account.history.isEmpty) {
+                      return TransactionsPlaceholder();
+                    }
+                    //return const CircularProgressIndicator();
+                  } else if (snapshot.connectionState == ConnectionState.done) {
+                    if (!account.completed) {
+                      account.handleResponse();
+                    }
+                    // If we got an error
+                    if (snapshot.hasError) {
+                      return TransactionsPlaceholder();
+                      // Center(
+                      //   child: Text(
+                      //     '${snapshot.error} occurred',
+                      //     style: const TextStyle(fontSize: 18),
+                      //   ),
+                      // );
+                    }
+                  }
+                  if (account.history.isEmpty) {
+                    return unopenedCard();
+                  } else {
+                    return _transListViewBuilder(account);
+                  }
+                  // else if (snapshot.hasData) {
+                  //   return _transListViewBuilder();
+                  // } else {
+                  //   return const Text("No data available");
+                  // }
+                },
+              ),
+            ],
           ),
         ),
       ),

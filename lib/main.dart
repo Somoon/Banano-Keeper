@@ -16,6 +16,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main_app_logic.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 //for debug prints kDebugMode
 import 'package:flutter/foundation.dart';
@@ -124,7 +125,8 @@ Future<void> loadWalletsFromDB(
 }
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // register services
   initServices();
@@ -135,6 +137,9 @@ void main() async {
   // Setup firebase
   // await Firebase.initializeApp();
   // Run app
+
+  //remove splash ready to start
+  FlutterNativeSplash.remove();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(
