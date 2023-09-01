@@ -308,7 +308,10 @@ class AccountManagementPageState extends State<AccountManagementPage>
                         renameController.clear();
                         Navigator.pop(context);
                       },
-                      child: Text(appLocalizations.close ?? ""),
+                      child: Text(
+                        appLocalizations.close ?? "",
+                        style: TextStyle(color: currentTheme.text),
+                      ),
                     ),
                   ],
                 ),

@@ -313,7 +313,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                                   Navigator.pop(context);
                                 },
                                 child: Text(
-                                  AppLocalizations.of(context)!.rename,
+                                  AppLocalizations.of(context)!.close,
                                   style: TextStyle(color: currentTheme.text),
                                 ),
                               ),

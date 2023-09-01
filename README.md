@@ -1,16 +1,19 @@
-# bananokeeper
+# Banano Keeper
 
-a Banano and Nano cross-platform wallet
 
-## Getting Started
+Banano Keeper is a multi-wallet for Banano cryptocurrncy for Android, iOS and windows.
 
-This project is a starting point for a Flutter application.
+it features:
+- Creating a new or importing an existing wallet.
+- Local wallet backup
+- View transactions of your accounts.
+- Send and receive banano.
+- Scan QR Code to send.
+- Set account-specific representative.
+- Authentication using pin and/or biometric.
+- Enable/Disable auth on startup.
+- Change PIN
+- Themes (more to come).
+- Languages support (more to come).
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+currently, only Android version compiled and ready to be tested
