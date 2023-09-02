@@ -41,7 +41,7 @@ class AccountAPI {
     return response;
   }
 
-  getReceivables(String address) async {
+  getReceivables(String address, [size = 10]) async {
     String apiURL =
         'https://api.spyglass.pw/banano/v1/account/receivable-transactions';
     http.Response response = await http.post(
@@ -51,6 +51,7 @@ class AccountAPI {
       },
       body: jsonEncode(<String, dynamic>{
         'address': address,
+        'size': size,
       }),
     );
 
@@ -83,9 +84,45 @@ class AccountAPI {
     }
 
     // print(response.statusCode);
-    // print(response.body);
+    print(response.body);
     return response.body;
   }
+
+  /*
+  //get current balance
+        var accOverview = await getOverview(account);
+        var accOverviewData = jsonDecode(accOverview.body);
+        balance = accOverviewData['balanceRaw'];
+
+        String sendAmountRaw = getAmountAsRaw("0.01");
+        String destAddress =
+            "ban_14xjizffqiwjamztn4edhmbinnaxuy4fzk7c7d6gywxigydrrxftp4qgzabh";
+
+        var hist = await getHistory(account, 1);
+        var historyData = jsonDecode(hist.body);
+        previous = historyData[0]['hash'];
+
+        var newRaw =
+            (BigInt.parse(balance) - BigInt.parse(sendAmountRaw))
+                .toString();
+
+        var sign = await createOpenBlock(account, previous,
+            representative, newRaw, destAddress, privateKey);
+
+        print(sign);
+
+        Map<String, dynamic> block = {
+          "type": "state",
+          "account": account,
+          "previous": previous,
+          "representative": representative,
+          "balance": newRaw,
+          "link": destAddress,
+          "signature": sign,
+          // "private"
+        };
+        processRequest(block, "send");
+   */
 
   /*
       // RECEIVE

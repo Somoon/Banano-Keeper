@@ -1,4 +1,10 @@
 // import 'dart:async';
+import 'dart:convert';
+
+import 'package:bananokeeper/api/account_api.dart';
+import 'package:bananokeeper/api/state_block.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:decimal/decimal.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/providers/account.dart';
@@ -30,6 +36,8 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
   final amountController = TextEditingController();
   FocusNode amountControllerFocusNode = FocusNode();
 
+  bool validAddr = false;
+  bool validAmount = false;
   @override
   void dispose() {
     addressController.dispose();
@@ -100,11 +108,12 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
       onPressed: () async {
         final LocalAuthentication auth = LocalAuthentication();
         var appLocalizations = AppLocalizations.of(context);
-        num activeAccountBalance = watchOnly((WalletsService x) => x
+        String activeAccountBalance = watchOnly((WalletsService x) => x
             .wallets[x.activeWallet]
             .accounts[x.wallets[x.activeWallet].getActiveIndex()]
             .getBalance());
-        showModalBottomSheet<void>(
+        bool sent = false;
+        sent = await showModalBottomSheet(
           enableDrag: true,
           isScrollControlled: true,
           context: context,
@@ -113,122 +122,145 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
           ),
           backgroundColor: currentTheme.primary,
           builder: (BuildContext context) {
-            return GestureDetector(
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: currentTheme.primary,
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  color: currentTheme.primary,
-                ),
-                // color: currentTheme.primary,
-                child: SizedBox(
-                  height: height / 1.25,
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(top: 10),
-                          height: 5,
-                          width: MediaQuery.of(context).size.width * 0.15,
-                          decoration: BoxDecoration(
-                            color: currentTheme.secondary,
-                            borderRadius: BorderRadius.circular(100.0),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+            return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return GestureDetector(
+                  onTap: () {
+                    FocusScope.of(context).unfocus();
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: currentTheme.primary,
+                      ),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      color: currentTheme.primary,
+                    ),
+                    // color: currentTheme.primary,
+                    child: SizedBox(
+                      height: height / 1.25,
+                      child: Center(
+                        child: Column(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                right: 10,
+                            Container(
+                              margin: const EdgeInsets.only(top: 10),
+                              height: 5,
+                              width: MediaQuery.of(context).size.width * 0.15,
+                              decoration: BoxDecoration(
+                                color: currentTheme.secondary,
+                                borderRadius: BorderRadius.circular(100.0),
                               ),
-                              child: SizedBox(
-                                child: TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(context);
-                                  },
-                                  style: ButtonStyle(
-                                    foregroundColor:
-                                        MaterialStatePropertyAll<Color>(
-                                            currentTheme.textDisabled),
-                                    // backgroundColor:
-                                    //     MaterialStatePropertyAll<
-                                    //         Color>(primary),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: 10,
                                   ),
-                                  child: const Icon(Icons.close),
-                                ),
+                                  child: SizedBox(
+                                    child: TextButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          amountController.clear();
+                                          addressController.clear();
+                                          Navigator.of(context).pop(context);
+                                        });
+                                      },
+                                      style: ButtonStyle(
+                                        foregroundColor:
+                                            MaterialStatePropertyAll<Color>(
+                                                currentTheme.textDisabled),
+                                        // backgroundColor:
+                                        //     MaterialStatePropertyAll<
+                                        //         Color>(primary),
+                                      ),
+                                      child: const Icon(Icons.close),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 15, right: 15),
+                              child: Column(
+                                children: [
+                                  AutoSizeText(
+                                    AppLocalizations.of(context)!.send,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      color: currentTheme.text,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  AutoSizeText(
+                                    account.name,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: currentTheme.text,
+                                      fontFamily: 'monospace',
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 25, right: 25),
+                                    child: Utils().colorffix(
+                                        account.address, currentTheme),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Utils().formatBalance(
+                                      activeAccountBalance, currentTheme),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  sendAddressTextField(currentTheme),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  sendAmountTextField(account, currentTheme),
+                                  const SizedBox(
+                                    height: 40,
+                                  ),
+                                  createSendButton(account, currentTheme,
+                                      appLocalizations, width),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  createQRButton(
+                                      currentTheme, appLocalizations, width),
+                                ],
                               ),
-                            )
+                            ),
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15, right: 15),
-                          child: Column(
-                            children: [
-                              AutoSizeText(
-                                "Send",
-                                maxLines: 1,
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: currentTheme.text,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              AutoSizeText(
-                                account.name,
-                                maxLines: 1,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: currentTheme.text,
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 25, right: 25),
-                                child: Utils()
-                                    .colorffix(account.address, currentTheme),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Utils().formatBalance(
-                                  activeAccountBalance, currentTheme),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              sendAddressTextField(currentTheme),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              sendAmountTextField(currentTheme),
-                              const SizedBox(
-                                height: 40,
-                              ),
-                              createSendButton(
-                                  currentTheme, appLocalizations, width),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              createQRButton(
-                                  currentTheme, appLocalizations, width),
-                            ],
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         );
-        setState(() {});
+        addressController.clear();
+        amountController.clear();
+        if (sent) {
+          print("INSIDE SENT");
+          await account.onRefreshUpdateHistory();
+          await account.getOverview(true);
+          await account.handleOverviewResponse(true);
+        }
+        sent = false;
+        setState(() {
+          update = !update;
+        });
       },
       child: SizedBox(
         width: width / 3.5,
@@ -251,6 +283,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
     );
   }
 
+  bool update = false;
   TextButton receiveTextButton(BaseTheme currentTheme, BuildContext context,
       double height, double width, Account account) {
     return TextButton(
@@ -276,12 +309,12 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                 border: Border.all(
                   color: currentTheme.primary,
                 ),
-                borderRadius: BorderRadius.all(Radius.circular(20)),
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
                 color: currentTheme.primary,
               ),
               // color: currentTheme.primary,
               child: SizedBox(
-                height: height / 1.25,
+                height: height / 1.55,
                 child: Center(
                   child: Column(
                     children: [
@@ -304,6 +337,8 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                             child: SizedBox(
                               child: TextButton(
                                 onPressed: () {
+                                  amountController.clear();
+                                  addressController.clear();
                                   Navigator.of(context).pop(context);
                                 },
                                 style: ButtonStyle(
@@ -427,7 +462,8 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
     );
   }
 
-  Widget createSendButton(currentTheme, appLocalizations, width) {
+  Widget createSendButton(
+      Account account, currentTheme, appLocalizations, width) {
     return SizedBox(
       height: 48,
       width: width - 40,
@@ -450,11 +486,62 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
           ),
         ),
         onPressed: () async {
-          if (addressController.text.length > 1 &&
-              amountController.text.length > 1) {}
+          if (amountController.text != "" &&
+              NanoAccounts.isValid(
+                  NanoAccountType.BANANO, addressController.text)) {
+            Decimal amount = Decimal.parse(amountController.text);
+
+            var maxAmount = Utils().amountFromRaw(account.getBalance());
+            if ((amount > Decimal.parse("0") && amount <= maxAmount)) {
+              //get latest bal
+              print("on click SEND button");
+              await account.getOverview(true);
+              await account.handleOverviewResponse(true);
+
+              String sendAmountRaw =
+                  Utils().rawFromAmount(amountController.text);
+              String destAddress = addressController.text;
+              var hist = await AccountAPI().getHistory(account.address, 1);
+              var historyData = jsonDecode(hist.body);
+              String previous = historyData[0]['hash'];
+
+              var newRaw = (BigInt.parse(account.getBalance()) -
+                      BigInt.parse(sendAmountRaw))
+                  .toString();
+              print("newRaw $newRaw");
+
+              int accountType = NanoAccountType.BANANO;
+              String calculatedHash = NanoBlocks.computeStateHash(
+                  accountType,
+                  account.address,
+                  previous,
+                  account.representative,
+                  BigInt.parse(newRaw),
+                  destAddress);
+              int activeWallet = services<WalletsService>().activeWallet;
+              String privateKey = services<WalletsService>()
+                  .wallets[activeWallet]
+                  .getPrivateKey(account.index);
+              // Signing a block
+              String sign =
+                  NanoSignatures.signBlock(calculatedHash, privateKey);
+
+              StateBlock sendBlock = StateBlock(account.address, previous,
+                  account.representative, newRaw, destAddress, sign);
+
+              await AccountAPI().processRequest(sendBlock.toJson(), "send");
+              await account.setBalance(newRaw);
+              await account.onRefreshUpdateHistory();
+              setState(() {
+                amountController.clear();
+                addressController.clear();
+                Navigator.of(context).pop(true);
+              });
+            }
+          }
         },
         child: AutoSizeText(
-          "Send",
+          AppLocalizations.of(context)!.send,
           style: TextStyle(
             color: currentTheme.text,
             fontSize: currentTheme.fontSize,
@@ -553,7 +640,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
     );
   }
 
-  TextFormField sendAmountTextField(BaseTheme currentTheme) {
+  TextFormField sendAmountTextField(Account account, BaseTheme currentTheme) {
     return TextFormField(
       keyboardType: TextInputType.number,
       textAlign: TextAlign.center,
@@ -570,7 +657,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
         isDense: true,
         isCollapsed: true,
         contentPadding: const EdgeInsets.only(
-          left: 8,
+          // left: 8,
           right: 8,
         ),
         hintText: "Enter Amount",
@@ -582,31 +669,36 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
         // hintStyle:
         //     TextStyle(color: currentTheme.textDisabled),
 
-        suffixIcon: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size(15, 30),
-            backgroundColor: currentTheme.primaryBottomBar,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0),
+        suffixIcon: Container(
+          margin: const EdgeInsets.all(8),
+          // width: 15,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              minimumSize: const Size(15, 35),
+              backgroundColor: currentTheme.primaryBottomBar,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.0),
+              ),
             ),
-          ),
-          child: Icon(
-            Icons.paste_outlined,
-            color: currentTheme.text,
-          ),
-          onPressed: () async {
-            ClipboardData? cdata =
-                await Clipboard.getData(Clipboard.kTextPlain);
-            String copiedText = cdata?.text ?? "";
-            bool isCorrectHex =
-                NanoAccounts.isValid(NanoAccountType.BANANO, copiedText);
+            child: Icon(
+              Icons.paste_outlined,
+              color: currentTheme.text,
+            ),
+            onPressed: () async {
+              Decimal? isNum;
+              ClipboardData? cdata =
+                  await Clipboard.getData(Clipboard.kTextPlain);
+              try {
+                isNum = Decimal.parse(cdata?.text ?? "");
+              } catch (_) {}
 
-            setState(() {
-              if (isCorrectHex) {
-                amountController.text = copiedText;
-              }
-            });
-          },
+              setState(() {
+                if (isNum != null) {
+                  amountController.text = isNum.toString();
+                }
+              });
+            },
+          ),
         ),
         prefixIcon: Container(
           margin: const EdgeInsets.all(8),
@@ -627,28 +719,47 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
               maxFontSize: 10,
               minFontSize: 7,
             ),
-            onPressed: () async {
-              ClipboardData? cdata =
-                  await Clipboard.getData(Clipboard.kTextPlain);
-              String copiedText = cdata?.text ?? "";
-              bool isCorrectHex =
-                  NanoAccounts.isValid(NanoAccountType.BANANO, copiedText);
-
+            onPressed: () {
               setState(() {
-                if (isCorrectHex) {
-                  addressController.text = copiedText;
-                }
+                amountController.text = Utils()
+                    .amountFromRaw(account.getBalance())
+                    .toStringAsFixed(2);
               });
             },
           ),
         ),
       ),
-      // autovalidateMode: AutovalidateMode.always,
-      // validator: (value) {
-      //   return value!.length > 64
-      //       ? 'Wallet name length can be up to 20 characters.'
-      //       : null;
-      // },
+      autovalidateMode: AutovalidateMode.always,
+      validator: (value) {
+        if (value != null) {
+          Decimal? valueInt = Decimal.tryParse(value);
+
+          try {
+            if (valueInt != null) {
+              var maxAmount = Utils().amountFromRaw(account.getBalance());
+              if (valueInt == Decimal.parse("0")) {
+                validAmount = false;
+                return "Error: amount can't be zero.";
+              }
+              if (valueInt < Decimal.parse("0")) {
+                validAmount = false;
+                return "Error: amount can't be negative.";
+              }
+              if (valueInt > maxAmount) {
+                validAmount = false;
+                return "Error: amount can't be more than balance.";
+              }
+
+              setState(() {
+                validAmount = true;
+                print('amount ok $validAmount');
+              });
+            }
+          } catch (_) {}
+        }
+        validAmount = false;
+        return null;
+      },
       style: TextStyle(color: currentTheme.text),
     );
   }
@@ -685,15 +796,17 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
 
         suffixIcon: Container(
           margin: const EdgeInsets.all(8),
+          // width: 15,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(15, 30),
+              minimumSize: const Size(15, 35),
               backgroundColor: currentTheme.primaryBottomBar,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30.0),
               ),
             ),
             child: Icon(
+              size: 18,
               Icons.paste_outlined,
               color: currentTheme.text,
             ),
@@ -716,16 +829,24 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
       autovalidateMode: AutovalidateMode.always,
       validator: (value) {
         if (value != null) {
-          if (NanoAccounts.isValid(NanoAccountType.BANANO, value)) {
-            if (value.length != 64) {
-              return 'Wallet name length can be up to 20 characters.';
+          if (value.length >= 64) {
+            if (NanoAccounts.isValid(NanoAccountType.BANANO, value)) {
+              validAddr = true;
+              print("ADDR OK $validAddr");
+            } else {
+              validAddr = false;
+              return 'Error: Incorrect ban address.';
             }
           }
         }
-
+        validAddr = false;
         return null;
       },
-      style: TextStyle(color: currentTheme.text),
+      style: TextStyle(
+        color: currentTheme.text,
+        fontFamily: 'monospace',
+        fontSize: 13,
+      ),
     );
   }
 }

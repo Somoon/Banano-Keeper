@@ -186,8 +186,8 @@ class InitialPageImportState extends State<InitialPageImport>
 
             await services<WalletsService>()
                 .createNewWallet(importSeedTextController.text);
-            importSeedTextController.clear();
-            services<WalletsService>().setActiveWallet(0);
+            // importSeedTextController.clear();
+            await services<WalletsService>().setActiveWallet(0);
 
             services<WalletsService>().wallets[0].setActiveIndex(0);
             services<SharedPrefsModel>().initliazeValues();

@@ -147,8 +147,8 @@ class Utils {
     );
   }
 
-  String displayNums(num number) {
-    return number.toStringAsFixed(2).replaceAllMapped(
+  String displayNums(String number) {
+    return amountFromRaw(number).toString().replaceAllMapped(
         RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
   }
 

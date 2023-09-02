@@ -179,10 +179,11 @@ class ActiveAccountState extends State<ActiveAccount>
   }
 
   Widget displayBalance(Account account, BaseTheme currentTheme) {
-    num activeAccountBalance = watchOnly((WalletsService x) => x
+    String activeAccountBalance = watchOnly((WalletsService x) => x
         .wallets[x.activeWallet]
         .accounts[x.wallets[x.activeWallet].getActiveIndex()]
         .getBalance());
+
     if (kDebugMode) {
       print("ACTIVE ADDRESS: $activeAccountBalance");
     }

@@ -105,9 +105,14 @@ Future<void> loadWalletsFromDB(
         await services<DBManager>().getWalletData(original_name);
     for (var row in walletIndices) {
       // print(row);
-      services<WalletsService>()
-          .wallets[index]
-          .importAccount(row['index_id'], row['index_name'], row['address']);
+      services<WalletsService>().wallets[index].importAccount(
+            row['index_id'],
+            row['index_name'],
+            row['address'],
+            row['balance'],
+            int.parse(row['last_update']),
+            row['representative'],
+          );
     }
     if (original_name == activeWalletName) {
       int walletslen = services<WalletsService>().wallets.length - 1;

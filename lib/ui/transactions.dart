@@ -4,12 +4,13 @@ import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/api/account_history_response.dart';
 import 'package:bananokeeper/placeholders/transctions.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 
-import '../themes.dart';
+import 'package:bananokeeper/themes.dart';
 
 class transactionsBody extends StatefulWidget with GetItStatefulWidgetMixin {
   transactionsBody({super.key});
@@ -48,44 +49,44 @@ class _transactionsBody extends State<transactionsBody>
               PointerDeviceKind.mouse,
             },
           ),
-          child: Column(
-            children: [
-              FutureBuilder(
-                future: account.getHistory(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    if (account.history.isEmpty) {
-                      return TransactionsPlaceholder();
-                    }
-                    //return const CircularProgressIndicator();
-                  } else if (snapshot.connectionState == ConnectionState.done) {
-                    if (!account.completed) {
-                      account.handleResponse();
-                    }
-                    // If we got an error
-                    if (snapshot.hasError) {
-                      return TransactionsPlaceholder();
-                      // Center(
-                      //   child: Text(
-                      //     '${snapshot.error} occurred',
-                      //     style: const TextStyle(fontSize: 18),
-                      //   ),
-                      // );
-                    }
-                  }
+          child: Container(
+            child: //[
+                FutureBuilder(
+              future: account.getHistory(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   if (account.history.isEmpty) {
-                    return unopenedCard();
-                  } else {
-                    return _transListViewBuilder(account);
+                    return TransactionsPlaceholder();
                   }
-                  // else if (snapshot.hasData) {
-                  //   return _transListViewBuilder();
-                  // } else {
-                  //   return const Text("No data available");
-                  // }
-                },
-              ),
-            ],
+                  //return const CircularProgressIndicator();
+                } else if (snapshot.connectionState == ConnectionState.done) {
+                  if (!account.completed) {
+                    account.handleResponse();
+                  }
+                  // If we got an error
+                  if (snapshot.hasError) {
+                    return TransactionsPlaceholder();
+                    // Center(
+                    //   child: Text(
+                    //     '${snapshot.error} occurred',
+                    //     style: const TextStyle(fontSize: 18),
+                    //   ),
+                    // );
+                  }
+                }
+                if (account.history.isEmpty) {
+                  return unopenedCard();
+                } else {
+                  return _transListViewBuilder(account);
+                }
+                // else if (snapshot.hasData) {
+                //   return _transListViewBuilder();
+                // } else {
+                //   return const Text("No data available");
+                // }
+              },
+            ),
+            //],
           ),
         ),
       ),
@@ -252,8 +253,8 @@ class _transactionsBody extends State<transactionsBody>
 
   Future<void> addItemToList(account) async {
     await account.onRefreshUpdateHistory();
-    await account.getOverview();
-    await account.handleOverviewResponse();
+    await account.getOverview(true);
+    await account.handleOverviewResponse(true);
 
     setState(() {});
   }

@@ -91,7 +91,13 @@ class WalletService extends ChangeNotifier {
   }
 
   void addAccount(
-      [int? index, nickname = "", address = "", bool newAccount = false]) {
+      [int? index,
+      nickname = "",
+      address = "",
+      String balance = "0",
+      lastUpdate,
+      representative,
+      bool newAccount = false]) {
     // print('-------------------- START OF addAccount ----------------------');
 
     if (index == null) {
@@ -121,9 +127,8 @@ class WalletService extends ChangeNotifier {
     if (nickname == "") {
       nickname = "Account $index";
     }
-
-    num balance = 0;
-    Account account = Account(index, nickname, address, balance);
+    Account account =
+        Account(index, nickname, address, balance, lastUpdate, representative);
 
     if (kDebugMode) {
       // print('----------------------------------------------');
@@ -136,7 +141,9 @@ class WalletService extends ChangeNotifier {
         "index_id": index,
         "index_name": nickname,
         "address": currentAccount.value,
-        "balance": 0,
+        "balance": balance,
+        "last_update": lastUpdate,
+        "representative": representative
       });
     }
 
@@ -146,15 +153,27 @@ class WalletService extends ChangeNotifier {
   }
 
   void createAccount(
-      [int? index, nickname = "", address = "", bool newAccount = true]) async {
-    addAccount(index, nickname, address, newAccount);
+      [int? index,
+      nickname = "",
+      address = "",
+      balance = "0",
+      lastUpdate = 0,
+      representative = "",
+      bool newAccount = true]) async {
+    addAccount(index, nickname, address, balance, lastUpdate, representative,
+        newAccount);
 
     notifyListeners();
   }
 
-  void importAccount(int index, [nickname = "", address = ""]) {
+  void importAccount(int index,
+      [nickname = "",
+      address = "",
+      balance = "0",
+      lastUpdate = 0,
+      representative = ""]) {
     // print("IMPORTING INDEX $index");
-    addAccount(index, nickname, address);
+    addAccount(index, nickname, address, balance, lastUpdate, representative);
     notifyListeners();
   }
 

@@ -14,6 +14,8 @@ import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
+import 'package:bananokeeper/utils/utils.dart';
+import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nanodart/nanodart.dart';
@@ -22,14 +24,12 @@ class Account extends ChangeNotifier {
   late int index;
   late String address;
   late String name;
-  late num balance;
+  late String balance;
   late String representative;
   bool opened = false;
-  //placeholders for now
-  int lastUpdate = 0; //date of last update
-  Account(this.index, this.name, this.address, this.balance) {
-    representative = "";
-  }
+  int lastUpdate; //date of last update
+  Account(this.index, this.name, this.address, this.balance, this.lastUpdate,
+      this.representative);
 
   setIndex(int newIndex) {
     index = newIndex;
@@ -40,13 +40,17 @@ class Account extends ChangeNotifier {
     return index;
   }
 
-  setBalance(num newBalance) {
+  setBalance(String newBalance) {
+    int activeWallet = services<WalletsService>().activeWallet;
+    String originalName =
+        services<WalletsService>().wallets[activeWallet].original_name;
+    services<DBManager>().updateAccountBalance(originalName, index, newBalance);
     balance = newBalance;
-    print("setBalance: $balance");
+    // print("-------------------------------- setBalance: $balance");
     notifyListeners();
   }
 
-  num getBalance() {
+  String getBalance() {
     return balance;
   }
 
@@ -69,6 +73,10 @@ class Account extends ChangeNotifier {
   }
 
   void setRep(String newRep) {
+    int activeWallet = services<WalletsService>().activeWallet;
+    String originalName =
+        services<WalletsService>().wallets[activeWallet].original_name;
+    services<DBManager>().updateAccountRep(originalName, index, newRep);
     representative = newRep;
     notifyListeners();
   }
@@ -77,15 +85,15 @@ class Account extends ChangeNotifier {
     return representative;
   }
 
-  //
-  updateTime() {
-    //get current unix time
-    //set lastUpdate to it
-    //notify
-  }
   void setLastUpdate(int time) {
-    print("look into using updateTime fn, much easier");
+    int activeWallet = services<WalletsService>().activeWallet;
+    String originalName =
+        services<WalletsService>().wallets[activeWallet].original_name;
+    services<DBManager>()
+        .updateAccountTime(originalName, index, time.toString());
     lastUpdate = time;
+
+    notifyListeners();
   }
 
   int getLastUpdate() {
@@ -108,9 +116,10 @@ class Account extends ChangeNotifier {
   }
 
   handleResponse() {
-    print(completed);
+    print("handleResponse $completed");
     try {
       if (res.isNotEmpty || res != null) {
+        var _history = history;
         for (var row in res) {
           String hash = row['hash'];
           String address = row['address'] ?? "";
@@ -124,26 +133,24 @@ class Account extends ChangeNotifier {
           AccountHistory t = AccountHistory(hash, address, type, height,
               timestamp, date, amountRaw, amount, newRep);
 
-          // print(t.toJson());
-          if (kDebugMode) {
-            // print("creating history item in HandleResponse");
-          }
-          history.add(t);
-          // history.reversed;
+          if (kDebugMode) {}
+          _history.add(t);
         }
+        history = List.from(_history);
       }
     } catch (e) {
       if (kDebugMode) {
-        print(e);
+        print("err handleResponse: $e");
       }
     }
     completed = true;
     notifyListeners();
   }
 
-  void onRefreshUpdateHistory() async {
+  onRefreshUpdateHistory() async {
     await getHistory();
 
+    var _history = history;
     if (res == null || res.length == 0) return;
     res.reversed.forEach((row) {
       var exist = false;
@@ -157,92 +164,140 @@ class Account extends ChangeNotifier {
           row['amountRaw'] ?? "",
           row['amount'] ?? num.parse("0"),
           row['newRepresentative'] ?? "");
-      history.forEach((element) {
-        // print(
-        //     "${element.height} == ${t.height} => ${element.height == t.height}");
+      _history.forEach((element) {
         if (element.height == t.height) {
           exist = true;
         }
       });
       if (!exist) {
-        // print("RETURN TRUE");
-        // exist = false;
-
-        if (kDebugMode) {
-          print("DIFFED ${t.toJson()}");
-        }
-        if (kDebugMode) {
-          print("before insert ${history.length}");
-        }
-        history.insert(0, t);
-        if (kDebugMode) {
-          print("after insert ${history.length}");
-        }
+        _history.insert(0, t);
         exist = false;
-        // res.remove(item);
       }
     });
-    if (kDebugMode) {
-      print(history.length);
-    }
+    history = List.from(_history);
+
     notifyListeners();
   }
 
-  getOverview() async {
-    var overview = await AccountAPI().getOverview(getAddress());
-    // "ban_14xjizffqiwjamztn4edhmbinnaxuy4fzk7c7d6gywxigydrrxftp4qgzabh");
+  getOverview([forceUpdate = false]) async {
+    DateTime now = DateTime.now();
+    var currentTime =
+        int.parse((now.millisecondsSinceEpoch / 1000).toStringAsFixed(0));
 
-    overviewResp = jsonDecode(overview.body);
+    if ((currentTime - lastUpdate) > 60 || forceUpdate) {
+      var overview = await AccountAPI().getOverview(getAddress());
+      // "ban_14xjizffqiwjamztn4edhmbinnaxuy4fzk7c7d6gywxigydrrxftp4qgzabh");
 
-    if (kDebugMode) {
-      print('------------------------------------------------------------');
-      print(overviewResp);
+      overviewResp = jsonDecode(overview.body);
+
+      if (kDebugMode) {
+        print(
+            '----------------------getOverview $forceUpdate--------------------------------------');
+        print("getOverview: $overviewResp");
+      }
     }
   }
 
   bool hasReceivables = false;
-  handleOverviewResponse() async {
+  handleOverviewResponse([forceUpdate = false]) async {
     try {
-      if (overviewResp.isNotEmpty || overviewResp != null) {
-        opened = overviewResp['opened'];
-        hasReceivables = (overviewResp['receivable'] > 0);
-        if (hasReceivables && !opened) {
-          if (kDebugMode) {
-            print(
-                "Account is not opened yet, we have receivable, starting open process...");
+      DateTime now = DateTime.now();
+      var currentTime =
+          int.parse((now.millisecondsSinceEpoch / 1000).toStringAsFixed(0));
+      if ((currentTime - lastUpdate) > 60 || forceUpdate) {
+        if (overviewResp.isNotEmpty || overviewResp != null) {
+          opened = overviewResp['opened'] ?? false;
+          hasReceivables = (overviewResp['receivable'] > 0);
+          if (hasReceivables && !opened) {
+            if (kDebugMode) {
+              print(
+                  "Account is not opened yet, we have receivable, starting open process...");
+            }
+            openAcc();
           }
-          openAcc();
-        }
-        if (opened) {
-          var newBalance = overviewResp['balance'].toStringAsFixed(2);
-          print(
-              'ACCOUNT: handleOverviewResponse: get Balance from resp ${newBalance}');
-
-          newBalance = num.parse(newBalance);
-          if (kDebugMode) {
-            print(getBalance() != newBalance);
-          }
-          String newRep = overviewResp['representative'];
-          if (getBalance() != newBalance) {
-            setBalance(newBalance);
+          if (opened) {
+            String newBalance = overviewResp['balanceRaw'];
 
             if (kDebugMode) {
               print(
-                  'ACCOUNT: handleOverviewResponse: newBalance ${newBalance} ${getBalance().toString()}');
+                  'ACCOUNT: handleOverviewResponse: get Balance from resp ${newBalance}');
+              // print(getBalance() != newBalance);
             }
-          }
-          if (getRep() != newRep) {
-            setRep(newRep);
-          }
+            String newRep = overviewResp['representative'];
+            if (getBalance() != newBalance) {
+              setBalance(newBalance);
 
-          notifyListeners();
+              if (kDebugMode) {
+                print(
+                    'ACCOUNT: handleOverviewResponse: newBalance ${newBalance} -> ${Utils().amountFromRaw(getBalance())}');
+              }
+            }
+            if (getRep() != newRep) {
+              setRep(newRep);
+            }
+            setLastUpdate(int.parse(currentTime.toString()));
 
-          print("DONE EXUCTING NOTIFYLIS");
+            //get receivables
+            if (hasReceivables) {
+              //get blocks data
+              var recRes = await AccountAPI().getReceivables(address);
+
+              //latest hash
+              var hist = await AccountAPI().getHistory(address, 1);
+              var historyData = jsonDecode(hist.body);
+              String previous = historyData[0]['hash'];
+
+              var data = jsonDecode(recRes.body);
+
+              for (var row in data) {
+                var receivableHash = row['hash'];
+                var receivableRaw = row['amountRaw'];
+
+                var newRaw =
+                    (BigInt.parse(newBalance) + BigInt.parse(receivableRaw))
+                        .toString();
+
+                int accountType = NanoAccountType.BANANO;
+                String calculatedHash = NanoBlocks.computeStateHash(
+                    accountType,
+                    address,
+                    previous,
+                    representative,
+                    BigInt.parse(newRaw),
+                    receivableHash);
+
+                int activeWallet = services<WalletsService>().activeWallet;
+                String privateKey = services<WalletsService>()
+                    .wallets[activeWallet]
+                    .getPrivateKey(index);
+                // Signing a block
+                String sign =
+                    NanoSignatures.signBlock(calculatedHash, privateKey);
+
+                StateBlock sendBlock = StateBlock(address, previous,
+                    representative, newRaw, receivableHash, sign);
+
+                var res = await AccountAPI()
+                    .processRequest(sendBlock.toJson(), "receive");
+
+                newBalance = Decimal.tryParse(newRaw).toString();
+
+                setBalance(newBalance);
+                previous = jsonDecode(res)['hash'];
+                await onRefreshUpdateHistory();
+                notifyListeners();
+              }
+            }
+
+            notifyListeners();
+
+            // print("DONE EXUCTING NOTIFYLIS");
+          }
         }
       }
     } catch (e) {
       if (kDebugMode) {
-        print("HandleOVerviewResp : $e");
+        print("HandleOVerviewResp: $e");
       }
     }
   }
@@ -279,9 +334,9 @@ class Account extends ChangeNotifier {
 
     String hashResponse =
         await AccountAPI().processRequest(openBlock.toJson(), "open");
-    if (kDebugMode) {
-      print(hashResponse);
-    }
+    // if (kDebugMode) {
+    //   print(hashResponse);
+    // }
     // too add to list
     onRefreshUpdateHistory();
     opened = true;

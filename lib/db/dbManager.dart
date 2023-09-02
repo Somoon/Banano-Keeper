@@ -45,14 +45,11 @@ class DBManager {
 
   Future<void> init() async {
     final documentsDirectory = await getApplicationDocumentsDirectory();
-    final Directory tempDir = await getTemporaryDirectory();
+    // final Directory tempDir = await getTemporaryDirectory();
     final path = join(documentsDirectory.path, _databaseName);
-    print(tempDir);
+    // print(tempDir);
     if (Platform.isWindows || Platform.isLinux) {
-      // Initialize FFI
       sqfliteFfiInit();
-      // Change the default factory. On iOS/Android, if not using `sqlite_flutter_lib` you can forget
-      // this step, it will use the sqlite version available on the system.
       databaseFactory = databaseFactoryFfi;
     }
     database = await openDatabase(
@@ -76,7 +73,9 @@ class DBManager {
 	'index_id'	INTEGER NOT NULL UNIQUE,
 	'index_name' TEXT NOT NULL,
 	'address' TEXT NOT NULL,
-	'balance' INTEGER DEFAULT 0,
+	'balance' TEXT DEFAULT 0,
+	'last_update' TEXT DEFAULT 0,
+	"representative" TEXT NOT NULL,
 	PRIMARY KEY('ID' AUTOINCREMENT)
 );""";
   }
@@ -137,6 +136,27 @@ class DBManager {
       String tableName, int index, String newName) async {
     await database.rawUpdate(
       'UPDATE $tableName SET index_name = "$newName" WHERE index_id = $index',
+    );
+  }
+
+  Future<void> updateAccountBalance(
+      String tableName, int index, String newBalance) async {
+    await database.rawUpdate(
+      'UPDATE $tableName SET balance = "$newBalance" WHERE index_id = $index',
+    );
+  }
+
+  Future<void> updateAccountTime(
+      String tableName, int index, String lastUpdate) async {
+    await database.rawUpdate(
+      'UPDATE $tableName SET last_update = "$lastUpdate" WHERE index_id = $index',
+    );
+  }
+
+  Future<void> updateAccountRep(
+      String tableName, int index, String newRep) async {
+    await database.rawUpdate(
+      'UPDATE $tableName SET representative = "$newRep" WHERE index_id = $index',
     );
   }
 
