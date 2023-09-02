@@ -66,6 +66,7 @@ dependencies:
   flutter_native_splash: ^2.3.2
   flutter_launcher_icons: ^0.13.1
   rename: ^2.1.1
+  qr_flutter: ^4.1.0
 #  cryptography: ^2.5.0
 #   banano_library:
 #     path: local_packages/banano_library

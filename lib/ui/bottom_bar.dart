@@ -1,5 +1,5 @@
 // import 'dart:async';
-
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
@@ -64,36 +64,9 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                     maxWidth: 215,
                   ),
                   child: SizedBox(
-                    height: 40,
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                          foregroundColor: currentTheme.text,
-                          backgroundColor: currentTheme.primary // foreground
-                          ),
-                      onPressed: () {
-                        showModal(context, "meow");
-                      },
-                      child: SizedBox(
-                        width: width / 3.5,
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .center, //Center Row contents horizontally,
-                            crossAxisAlignment: CrossAxisAlignment
-                                .center, //Center Row contents vertically,
-                            children: <Widget>[
-                              Text(
-                                AppLocalizations.of(context)!.receive,
-                                // "Receive",
-                                style: TextStyle(
-                                    fontSize: currentTheme.fontSize,
-                                    fontWeight: FontWeight.bold,
-                                    color: currentTheme.text),
-                              ),
-                              const Icon(Icons.arrow_downward_rounded),
-                            ]),
-                      ),
-                    ),
-                  ),
+                      height: 40,
+                      child: receiveTextButton(
+                          currentTheme, context, height, width, account)),
                 ),
                 const SizedBox(
                   width: 25,
@@ -125,8 +98,6 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
           backgroundColor: currentTheme.primary // foreground
           ),
       onPressed: () async {
-        // showModal(context, "meow");
-
         final LocalAuthentication auth = LocalAuthentication();
         var appLocalizations = AppLocalizations.of(context);
         num activeAccountBalance = watchOnly((WalletsService x) => x
@@ -269,6 +240,182 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
             children: <Widget>[
               Text(
                 AppLocalizations.of(context)!.send,
+                style: TextStyle(
+                  fontSize: currentTheme.fontSize,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Icon(Icons.arrow_upward_rounded),
+            ]),
+      ),
+    );
+  }
+
+  TextButton receiveTextButton(BaseTheme currentTheme, BuildContext context,
+      double height, double width, Account account) {
+    return TextButton(
+      style: TextButton.styleFrom(
+          foregroundColor: currentTheme.text,
+          backgroundColor: currentTheme.primary // foreground
+          ),
+      onPressed: () async {
+        final LocalAuthentication auth = LocalAuthentication();
+        var appLocalizations = AppLocalizations.of(context);
+
+        showModalBottomSheet<void>(
+          enableDrag: true,
+          isScrollControlled: true,
+          context: context,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          backgroundColor: currentTheme.primary,
+          builder: (BuildContext context) {
+            return Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: currentTheme.primary,
+                ),
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                color: currentTheme.primary,
+              ),
+              // color: currentTheme.primary,
+              child: SizedBox(
+                height: height / 1.25,
+                child: Center(
+                  child: Column(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 10),
+                        height: 5,
+                        width: MediaQuery.of(context).size.width * 0.15,
+                        decoration: BoxDecoration(
+                          color: currentTheme.secondary,
+                          borderRadius: BorderRadius.circular(100.0),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              right: 10,
+                            ),
+                            child: SizedBox(
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(context);
+                                },
+                                style: ButtonStyle(
+                                  foregroundColor:
+                                      MaterialStatePropertyAll<Color>(
+                                          currentTheme.textDisabled),
+                                  // backgroundColor:
+                                  //     MaterialStatePropertyAll<
+                                  //         Color>(primary),
+                                ),
+                                child: const Icon(Icons.close),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, right: 15),
+                        child: Column(
+                          children: [
+                            AutoSizeText(
+                              account.name,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: currentTheme.text,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 20, right: 20),
+                              child: Utils()
+                                  .colorffix(account.address, currentTheme),
+                            ),
+                            const SizedBox(
+                              height: 40,
+                            ),
+                            QrImageView(
+                              data: account.address,
+                              version: QrVersions.auto,
+                              size: 200.0,
+                              backgroundColor: currentTheme.textDisabled,
+                            ),
+                            const SizedBox(
+                              height: 40,
+                            ),
+                            SizedBox(
+                              height: 48,
+                              width: width - 40,
+                              child: OutlinedButton(
+                                style: ButtonStyle(
+                                  overlayColor: MaterialStateColor.resolveWith(
+                                      (states) =>
+                                          currentTheme.text.withOpacity(0.3)),
+                                  // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
+                                  shape: MaterialStateProperty.all<
+                                      RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                  ),
+
+                                  side: MaterialStatePropertyAll<BorderSide>(
+                                    BorderSide(
+                                      color: currentTheme.buttonOutline,
+                                      width: 1,
+                                    ),
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  Clipboard.setData(
+                                    ClipboardData(text: account.address),
+                                  );
+                                  setState(() {});
+                                },
+                                child: AutoSizeText(
+                                  "Copy address",
+                                  style: TextStyle(
+                                    color: currentTheme.text,
+                                    fontSize: currentTheme.fontSize,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+        setState(() {});
+      },
+      child: SizedBox(
+        width: width / 3.5,
+        child: Row(
+            mainAxisAlignment:
+                MainAxisAlignment.center, //Center Row contents horizontally,
+            crossAxisAlignment:
+                CrossAxisAlignment.center, //Center Row contents vertically,
+            children: <Widget>[
+              Text(
+                AppLocalizations.of(context)!.receive,
                 style: TextStyle(
                   fontSize: currentTheme.fontSize,
                   fontWeight: FontWeight.bold,
