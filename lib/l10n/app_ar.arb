@@ -38,6 +38,69 @@
     }
   },
   "copy": "نسخ",
-  "verifyPIN": "التحقق من الرمز الخاص"
+  "verifyPIN": "التحقق من الرمز الخاص",
+  "selectWallet": "إختيار المحفظة",
+  "accountSettings": "إعدادات الحساب",
+  "representative": "الممثل",
+  "appSettings": "إعدادت التطبيق",
+  "themes": "الالوان",
+  "security": "الحماية",
+  "language": "اللغة",
+  "resetApp": "إعادة تهيئة التطبيق",
+  "walletNameErrMsg": "Wallet name length can be up to 20 characters.",
+  "removeWallet": "Remove wallet?",
+  "removeWalletWarning": "Warning: make sure you have a backup of your seed or Mnemonic words. this is irreversible.",
+  "lastWalletSnackBar": "This is the only wallet you have. Please reset from the side-menu.",
+  "authMsgWalletDel": "Authenticate to delete wallet.",
+  "authMsgWalletBackup": "Authenticate to view wallet backup data.",
+  "backupWalletTitle": "{state} Info",
+  "@backupWalletTitle": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "seed"
+      }
+    }
+  },
+  "seedInfo": "Seed Info",
+  "mnemonicInfo": "Mnemonic Phrase Info",
+  "seed": "Seed",
+  "mnemonicPhrase": "Mnemonic Phrase",
+  "accNameErrMsg": "Account name length can be up to 20 characters.",
+  "removeAddress": "Remove address?",
+  "removeAddressWarning": "Account can be re-added using the \\'Add\\' button above.",
+  "lastAddressSnackBar": "You can\\'t delete the last address in the wallet.",
+  "importWalletTitle": "Import {state}",
+  "@importWalletTitle": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "seed"
+      }
+    }
+  },
+  "enterSeed": "Enter your seed:",
+  "enter24Words": "Enter your 24-words secret phrase:",
+  "qrNotSupported": "QR Scan is not supported on windows.",
+  "invalidSeed": "Invalid seed.",
+  "invalidSeedLength": "seed length cannot be longer than 64 characters",
+  "incorrectWords": "The following words are incorrect: ",
+  "not24Words": "Error: not 24 words.",
+  "transactions": "Transactions",
+  "selectAddressHint": "Select Address",
+  "sendCard": "SEND",
+  "receiveCard": "RECEIVE",
+  "changeCard": "CHANGE",
+  "unopenedAccount": "Unopened Account",
+  "unopenedReceiveMsg": "Receive Banano to open your new account.",
+  "copyAddress": "Copy Address",
+  "scanQRCode": "Scan QR Code",
+  "enterAmountHint": "Enter Amount",
+  "maxAmountIcon": "MAX",
+  "amountFieldErrZero": "Error: amount can't be zero.",
+  "amountFieldErrNegative": "Error: amount can't be negative.",
+  "amountFieldErrMore": "Error: amount can't be more than balance.",
+  "enterAddressHint": "Enter Address",
+  "addressFieldErrAddr": "Error: Incorrect ban address."
 
 }

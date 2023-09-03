@@ -9,7 +9,6 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
-import 'package:bananokeeper/ui/send/send_menu_1.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +20,8 @@ import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 import 'package:bananokeeper/themes.dart';
 import 'dart:io';
+
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BottomBarApp extends StatefulWidget with GetItStatefulWidgetMixin {
   BottomBarApp({super.key});
@@ -221,11 +222,12 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  sendAddressTextField(currentTheme),
+                                  sendAddressTextField(currentTheme, context),
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  sendAmountTextField(account, currentTheme),
+                                  sendAmountTextField(
+                                      account, currentTheme, context),
                                   const SizedBox(
                                     height: 40,
                                   ),
@@ -251,13 +253,12 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
         );
         addressController.clear();
         amountController.clear();
-        if (sent) {
-          print("INSIDE SENT");
-          await account.onRefreshUpdateHistory();
-          await account.getOverview(true);
-          await account.handleOverviewResponse(true);
-        }
-        sent = false;
+        // if (sent) {
+        //   await account.onRefreshUpdateHistory();
+        //   await account.getOverview(true);
+        //   await account.handleOverviewResponse(true);
+        // }
+        // sent = false;
         setState(() {
           update = !update;
         });
@@ -418,7 +419,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                                   setState(() {});
                                 },
                                 child: AutoSizeText(
-                                  "Copy address",
+                                  appLocalizations!.copyAddress,
                                   style: TextStyle(
                                     color: currentTheme.text,
                                     fontSize: currentTheme.fontSize,
@@ -494,7 +495,6 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
             var maxAmount = Utils().amountFromRaw(account.getBalance());
             if ((amount > Decimal.parse("0") && amount <= maxAmount)) {
               //get latest bal
-              print("on click SEND button");
               await account.getOverview(true);
               await account.handleOverviewResponse(true);
 
@@ -508,7 +508,6 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
               var newRaw = (BigInt.parse(account.getBalance()) -
                       BigInt.parse(sendAmountRaw))
                   .toString();
-              print("newRaw $newRaw");
 
               int accountType = NanoAccountType.BANANO;
               String calculatedHash = NanoBlocks.computeStateHash(
@@ -603,12 +602,9 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
 
             setState(() {
               if (data['address'] != "") {
-                print("address ${data['address']}");
                 addressController.text = data['address'];
               }
               if (data['amountRaw'] != "") {
-                print(
-                    "amount ${data['amountRaw']} -> ${Utils().amountFromRaw(data['amountRaw'])}");
                 amountController.text =
                     Utils().amountFromRaw(data['amountRaw']).toString();
               }
@@ -620,7 +616,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
           } else {
             var snackBar = SnackBar(
               content: Text(
-                'QR Scan is not supported on windows.',
+                appLocalizations!.qrNotSupported,
                 style: TextStyle(
                   color: currentTheme.textDisabled,
                 ),
@@ -630,7 +626,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
           }
         },
         child: AutoSizeText(
-          "Scan QR Code",
+          appLocalizations!.scanQRCode,
           style: TextStyle(
             color: currentTheme.text,
             fontSize: currentTheme.fontSize,
@@ -640,7 +636,8 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
     );
   }
 
-  TextFormField sendAmountTextField(Account account, BaseTheme currentTheme) {
+  TextFormField sendAmountTextField(
+      Account account, BaseTheme currentTheme, BuildContext context) {
     return TextFormField(
       keyboardType: TextInputType.number,
       textAlign: TextAlign.center,
@@ -660,7 +657,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
           // left: 8,
           right: 8,
         ),
-        hintText: "Enter Amount",
+        hintText: AppLocalizations.of(context)!.enterAmountHint,
         hintStyle: TextStyle(color: currentTheme.textDisabled),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
@@ -711,7 +708,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
               ),
             ),
             child: AutoSizeText(
-              "MAX",
+              AppLocalizations.of(context)!.maxAmountIcon,
               maxLines: 1,
               style: TextStyle(
                 color: currentTheme.text,
@@ -739,20 +736,19 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
               var maxAmount = Utils().amountFromRaw(account.getBalance());
               if (valueInt == Decimal.parse("0")) {
                 validAmount = false;
-                return "Error: amount can't be zero.";
+                return AppLocalizations.of(context)!.amountFieldErrZero;
               }
               if (valueInt < Decimal.parse("0")) {
                 validAmount = false;
-                return "Error: amount can't be negative.";
+                return AppLocalizations.of(context)!.amountFieldErrNegative;
               }
               if (valueInt > maxAmount) {
                 validAmount = false;
-                return "Error: amount can't be more than balance.";
+                return AppLocalizations.of(context)!.amountFieldErrMore;
               }
 
               setState(() {
                 validAmount = true;
-                print('amount ok $validAmount');
               });
             }
           } catch (_) {}
@@ -764,7 +760,8 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
     );
   }
 
-  TextFormField sendAddressTextField(BaseTheme currentTheme) {
+  TextFormField sendAddressTextField(
+      BaseTheme currentTheme, BuildContext context) {
     return TextFormField(
       maxLines: 2,
       minLines: 1,
@@ -785,7 +782,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
           left: 8,
           right: 8,
         ),
-        hintText: "Enter Address",
+        hintText: AppLocalizations.of(context)!.enterAddressHint,
         hintStyle: TextStyle(color: currentTheme.textDisabled),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
@@ -832,10 +829,9 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
           if (value.length >= 64) {
             if (NanoAccounts.isValid(NanoAccountType.BANANO, value)) {
               validAddr = true;
-              print("ADDR OK $validAddr");
             } else {
               validAddr = false;
-              return 'Error: Incorrect ban address.';
+              return AppLocalizations.of(context)!.addressFieldErrAddr;
             }
           }
         }
@@ -849,22 +845,4 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
       ),
     );
   }
-}
-
-//// ------- Use this to show Receive/Send popups
-void showModal(BuildContext context, String dataS) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) => AlertDialog(
-      content: Text('Example Dialog $dataS'),
-      actions: <TextButton>[
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Close'),
-        )
-      ],
-    ),
-  );
 }

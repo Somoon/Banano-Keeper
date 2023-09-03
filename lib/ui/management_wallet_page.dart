@@ -300,7 +300,8 @@ class WalletManagementPageState extends State<WalletManagementPage>
                                   autovalidateMode: AutovalidateMode.always,
                                   validator: (value) {
                                     return value!.length > 20
-                                        ? 'Wallet name length can be up to 20 characters.'
+                                        ? AppLocalizations.of(context)!
+                                            .walletNameErrMsg
                                         : null;
                                   },
                                   style: TextStyle(color: currentTheme.text),
@@ -387,10 +388,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
           return AlertDialog(
             backgroundColor: currentTheme.secondary,
             elevation: 2,
-            title: const Text('Remove address?'),
+            title: Text(appLocalizations!.removeWallet),
             titleTextStyle: currentTheme.textStyle,
-            content: const Text(
-                'Warning: make sure you have a backup of your seed or Mnemonic words. this is irreversible.'),
+            content: Text(appLocalizations.removeWalletWarning),
             contentTextStyle: TextStyle(
               color: currentTheme.textDisabled,
               fontSize: currentTheme.fontSize - 3,
@@ -401,7 +401,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                   if (wallets.length == 1) {
                     var snackBar = SnackBar(
                       content: Text(
-                        'do some reset app wizardy here',
+                        appLocalizations.lastWalletSnackBar,
                         style: TextStyle(
                           color: currentTheme.textDisabled,
                         ),
@@ -411,27 +411,16 @@ class WalletManagementPageState extends State<WalletManagementPage>
                   } else {
                     bool canauth = await BiometricUtil().canAuth();
                     bool verified = false;
-                    if (kDebugMode) {
-                      print("CAN AUTH???? $canauth");
-                    }
+
                     if (!canauth) {
                       verified = await Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => VerifyPIN(),
                         ),
                       );
-                      if (kDebugMode) {
-                        print("inside verify pin  $verified");
-                      }
                     } else {
                       verified = await BiometricUtil()
-                          .authenticate("Authenticate to delete wallet.");
-                      if (kDebugMode) {
-                        print("inside biometric $verified");
-                      }
-                    }
-                    if (kDebugMode) {
-                      print("is verified? $verified");
+                          .authenticate(appLocalizations.authMsgWalletDel);
                     }
 
                     if (verified) {
@@ -470,27 +459,16 @@ class WalletManagementPageState extends State<WalletManagementPage>
   void backupWallet(context, index, wallets, currentTheme) async {
     bool canauth = await BiometricUtil().canAuth();
     bool verified = false;
-    if (kDebugMode) {
-      print("CAN AUTH???? $canauth");
-    }
+    var appLocalizations = AppLocalizations.of(context);
     if (!canauth) {
       verified = await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => VerifyPIN(),
         ),
       );
-      if (kDebugMode) {
-        print("inside verify pin  $verified");
-      }
     } else {
-      verified =
-          await BiometricUtil().authenticate("Authenticate to delete wallet.");
-      if (kDebugMode) {
-        print("inside biometric $verified");
-      }
-    }
-    if (kDebugMode) {
-      print("is verified? $verified");
+      verified = await BiometricUtil()
+          .authenticate(appLocalizations!.authMsgWalletBackup);
     }
 
     if (verified) {
@@ -561,8 +539,10 @@ class WalletManagementPageState extends State<WalletManagementPage>
                 title: Center(
                   child: Text(
                     (createStateNewWallet
-                        ? "Seed Info"
-                        : "Mnemonic Phrase Info"),
+                        ? appLocalizations!
+                            .backupWalletTitle(appLocalizations.seed)
+                        : appLocalizations!.backupWalletTitle(
+                            appLocalizations.mnemonicPhrase)),
                   ),
                 ),
                 titleTextStyle: currentTheme.textStyle,
@@ -823,7 +803,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
               elevation: 2,
               title: Center(
                 child: Text(
-                  (createStateNewWallet ? "Seed Info" : "Mnemonic Phrase Info"),
+                  (createStateNewWallet
+                      ? appLocalizations!.seedInfo
+                      : appLocalizations!.mnemonicInfo),
                 ),
               ),
               titleTextStyle: currentTheme.textStyle,
@@ -951,7 +933,11 @@ class WalletManagementPageState extends State<WalletManagementPage>
                             SizedBox(
                               width: 170,
                               child: AutoSizeText(
-                                'I have backed up the new wallet ${(createStateNewWallet ? "seed" : "mnemonic phrase")}.',
+                                (createStateNewWallet
+                                    ? appLocalizations.backedNewWalletMSG(
+                                        appLocalizations.seed)
+                                    : appLocalizations.backedNewWalletMSG(
+                                        appLocalizations.mnemonicPhrase)),
                                 style: TextStyle(
                                   color: currentTheme.textDisabled,
                                   fontSize: currentTheme.fontSize - 3,

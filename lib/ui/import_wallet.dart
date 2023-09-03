@@ -56,7 +56,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
     var primary = watchOnly((ThemeModel x) => x.curTheme.primary);
     var secondary = watchOnly((ThemeModel x) => x.curTheme.secondary);
     var statusBarHeight = MediaQuery.of(context).viewPadding.top;
-
+    var appLocalizations = AppLocalizations.of(context);
     return SafeArea(
       minimum: EdgeInsets.only(
         top: (statusBarHeight == 0.0 ? 50 : statusBarHeight),
@@ -91,7 +91,10 @@ class ImportWalletPageState extends State<ImportWalletPage>
               ],
               titleSpacing: 10.0,
               title: Text(
-                (importState ? "Import Seed" : "Import Mnemonic"),
+                (importState
+                    ? appLocalizations!.importWalletTitle(appLocalizations.seed)
+                    : appLocalizations!
+                        .importWalletTitle(appLocalizations.mnemonicPhrase)),
                 style: TextStyle(
                   color: currentTheme.text,
                   // fontSize: currentTheme.fontSize,
@@ -132,7 +135,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
       child: Column(
         children: [
           Text(
-            "Enter your seed:",
+            appLocalizations!.enterSeed,
             style: currentTheme.textStyle,
           ),
           SizedBox(
@@ -167,7 +170,9 @@ class ImportWalletPageState extends State<ImportWalletPage>
                   // scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
                 }
               },
-              icon: Text("Import"),
+              icon: Text(
+                appLocalizations.import,
+              ),
               label: Icon(Icons.navigate_next),
               style: ElevatedButton.styleFrom(
                 backgroundColor: currentTheme.primaryBottomBar,
@@ -191,6 +196,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
   }
 
   TextFormField seedTextField(BaseTheme currentTheme) {
+    var appLocalizations = AppLocalizations.of(context);
     return TextFormField(
       maxLines: null,
       focusNode: ControllerFocusNode,
@@ -262,7 +268,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
             } else {
               var snackBar = SnackBar(
                 content: Text(
-                  'QR Scan is not supported on windows.',
+                  appLocalizations!.qrNotSupported,
                   style: TextStyle(
                     color: currentTheme.textDisabled,
                   ),
@@ -296,16 +302,12 @@ class ImportWalletPageState extends State<ImportWalletPage>
       validator: (value) {
         if (value!.isNotEmpty) {
           bool isCorrectHex = NanoSeeds.isValidSeed(value);
-          if (kDebugMode) {
-            print('isCorrectHex? $isCorrectHex');
-          }
+
           if (!isCorrectHex) {
-            return 'Invalid seed';
+            return appLocalizations!.invalidSeed;
           }
 
-          return value.length > 64
-              ? 'seed length cannot be longer than 64 characters'
-              : null;
+          return value.length > 64 ? appLocalizations!.invalidSeedLength : null;
         }
         return null;
       },
@@ -335,7 +337,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
       child: Column(
         children: [
           Text(
-            "Enter your 24-words secret phrase:",
+            appLocalizations!.enter24Words,
             style: currentTheme.textStyle,
           ),
           SizedBox(
@@ -364,7 +366,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
                   if (wordsErr.isNotEmpty) {
                     setState(() {
                       wordsErr.insert(
-                          0, "The following words are incorrect: \n ");
+                          0, "${appLocalizations.incorrectWords}\n ");
                       mnemonicIsValid = false;
                     });
                   } else {
@@ -391,11 +393,11 @@ class ImportWalletPageState extends State<ImportWalletPage>
                   setState(() {
                     mnemonicIsValid = false;
                     wordsErr.clear();
-                    wordsErr.add("Error: not 24 words.");
+                    wordsErr.add(appLocalizations.not24Words);
                   });
                 }
               },
-              icon: Text("Import"),
+              icon: Text(appLocalizations.import),
               label: Icon(Icons.navigate_next),
               style: ElevatedButton.styleFrom(
                 backgroundColor: currentTheme.primaryBottomBar,
@@ -419,6 +421,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
   }
 
   TextFormField MnemonicTextField(BaseTheme currentTheme) {
+    var appLocalizations = AppLocalizations.of(context);
     return TextFormField(
       maxLines: null,
       focusNode: ControllerFocusNode2,
@@ -488,7 +491,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
             } else {
               var snackBar = SnackBar(
                 content: Text(
-                  'QR Scan is not supported on windows.',
+                  appLocalizations!.qrNotSupported,
                   style: TextStyle(
                     color: currentTheme.textDisabled,
                   ),

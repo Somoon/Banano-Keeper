@@ -108,20 +108,24 @@ class _sideDrawer extends State<sideDrawer>
                   height: 15,
                   thickness: 3,
                 ),
-                Text("Account Settings",
+                Text(AppLocalizations.of(context)!.accountSettings,
                     style: TextStyle(
                       fontSize: currentTheme.fontSize - 4,
                       color: currentTheme.offColor,
                     )),
                 createDialogButton(
-                    "Representative", account.getRep(), Text("")),
+                  AppLocalizations.of(context)!.representative,
+                  account.getRep(),
+                  //
+                  Text(""),
+                ),
                 const Divider(
                   height: 15,
                   thickness: 2,
                 ),
 
                 // ------------------------------------
-                Text("App Settings",
+                Text(AppLocalizations.of(context)!.appSettings,
                     style: TextStyle(
                       fontSize: currentTheme.fontSize - 4,
                       color: currentTheme.offColor,
@@ -135,10 +139,13 @@ class _sideDrawer extends State<sideDrawer>
                 // createDialogButton("Block Explorer", "1", ThemesDialog()),
                 // createDialogButton("Data Source", "1", ThemesDialog()),
 
-                createDialogButton("Themes", activeTheme, ThemesDialog()),
-                createDialogButton("Security", "", SecurityDialog()),
+                createDialogButton(AppLocalizations.of(context)!.themes,
+                    activeTheme, ThemesDialog()),
+                createDialogButton(AppLocalizations.of(context)!.security, "",
+                    SecurityDialog()),
 
-                createDialogButton("Language", activeLanguage, LangDialog()),
+                createDialogButton(AppLocalizations.of(context)!.language,
+                    activeLanguage, LangDialog()),
                 // createDialogButton("Contacts/Bookmark", "1", ThemesDialog()),
                 // createDialogButton("Notifications", "1", ThemesDialog()),
                 // createDialogButton("switch to nano?", "1", ThemesDialog()),
@@ -154,7 +161,7 @@ class _sideDrawer extends State<sideDrawer>
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Reset App",
+                            AppLocalizations.of(context)!.resetApp,
                             style: TextStyle(
                               color: currentTheme.text,
                               fontSize: currentTheme.fontSize,

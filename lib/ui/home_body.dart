@@ -9,14 +9,12 @@ import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
-import 'package:bananokeeper/ui/transactions.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
-
-import 'active_address.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class home_body extends StatefulWidget with GetItStatefulWidgetMixin {
   home_body({super.key});
@@ -100,7 +98,7 @@ class _home_body extends State<home_body>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Transactions",
+                  AppLocalizations.of(context)!.transactions,
                   textDirection: TextDirection.ltr,
                   style: TextStyle(color: currentTheme.text, fontSize: 24),
                 ),
@@ -235,7 +233,8 @@ class _home_body extends State<home_body>
                           Container(
                             child: PopupMenuButton(
                               constraints: const BoxConstraints(maxHeight: 300),
-                              tooltip: "select address",
+                              tooltip: AppLocalizations.of(context)!
+                                  .selectAddressHint,
                               // position: PopupMenuPosition.under,
                               // offset: const Offset(0, -380),
                               // position: ,
@@ -413,7 +412,7 @@ class _home_body extends State<home_body>
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            getTState(historyItem.type),
+                            getTState(historyItem.type, context),
                             if (historyItem.type != 'change') ...[
                               Text(
                                 "${historyItem.amount} BAN",
@@ -463,10 +462,10 @@ class _home_body extends State<home_body>
     );
   }
 
-  Widget getTState(String tText) {
+  Widget getTState(String tText, BuildContext context) {
     if (tText == 'send') {
-      return const Text(
-        'SEND',
+      return Text(
+        AppLocalizations.of(context)!.sendCard,
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 18,
@@ -482,8 +481,8 @@ class _home_body extends State<home_body>
         ),
       );
     } else if (tText == "receive") {
-      return const Text(
-        'RECEIVE',
+      return Text(
+        AppLocalizations.of(context)!.receiveCard,
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 18,
@@ -499,8 +498,8 @@ class _home_body extends State<home_body>
         ),
       );
     } else {
-      return const Text(
-        "CHANGE",
+      return Text(
+        AppLocalizations.of(context)!.changeCard,
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 17,
@@ -556,7 +555,7 @@ class _home_body extends State<home_body>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     AutoSizeText(
-                      "Unopened Account",
+                      AppLocalizations.of(context)!.unopenedAccount,
                       style: TextStyle(
                         color: currentTheme.text,
                         fontSize: currentTheme.fontSize - 2,
@@ -567,7 +566,7 @@ class _home_body extends State<home_body>
                       height: 10,
                     ),
                     AutoSizeText(
-                      "Receive Banano to open your new account.",
+                      AppLocalizations.of(context)!.unopenedReceiveMsg,
                       style: TextStyle(
                         color: currentTheme.textDisabled,
                         fontSize: currentTheme.fontSize - 2,

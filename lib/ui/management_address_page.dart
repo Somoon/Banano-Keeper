@@ -296,7 +296,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                         autovalidateMode: AutovalidateMode.always,
                         validator: (value) {
                           return value!.length > 20
-                              ? 'Account name length can be up to 20 characters.'
+                              ? appLocalizations.accNameErrMsg
                               : null;
                         },
                         style: TextStyle(color: currentTheme.text),
@@ -511,10 +511,9 @@ class AccountManagementPageState extends State<AccountManagementPage>
         return AlertDialog(
           backgroundColor: currentTheme.secondary,
           elevation: 2,
-          title: const Text('Remove address?'),
+          title: Text(appLocalizations!.removeAddress),
           titleTextStyle: currentTheme.textStyle,
-          content: const Text(
-              'Account can be re-added using the \'Add\' button above.'),
+          content: Text(appLocalizations.removeAddressWarning),
           contentTextStyle: TextStyle(
             color: currentTheme.textDisabled,
             fontSize: currentTheme.fontSize - 3,
@@ -525,7 +524,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                 if (currentWallet.accounts.length == 1) {
                   var snackBar = SnackBar(
                     content: Text(
-                      'You can\'t delete the last address in the wallet.',
+                      appLocalizations.lastAddressSnackBar,
                       style: TextStyle(
                         color: currentTheme.textDisabled,
                       ),
@@ -745,14 +744,8 @@ class AccountManagementPageState extends State<AccountManagementPage>
         get<WalletsService>().wallets[get<WalletsService>().activeWallet];
 
     var index = indexController.text;
-    if (kDebugMode) {
-      print(
-          "management_address_page.dart: adding address of index ${indexController.text}");
-    }
+
     if (index == "" || index == "0") {
-      if (kDebugMode) {
-        print("management_address_page.dart: addAccount empty controller");
-      }
       currentWallet.createAccount();
     } else {
       // services<WalletsService>()
@@ -769,24 +762,3 @@ class AccountManagementPageState extends State<AccountManagementPage>
     });
   }
 }
-
-// class AddAccount extends StatelessWidget {
-//   const AddAccount({
-//     super.key,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return TextButton(
-//       onPressed: () {
-//         Navigator.pop(context);
-//       },
-//       child: Center(
-//         child: Text(
-//           'Close',
-//           style: TextStyle(color: currentTheme.text),
-//         ),
-//       ),
-//     );
-//   }
-// }
