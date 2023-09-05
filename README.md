@@ -1,22 +1,23 @@
 # Banano Keeper
 
 
-Banano Keeper is a multi-wallet for Banano cryptocurrncy for Android, iOS and windows.
+Banano Keeper is a multi-wallet for Banano cryptocurrency for Android, iOS and Windows.
 
-it features:
-- Creating a new or importing an existing wallet.
-- Local wallet backup
+Its features:
+
+- Create a new or import an existing wallet.
+- Local wallet backup.
 - View transactions of your accounts.
-- Send and receive banano.
+- Send and receive Banano.
 - Scan QR Code to send.
 - Set account-specific representative.
 - Authentication using pin and/or biometric.
 - Enable/Disable auth on startup.
-- Change PIN
+- Change PIN.
 - Themes (more to come).
 - Localization support (more to come).
 
-currently, only Android version compiled and ready to be tested
+Currently, only Android version is compiled and ready to be tested.
 
 
 ## Screenshots
