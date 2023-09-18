@@ -117,8 +117,9 @@ Future<void> loadWalletsFromDB(
     if (original_name == activeWalletName) {
       int walletslen = services<WalletsService>().wallets.length - 1;
       //lazy way of making sure we dont try to set active account to something doesnt exist
-      if (activeAccountIndex <
-          services<WalletsService>().wallets[walletslen].accounts.length) {
+      int accsLen =
+          services<WalletsService>().wallets[walletslen].accountsList.length;
+      if (activeAccountIndex < accsLen) {
         services<WalletsService>()
             .wallets[walletslen]
             .setActiveIndex(activeAccountIndex);

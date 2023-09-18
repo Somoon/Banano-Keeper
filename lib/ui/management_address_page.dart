@@ -3,6 +3,7 @@
 import 'dart:ui';
 
 import 'package:bananokeeper/providers/account.dart';
+import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/utils/utils.dart';
@@ -52,6 +53,20 @@ class AccountManagementPageState extends State<AccountManagementPage>
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     // var statusBarHeight = MediaQuery.of(context).viewPadding.top;
 
+    int walletIndex = services<WalletsService>().activeWallet;
+    int accLen =
+        services<WalletsService>().wallets[walletIndex].accountsList.length;
+    for (int index = 0; index < accLen; index++) {
+      String accOrgName =
+          services<WalletsService>().wallets[walletIndex].accountsList[index];
+
+      var account = services<Account>(instanceName: accOrgName);
+
+      if (!account.doneovR && !account.completed) {
+        services<QueueService>().add(account.getOverview());
+      }
+    }
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: ScaffoldMessenger(
@@ -100,8 +115,8 @@ class AccountManagementPageState extends State<AccountManagementPage>
   }
 
   Widget addressList() {
-    var accounts =
-        watchOnly((WalletsService x) => x.wallets[x.activeWallet].accounts);
+    var accountsList =
+        watchOnly((WalletsService x) => x.wallets[x.activeWallet].accountsList);
 
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     double width = MediaQuery.of(context).size.width;
@@ -122,7 +137,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
             physics: BouncingScrollPhysics(),
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
-            itemCount: accounts.length,
+            itemCount: accountsList.length,
             itemBuilder: (BuildContext context, int index) {
               // if (width < 600) {
               return Column(
@@ -140,13 +155,13 @@ class AccountManagementPageState extends State<AccountManagementPage>
                         motion: ScrollMotion(),
                         children: [
                           renameSlidableAction(
-                              context, currentTheme, accounts, index),
+                              context, currentTheme, accountsList, index),
                           deleteSlidableAction(
                               context, index, currentWallet, currentTheme),
                         ],
                       ),
                       child: slidableTileData(
-                          currentTheme, width, accounts, index),
+                          currentTheme, width, accountsList, index),
                     ),
                   ),
                   SizedBox(
@@ -182,6 +197,13 @@ class AccountManagementPageState extends State<AccountManagementPage>
     return SlidableAction(
       // An action can be bigger than the others.
       onPressed: (_) {
+        int walletIndex = services<WalletsService>().activeWallet;
+
+        String accOrgName =
+            services<WalletsService>().wallets[walletIndex].accountsList[index];
+
+        var account = services<Account>(instanceName: accOrgName);
+
         int activeWallet = watchOnly((WalletsService x) => x.activeWallet);
         String tempName = services<WalletsService>()
             .wallets[activeWallet]
@@ -216,8 +238,8 @@ class AccountManagementPageState extends State<AccountManagementPage>
                     ),
                     Padding(
                       padding: EdgeInsets.only(left: 25, right: 25, bottom: 10),
-                      child: Utils().colorffix(
-                          accounts[index].getAddress(), currentTheme),
+                      child:
+                          Utils().colorffix(account.getAddress(), currentTheme),
                       // AutoSizeText(
                       //   maxLines: 2,
                       //   loadedAccounts[index],
@@ -330,10 +352,21 @@ class AccountManagementPageState extends State<AccountManagementPage>
 
   Column slidableTileData(
       BaseTheme currentTheme, double width, accounts, int index) {
+    int walletIndex = services<WalletsService>().activeWallet;
+
+    String accOrgName =
+        services<WalletsService>().wallets[walletIndex].accountsList[index];
+
+    var account = services<Account>(instanceName: accOrgName);
     var currentWallet =
         watchOnly((WalletsService x) => x.wallets[x.activeWallet]);
     bool isActiveAccount =
-        (currentWallet.currentAccount.value == accounts[index].getAddress());
+        (currentWallet.currentAccount.value == account.getAddress());
+    // if (!account.doneovR) {
+    //   services<QueueService>().add(account.getOverview());
+    // }
+    var accountOpen =
+        watchOnly((Account x) => x.opened, instanceName: accOrgName);
     return Column(
       children: [
         Container(
@@ -357,7 +390,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    accounts[index].getIndex().toString(),
+                    account.getIndex().toString(),
                     textAlign: TextAlign.start,
                     maxLines: 1,
                     style: TextStyle(
@@ -370,8 +403,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
 
               // Image.network(
               FadeInImage.assetNetwork(
-                image:
-                    'https://imgproxy.moonano.net/${accounts[index].getAddress()}',
+                image: 'https://imgproxy.moonano.net/${account.getAddress()}',
                 placeholder: 'images/greymonkey.png',
                 width: 50,
                 fit: BoxFit.fill,
@@ -384,7 +416,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    accounts[index].getName(),
+                    account.getName(),
                     style: TextStyle(
                       color: currentTheme.textDisabled,
                     ),
@@ -396,9 +428,8 @@ class AccountManagementPageState extends State<AccountManagementPage>
                     fit: BoxFit.scaleDown,
                     child: AutoSizeText(
                       (width > 700
-                          ? accounts[index].getAddress()
-                          : Utils()
-                              .shortenAccount(accounts[index].getAddress())),
+                          ? account.getAddress()
+                          : Utils().shortenAccount(account.getAddress())),
                       style: TextStyle(
                         color: currentTheme.text,
                         fontSize: currentTheme.fontSize - 5,
@@ -427,38 +458,41 @@ class AccountManagementPageState extends State<AccountManagementPage>
                     // const SizedBox(
                     //   width: 4,
                     // ),
-                    FutureBuilder(
-                      future: //(accounts[index].overviewResp.isEmpty &&
-                          //accounts[index].getBalance() == 0
-                          // ?
-                          accounts[index].getOverview(),
-                      //  : Future<null>),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          if (accounts[index].overviewResp.isEmpty &&
-                              accounts[index].getBalance() == 0) {
-                            return blurBalance(true,
-                                displayBalance(accounts[index], currentTheme));
-                          }
-                        } else if (snapshot.connectionState ==
-                            ConnectionState.done) {
-                          accounts[index].handleOverviewResponse();
-                          // If we got an error
-                          if (snapshot.hasError) {
-                            return blurBalance(true,
-                                displayBalance(accounts[index], currentTheme));
-                          }
-                        }
-                        if (accounts[index].overviewResp.isEmpty) {
-                          return blurBalance(true,
-                              displayBalance(accounts[index], currentTheme));
-                        } else {
-                          return blurBalance(false,
-                              displayBalance(accounts[index], currentTheme));
-                        }
-                      },
-                    ),
+
+                    blurBalance(
+                        !accountOpen, displayBalance(account, currentTheme)),
+                    // FutureBuilder(
+                    //   future: //(accounts[index].overviewResp.isEmpty &&
+                    //       //accounts[index].getBalance() == 0
+                    //       // ?
+                    //       account.getOverview(),
+                    //   //  : Future<null>),
+                    //   builder: (context, snapshot) {
+                    //     if (snapshot.connectionState ==
+                    //         ConnectionState.waiting) {
+                    //       if (account.overviewResp.isEmpty &&
+                    //           account.getBalance() == 0) {
+                    //         return blurBalance(
+                    //             true, displayBalance(account, currentTheme));
+                    //       }
+                    //     } else if (snapshot.connectionState ==
+                    //         ConnectionState.done) {
+                    //       account.handleOverviewResponse();
+                    //       // If we got an error
+                    //       if (snapshot.hasError) {
+                    //         return blurBalance(
+                    //             true, displayBalance(account, currentTheme));
+                    //       }
+                    //     }
+                    //     if (account.overviewResp.isEmpty) {
+                    //       return blurBalance(
+                    //           true, displayBalance(account, currentTheme));
+                    //     } else {
+                    //       return blurBalance(
+                    //           false, displayBalance(account, currentTheme));
+                    //     }
+                    //   },
+                    // ),
                   ],
                 ),
               ),
@@ -521,7 +555,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
           actions: [
             TextButton(
               onPressed: () {
-                if (currentWallet.accounts.length == 1) {
+                if (currentWallet.accountsList.length == 1) {
                   var snackBar = SnackBar(
                     content: Text(
                       appLocalizations.lastAddressSnackBar,

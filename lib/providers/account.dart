@@ -7,7 +7,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:bananokeeper/api/account_api.dart';
 import 'package:bananokeeper/api/account_history_response.dart';
 import 'package:bananokeeper/api/state_block.dart';
@@ -108,10 +107,11 @@ class Account extends ChangeNotifier {
   Map<String, dynamic> overviewResp = {};
   getHistory() async {
     var historyRes = await AccountAPI().getHistory(getAddress(), 8);
-    // "ban_14xjizffqiwjamztn4edhmbinnaxuy4fzk7c7d6gywxigydrrxftp4qgzabh",
-    // 8);
 
     res = jsonDecode(historyRes.body);
+    if (!completed) {
+      handleResponse();
+    }
     // print('------------------------------------------------------------');
   }
 
@@ -184,7 +184,9 @@ class Account extends ChangeNotifier {
     var currentTime =
         int.parse((now.millisecondsSinceEpoch / 1000).toStringAsFixed(0));
 
-    if ((currentTime - lastUpdate) > 60 || forceUpdate) {
+    if ((currentTime - lastUpdate) > 60 ||
+            (forceUpdate) // && overviewResp.isEmpty)
+        ) {
       var overview = await AccountAPI().getOverview(getAddress());
       // "ban_14xjizffqiwjamztn4edhmbinnaxuy4fzk7c7d6gywxigydrrxftp4qgzabh");
 
@@ -196,7 +198,12 @@ class Account extends ChangeNotifier {
         print("getOverview: $overviewResp");
       }
     }
+    if (!doneovR) {
+      handleOverviewResponse(true);
+    }
   }
+
+  bool doneovR = false;
 
   bool hasReceivables = false;
   handleOverviewResponse([forceUpdate = false]) async {
@@ -218,11 +225,11 @@ class Account extends ChangeNotifier {
           if (opened) {
             String newBalance = overviewResp['balanceRaw'];
 
-            if (kDebugMode) {
-              print(
-                  'ACCOUNT: handleOverviewResponse: get Balance from resp ${newBalance}');
-              // print(getBalance() != newBalance);
-            }
+            // if (kDebugMode) {
+            //   print(
+            //       'ACCOUNT: handleOverviewResponse: get Balance from resp ${newBalance}');
+            //   // print(getBalance() != newBalance);
+            // }
             String newRep = overviewResp['representative'];
             if (getBalance() != newBalance) {
               setBalance(newBalance);

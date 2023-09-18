@@ -3,6 +3,7 @@
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/db/dbtest.dart';
 import 'package:bananokeeper/initial_pages/initial_page_one.dart';
+import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/pow_source.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
@@ -48,8 +49,19 @@ class _sideDrawer extends State<sideDrawer>
         (WalletsService x) => x.wallets[x.activeWallet].getWalletName());
     String currentAccount =
         watchX((WalletsService x) => x.wallets[x.activeWallet].currentAccount);
-    var account = watchOnly((WalletsService x) => x.wallets[x.activeWallet]
-        .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
+
+    int walletIndex = services<WalletsService>().activeWallet;
+    int accountIndex =
+        services<WalletsService>().wallets[walletIndex].activeIndex;
+
+    String accOrgName = services<WalletsService>()
+        .wallets[walletIndex]
+        .accountsList[accountIndex];
+
+    var account = services<Account>(instanceName: accOrgName);
+
+    // var account = watchOnly((WalletsService x) => x.wallets[x.activeWallet]
+    //     .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
     var statusBarHeight = MediaQuery.of(context).viewPadding.top;
 
     String selectedPoWName = watchOnly((PoWSource x) => x.getAPIName());

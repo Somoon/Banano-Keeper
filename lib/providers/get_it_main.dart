@@ -3,6 +3,7 @@
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/providers/pow_source.dart';
+import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
@@ -19,6 +20,7 @@ void initServices() {
   services.registerSingleton<UserData>(UserData());
   services.registerSingleton<DBManager>(DBManager());
   services.registerSingleton<PoWSource>(PoWSource());
+  services.registerSingleton<QueueService>(QueueService());
 
   // services.registerSingleton<SharedPrefsModel>(SharedPrefsModel());
   // services.registerSingletonAsync<SharedPrefsModel>(() => SharedPrefsModel());

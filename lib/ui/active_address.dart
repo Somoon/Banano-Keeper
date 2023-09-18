@@ -1,7 +1,9 @@
 import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bananokeeper/api/account_history_response.dart';
 import 'package:bananokeeper/providers/account.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:flutter/foundation.dart';
@@ -27,13 +29,26 @@ class ActiveAccountState extends State<ActiveAccount>
 
     var wallet = watchOnly((WalletsService x) => x.wallets[x.activeWallet]);
     // var account = wallet.accounts[wallet.getActiveIndex()];
-    var account = watchOnly((WalletsService x) => x.wallets[x.activeWallet]
-        .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
+    int walletIndex = services<WalletsService>().activeWallet;
+    int accountIndex =
+        services<WalletsService>().wallets[walletIndex].activeIndex;
+
+    String accOrgName = services<WalletsService>()
+        .wallets[walletIndex]
+        .accountsList[accountIndex];
+
+    var account = services<Account>(instanceName: accOrgName);
+    // watchOnly((WalletsService x) => x.wallets[x.activeWallet]
+    //   .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
 
     String currentAccount =
         watchX((WalletsService x) => x.wallets[x.activeWallet].currentAccount);
     // num activeAccountBalance =
     //     watchX((WalletsService x) => x.wallets[x.activeWallet].accounts[x.wallets[x.activeWallet].getActiveIndex()].getBalance());
+    Map<String, dynamic> overviewResp =
+        watchOnly((Account x) => x.overviewResp, instanceName: accOrgName);
+    List<AccountHistory> history =
+        watchOnly((Account x) => x.history, instanceName: accOrgName);
 
     double width = MediaQuery.of(context).size.width;
 
@@ -41,7 +56,7 @@ class ActiveAccountState extends State<ActiveAccount>
       future: account.getOverview(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          if (account.overviewResp.isEmpty && account.getBalance() == 0) {
+          if (overviewResp.isEmpty && account.getBalance() == 0) {
             return displayActiveCard(
                 currentTheme, width, currentAccount, account, wallet, true);
           }
@@ -53,7 +68,7 @@ class ActiveAccountState extends State<ActiveAccount>
                 currentTheme, width, currentAccount, account, wallet, true);
           }
         }
-        if (account.history.isEmpty) {
+        if (history.isEmpty) {
           return displayActiveCard(
               currentTheme, width, currentAccount, account, wallet, true);
         } else {
@@ -195,11 +210,14 @@ class ActiveAccountState extends State<ActiveAccount>
     var wallet = watchOnly((WalletsService x) => x.wallets[x.activeWallet]);
 
     var ddmi = <PopupMenuEntry>[];
-    for (int i = 0; i < wallet.accounts.length; i++) {
+    for (int i = 0; i < wallet.accountsList.length; i++) {
       ddmi.add(PopupMenuItem(
         value: i,
         child: Text(
-          wallet.accounts[i].getAddress().substring(0, 16),
+          services<Account>(instanceName: wallet.accountsList[i])
+              .getAddress()
+              .substring(0, 16),
+          // wallet.accounts[i].getAddress().substring(0, 16),
           style: currentTheme.textStyle.copyWith(fontSize: 14),
         ),
       ));

@@ -3,7 +3,10 @@ import 'dart:convert';
 
 import 'package:bananokeeper/api/account_api.dart';
 import 'package:bananokeeper/api/state_block.dart';
+import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/queue_service.dart';
+import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:decimal/decimal.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -53,8 +56,17 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    var account = watchOnly((WalletsService x) => x.wallets[x.activeWallet]
-        .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
+    int walletIndex = services<WalletsService>().activeWallet;
+    int accountIndex =
+        services<WalletsService>().wallets[walletIndex].activeIndex;
+
+    String accOrgName = services<WalletsService>()
+        .wallets[walletIndex]
+        .accountsList[accountIndex];
+
+    var account = services<Account>(instanceName: accOrgName);
+    // var account = watchOnly((WalletsService x) => x.wallets[x.activeWallet]
+    //     .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
 
     // double height = MediaQuery.of(context).size.height;
     return ScaffoldMessenger(
@@ -109,11 +121,21 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
       onPressed: () async {
         final LocalAuthentication auth = LocalAuthentication();
         var appLocalizations = AppLocalizations.of(context);
-        String activeAccountBalance = watchOnly((WalletsService x) => x
-            .wallets[x.activeWallet]
-            .accounts[x.wallets[x.activeWallet].getActiveIndex()]
-            .getBalance());
-        bool sent = false;
+        // String activeAccountBalance = watchOnly((WalletsService x) => x
+        //     .wallets[x.activeWallet]
+        //     .accounts[x.wallets[x.activeWallet].getActiveIndex()]
+        //     .getBalance());
+        int walletIndex = services<WalletsService>().activeWallet;
+        int accountIndex =
+            services<WalletsService>().wallets[walletIndex].activeIndex;
+
+        String accOrgName = services<WalletsService>()
+            .wallets[walletIndex]
+            .accountsList[accountIndex];
+
+        String activeAccountBalance =
+            watchOnly((Account x) => x.getBalance(), instanceName: accOrgName);
+        bool? sent = false;
         sent = await showModalBottomSheet(
           enableDrag: true,
           isScrollControlled: true,
@@ -125,6 +147,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
           builder: (BuildContext context) {
             return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
+                services<QueueService>().add(account.getOverview(true));
                 return GestureDetector(
                   onTap: () {
                     FocusScope.of(context).unfocus();
@@ -492,50 +515,86 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                   NanoAccountType.BANANO, addressController.text)) {
             Decimal amount = Decimal.parse(amountController.text);
 
-            var maxAmount = Utils().amountFromRaw(account.getBalance());
+            Decimal maxAmount = Utils().amountFromRaw(account.getBalance());
             if ((amount > Decimal.parse("0") && amount <= maxAmount)) {
-              //get latest bal
-              await account.getOverview(true);
-              await account.handleOverviewResponse(true);
+              bool canauth = await BiometricUtil().canAuth();
+              bool verified = false;
 
-              String sendAmountRaw =
-                  Utils().rawFromAmount(amountController.text);
-              String destAddress = addressController.text;
-              var hist = await AccountAPI().getHistory(account.address, 1);
-              var historyData = jsonDecode(hist.body);
-              String previous = historyData[0]['hash'];
+              if (!canauth) {
+                verified = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => VerifyPIN(),
+                      ),
+                    ) ??
+                    false;
+              } else {
+                verified = await BiometricUtil()
+                    .authenticate(appLocalizations.authMsgWalletDel);
+              }
 
-              var newRaw = (BigInt.parse(account.getBalance()) -
-                      BigInt.parse(sendAmountRaw))
-                  .toString();
+              if (verified) {
+                LoadingIndicatorDialog().show(context);
 
-              int accountType = NanoAccountType.BANANO;
-              String calculatedHash = NanoBlocks.computeStateHash(
-                  accountType,
-                  account.address,
-                  previous,
-                  account.representative,
-                  BigInt.parse(newRaw),
-                  destAddress);
-              int activeWallet = services<WalletsService>().activeWallet;
-              String privateKey = services<WalletsService>()
-                  .wallets[activeWallet]
-                  .getPrivateKey(account.index);
-              // Signing a block
-              String sign =
-                  NanoSignatures.signBlock(calculatedHash, privateKey);
+                await services<QueueService>().add(account.getOverview(true));
+                await services<QueueService>()
+                    .add(account.handleOverviewResponse(true));
 
-              StateBlock sendBlock = StateBlock(account.address, previous,
-                  account.representative, newRaw, destAddress, sign);
+                String sendAmountRaw =
+                    Utils().rawFromAmount(amountController.text);
+                String destAddress = addressController.text;
+                var hist = await AccountAPI().getHistory(account.address, 1);
+                var historyData = jsonDecode(hist.body);
+                String previous = historyData[0]['hash'];
 
-              await AccountAPI().processRequest(sendBlock.toJson(), "send");
-              await account.setBalance(newRaw);
-              await account.onRefreshUpdateHistory();
-              setState(() {
-                amountController.clear();
-                addressController.clear();
-                Navigator.of(context).pop(true);
-              });
+                var newRaw = (BigInt.parse(account.getBalance()) -
+                        BigInt.parse(sendAmountRaw))
+                    .toString();
+
+                int accountType = NanoAccountType.BANANO;
+                String calculatedHash = NanoBlocks.computeStateHash(
+                    accountType,
+                    account.address,
+                    previous,
+                    account.representative,
+                    BigInt.parse(newRaw),
+                    destAddress);
+                int activeWallet = services<WalletsService>().activeWallet;
+                String privateKey = services<WalletsService>()
+                    .wallets[activeWallet]
+                    .getPrivateKey(account.index);
+                // Signing a block
+                String sign =
+                    NanoSignatures.signBlock(calculatedHash, privateKey);
+
+                StateBlock sendBlock = StateBlock(account.address, previous,
+                    account.representative, newRaw, destAddress, sign);
+
+                var sendHash = await AccountAPI()
+                    .processRequest(sendBlock.toJson(), "send");
+
+                // Close the dialog programmatically
+                // We use "mounted" variable to get rid of the "Do not use BuildContexts across async gaps" warning
+                LoadingIndicatorDialog().dismiss();
+
+                //if
+                //{"error":"Invalid block balance for given subtype"}
+                //else v
+                if (jsonDecode(sendHash)['hash'] != null &&
+                    NanoHelpers.isHexString(jsonDecode(sendHash)['hash'])) {
+                  await account.setBalance(newRaw);
+                  await services<QueueService>()
+                      .add(account.onRefreshUpdateHistory());
+                } else {
+                  //ERR?
+                  print(sendHash);
+                }
+
+                setState(() {
+                  amountController.clear();
+                  addressController.clear();
+                  Navigator.of(context).pop(true);
+                });
+              }
             }
           }
         },
@@ -718,9 +777,8 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
             ),
             onPressed: () {
               setState(() {
-                amountController.text = Utils()
-                    .amountFromRaw(account.getBalance())
-                    .toStringAsFixed(2);
+                amountController.text =
+                    Utils().amountFromRaw(account.getBalance()).toString();
               });
             },
           ),
@@ -844,5 +902,62 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
         fontSize: 13,
       ),
     );
+  }
+}
+
+////////////////////////////////////
+class LoadingIndicatorDialog {
+  static final LoadingIndicatorDialog _singleton =
+      LoadingIndicatorDialog._internal();
+  late BuildContext _context;
+  bool isDisplayed = false;
+
+  factory LoadingIndicatorDialog() {
+    return _singleton;
+  }
+
+  LoadingIndicatorDialog._internal();
+
+  show(BuildContext context, {String text = 'Sending...'}) {
+    if (isDisplayed) {
+      return;
+    }
+    showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          _context = context;
+          isDisplayed = true;
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: SimpleDialog(
+              backgroundColor: Colors.white,
+              children: [
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 16, top: 16, right: 16),
+                        child: CircularProgressIndicator(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(text),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  dismiss() {
+    if (isDisplayed) {
+      Navigator.of(_context).pop();
+      isDisplayed = false;
+    }
   }
 }

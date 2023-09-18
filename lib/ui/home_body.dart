@@ -7,6 +7,7 @@ import 'package:bananokeeper/api/account_history_response.dart';
 import 'package:bananokeeper/placeholders/transctions.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/utils/utils.dart';
@@ -38,18 +39,37 @@ class _home_body extends State<home_body>
 
     var wallet = watchOnly((WalletsService x) => x.wallets[x.activeWallet]);
     // var account = wallet.accounts[wallet.getActiveIndex()];
-    var account = watchOnly((WalletsService x) => x.wallets[x.activeWallet]
-        .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
+    int walletIndex = services<WalletsService>().activeWallet;
+    int accountIndex =
+        services<WalletsService>().wallets[walletIndex].activeIndex;
 
-    var activeW = get<WalletsService>().activeWallet;
+    String accOrgName = services<WalletsService>()
+        .wallets[walletIndex]
+        .accountsList[accountIndex];
 
-    var idx = get<WalletsService>().wallets[activeW].getActiveIndex();
+    var account = services<Account>(instanceName: accOrgName);
+    var accountOpen =
+        watchOnly((Account x) => x.opened, instanceName: accOrgName);
+    List<AccountHistory> history =
+        watchOnly((Account x) => x.history, instanceName: accOrgName);
+
+    bool completed =
+        watchOnly((Account x) => x.completed, instanceName: accOrgName);
+
+    // var account = watchOnly((WalletsService x) => x.wallets[x.activeWallet]
+    //     .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
+
+    // var activeW = get<WalletsService>().activeWallet;
+
+    // var idx = get<WalletsService>().wallets[activeW].getActiveIndex();
 
     String currentAccount =
         watchX((WalletsService x) => x.wallets[x.activeWallet].currentAccount);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-
+    if (!account.doneovR && !completed) {
+      services<QueueService>().add(account.getOverview(true));
+    }
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: height,
@@ -60,37 +80,34 @@ class _home_body extends State<home_body>
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           // ActiveAccount(),
-          FutureBuilder(
-            future: services<WalletsService>()
-                .wallets[activeW]
-                .accounts[services<WalletsService>()
-                    .wallets[activeW]
-                    .getActiveIndex()]
-                .getOverview(true),
-            //account.getOverview(true),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                if (!account.opened) {
-                  return displayActiveCard(currentTheme, width, currentAccount,
-                      account, wallet, true);
-                }
-              } else if (snapshot.connectionState == ConnectionState.done) {
-                account.handleOverviewResponse(true);
-                // If we got an error
-                if (snapshot.hasError) {
-                  return displayActiveCard(currentTheme, width, currentAccount,
-                      account, wallet, true);
-                }
-              }
-              if (!account.opened) {
-                return displayActiveCard(
-                    currentTheme, width, currentAccount, account, wallet, true);
-              } else {
-                return displayActiveCard(currentTheme, width, currentAccount,
-                    account, wallet, false);
-              }
-            },
-          ),
+          displayActiveCard(currentTheme, width, currentAccount, account,
+              wallet, !accountOpen),
+          // FutureBuilder(
+          //   future: account.getOverview(true),
+          //   //account.getOverview(true),
+          //   builder: (context, snapshot) {
+          //     if (snapshot.connectionState == ConnectionState.waiting) {
+          //       if (!accountOpen) {
+          //         return displayActiveCard(currentTheme, width, currentAccount,
+          //             account, wallet, true);
+          //       }
+          //     } else if (snapshot.connectionState == ConnectionState.done) {
+          //       account.handleOverviewResponse(true);
+          //       // If we got an error
+          //       if (snapshot.hasError) {
+          //         return displayActiveCard(currentTheme, width, currentAccount,
+          //             account, wallet, true);
+          //       }
+          //     }
+          //     if (!accountOpen) {
+          //       return displayActiveCard(
+          //           currentTheme, width, currentAccount, account, wallet, true);
+          //     } else {
+          //       return displayActiveCard(currentTheme, width, currentAccount,
+          //           account, wallet, false);
+          //     }
+          //   },
+          // ),
           // -------------TRANSACTIONS TEXT
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
@@ -149,15 +166,15 @@ class _home_body extends State<home_body>
                     future: account.getHistory(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        if (account.history.isEmpty) {
+                        if (history.isEmpty) {
                           return TransactionsPlaceholder();
                         }
                         //return const CircularProgressIndicator();
                       } else if (snapshot.connectionState ==
                           ConnectionState.done) {
-                        if (!account.completed) {
-                          account.handleResponse();
-                        }
+                        // if (!completed) {
+                        //   account.handleResponse();
+                        // }
                         // If we got an error
                         if (snapshot.hasError) {
                           return TransactionsPlaceholder();
@@ -169,7 +186,7 @@ class _home_body extends State<home_body>
                           // );
                         }
                       }
-                      if (account.history.isEmpty) {
+                      if (history.isEmpty) {
                         return unopenedCard();
                       } else {
                         return _transListViewBuilder(account);
@@ -347,11 +364,14 @@ class _home_body extends State<home_body>
     // var wallet = watchOnly((WalletsService x) => x.wallets[x.activeWallet]);
 
     var ddmi = <PopupMenuEntry>[];
-    for (int i = 0; i < wallet.accounts.length; i++) {
+    for (int i = 0; i < wallet.accountsList.length; i++) {
       ddmi.add(PopupMenuItem(
         value: i,
         child: Text(
-          wallet.accounts[i].getAddress().substring(0, 16),
+          services<Account>(instanceName: wallet.accountsList[i])
+              .getAddress()
+              .substring(0, 16),
+          // wallet.accounts[i].getAddress().substring(0, 16),
           style: currentTheme.textStyle.copyWith(fontSize: 14.0),
         ),
       ));
@@ -518,9 +538,9 @@ class _home_body extends State<home_body>
   }
 
   Future<void> addItemToList(account) async {
-    await account.onRefreshUpdateHistory();
-    await account.getOverview(true);
-    await account.handleOverviewResponse(true);
+    await services<QueueService>().add(account.onRefreshUpdateHistory());
+    await services<QueueService>().add(account.getOverview(true));
+    await services<QueueService>().add(account.handleOverviewResponse(true));
 
     setState(() {});
   }

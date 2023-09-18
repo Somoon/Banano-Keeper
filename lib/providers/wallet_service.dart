@@ -34,6 +34,7 @@ class WalletService extends ChangeNotifier {
   ]);
 
   List<Account> accounts = [];
+  List<String> accountsList = [];
 
   void setSeed(newSeed) {
     seed = newSeed;
@@ -62,11 +63,14 @@ class WalletService extends ChangeNotifier {
   void editAccountName(int index, String newName) {
     services<DBManager>().updateAccountName(original_name, index, newName);
     accounts[index].setName(newName);
+//to move to this
+    services<Account>(instanceName: "${original_name}_$index").setName(newName);
     notifyListeners();
   }
 
   String getAccountName(int index) {
-    return accounts[index].getName();
+    //accounts[index].getName();
+    return services<Account>(instanceName: "${original_name}_$index").getName();
   }
 
   int getActiveIndex() {
@@ -76,14 +80,22 @@ class WalletService extends ChangeNotifier {
   setActiveIndex(int index) {
     // print("wallet_service.dart: setActiveIndex: $index");
     activeIndex = index;
-    currentAccount.value = accounts[index].getAddress();
+    // currentAccount.value = accounts[index].getAddress();
+    currentAccount.value =
+        services<Account>(instanceName: "${original_name}_$index").getAddress();
     services<SharedPrefsModel>().saveActiveAccount(index);
     notifyListeners();
   }
 
   bool indexExist(int index) {
-    for (var element in accounts) {
-      if (element.getIndex() == index) {
+    // for (var element in accounts) {
+    //   if (element.getIndex() == index) {
+    //     return true;
+    //   }
+    // }
+    for (int i = 0; i < accountsList.length; i++) {
+      var acc = services<Account>(instanceName: "${original_name}_$i");
+      if (acc.getIndex() == index) {
         return true;
       }
     }
@@ -136,6 +148,11 @@ class WalletService extends ChangeNotifier {
     }
     accounts.add(account);
 
+    String accName = "${original_name}_${accountsList.length}";
+    accountsList.add(accName);
+
+    services.registerSingleton<Account>(account, instanceName: accName);
+
     if (newAccount) {
       services<DBManager>().insertWalletDataRow(original_name, {
         "index_id": index,
@@ -179,15 +196,24 @@ class WalletService extends ChangeNotifier {
 
   String getCurrentAccount() {
     if (currentAccount.value == "" || currentAccount.value == null) {
-      currentAccount.value = accounts[activeIndex].getAddress();
+      currentAccount.value =
+          services<Account>(instanceName: "${original_name}_$activeIndex")
+              .getAddress();
+      // currentAccount.value = accounts[activeIndex].getAddress();
     }
     return currentAccount.value;
   }
 
   void removeIndex(int index) {
     if (accounts.length > 1) {
-      services<DBManager>()
-          .deleteAccount(original_name, accounts[index].getIndex());
+      // services<DBManager>()
+      //     .deleteAccount(original_name, accounts[index].getIndex());
+      services<DBManager>().deleteAccount(
+          original_name,
+          services<Account>(instanceName: "${original_name}_$index")
+              .getIndex());
+      accountsList.removeAt(index);
+      services.unregister<Account>(instanceName: "${original_name}_$index");
       accounts.removeAt(index);
       if (index == activeIndex) {
         setActiveIndex(0);
