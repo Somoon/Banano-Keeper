@@ -4,15 +4,16 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/api/account_history_response.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import '../themes.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:bananokeeper/themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 
-import '../utils/utils.dart';
+import 'package:bananokeeper/utils/utils.dart';
 
 class ActiveAccount extends StatefulWidget with GetItStatefulWidgetMixin {
   ActiveAccount({super.key});
@@ -25,58 +26,33 @@ class ActiveAccountState extends State<ActiveAccount>
     with WidgetsBindingObserver, GetItStateMixin {
   @override
   Widget build(BuildContext context) {
+    // double height = MediaQuery.of(context).size.height;
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
 
-    var wallet = watchOnly((WalletsService x) => x.wallets[x.activeWallet]);
-    // var account = wallet.accounts[wallet.getActiveIndex()];
-    int walletIndex = services<WalletsService>().activeWallet;
-    int accountIndex =
-        services<WalletsService>().wallets[walletIndex].activeIndex;
+    int walletID = watchOnly((WalletsService x) => x.activeWallet);
+    String walletName =
+        watchOnly((WalletsService x) => x.walletsList[walletID]);
+    WalletService wallet = services<WalletService>(instanceName: walletName);
 
-    String accOrgName = services<WalletsService>()
-        .wallets[walletIndex]
-        .accountsList[accountIndex];
+    int accountIndex = wallet.activeIndex;
+
+    String accOrgName = wallet.accountsList[accountIndex];
 
     var account = services<Account>(instanceName: accOrgName);
-    // watchOnly((WalletsService x) => x.wallets[x.activeWallet]
-    //   .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
+    var accountOpen =
+        watchOnly((Account x) => x.opened, instanceName: accOrgName);
 
+    bool completed =
+        watchOnly((Account x) => x.completed, instanceName: accOrgName);
+
+    if (!account.doneovR && !completed) {
+      services<QueueService>().add(account.getOverview(true));
+    }
     String currentAccount =
-        watchX((WalletsService x) => x.wallets[x.activeWallet].currentAccount);
-    // num activeAccountBalance =
-    //     watchX((WalletsService x) => x.wallets[x.activeWallet].accounts[x.wallets[x.activeWallet].getActiveIndex()].getBalance());
-    Map<String, dynamic> overviewResp =
-        watchOnly((Account x) => x.overviewResp, instanceName: accOrgName);
-    List<AccountHistory> history =
-        watchOnly((Account x) => x.history, instanceName: accOrgName);
-
+        watchX((WalletService x) => x.currentAccount, instanceName: walletName);
     double width = MediaQuery.of(context).size.width;
-
-    return FutureBuilder(
-      future: account.getOverview(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          if (overviewResp.isEmpty && account.getBalance() == 0) {
-            return displayActiveCard(
-                currentTheme, width, currentAccount, account, wallet, true);
-          }
-        } else if (snapshot.connectionState == ConnectionState.done) {
-          account.handleOverviewResponse();
-          // If we got an error
-          if (snapshot.hasError) {
-            return displayActiveCard(
-                currentTheme, width, currentAccount, account, wallet, true);
-          }
-        }
-        if (history.isEmpty) {
-          return displayActiveCard(
-              currentTheme, width, currentAccount, account, wallet, true);
-        } else {
-          return displayActiveCard(
-              currentTheme, width, currentAccount, account, wallet, false);
-        }
-      },
-    );
+    return displayActiveCard(
+        currentTheme, width, currentAccount, account, wallet, !accountOpen);
   }
 
   Center displayActiveCard(
@@ -121,7 +97,8 @@ class ActiveAccountState extends State<ActiveAccount>
                           Container(
                             child: PopupMenuButton(
                               constraints: const BoxConstraints(maxHeight: 300),
-                              tooltip: "select address",
+                              tooltip: AppLocalizations.of(context)!
+                                  .selectAddressHint,
                               // position: PopupMenuPosition.under,
                               // offset: const Offset(0, -380),
                               // position: ,
@@ -130,13 +107,19 @@ class ActiveAccountState extends State<ActiveAccount>
                               initialValue: currentAccount,
                               // Callback that sets the selected popup menu item.
                               onSelected: (item) {
-                                // services<WalletsService>()
-                                //     .setActiveWallet(item);
-                                wallet.setActiveIndex(item);
-                                setState(() {});
+                                setState(() {
+                                  int walletID =
+                                      services<WalletsService>().activeWallet;
+                                  String walletName = services<WalletsService>()
+                                      .walletsList[walletID];
+
+                                  services<WalletService>(
+                                          instanceName: walletName)
+                                      .setActiveIndex(item);
+                                });
                               },
                               itemBuilder: (BuildContext context) =>
-                                  createDropDownMenuItems(),
+                                  createDropDownMenuItems(wallet, currentTheme),
                               child: SizedBox(
                                 width: double.infinity,
                                 child: Center(
@@ -165,8 +148,12 @@ class ActiveAccountState extends State<ActiveAccount>
                           Expanded(
                             flex: 1,
                             child: Center(
-                              child: blurBalance(blurred,
-                                  displayBalance(account, currentTheme)),
+                              child: blurBalance(
+                                blurred,
+                                Utils().formatBalance(
+                                    account.getBalance(), currentTheme),
+                              ),
+                              // displayBalance(account, currentTheme)),
                             ),
                           )
                         ],
@@ -193,21 +180,10 @@ class ActiveAccountState extends State<ActiveAccount>
     }
   }
 
-  Widget displayBalance(Account account, BaseTheme currentTheme) {
-    String activeAccountBalance = watchOnly((WalletsService x) => x
-        .wallets[x.activeWallet]
-        .accounts[x.wallets[x.activeWallet].getActiveIndex()]
-        .getBalance());
-
-    if (kDebugMode) {
-      print("ACTIVE ADDRESS: $activeAccountBalance");
-    }
-    return Utils().formatBalance(activeAccountBalance, currentTheme);
-  }
-
-  List<PopupMenuEntry> createDropDownMenuItems() {
-    var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-    var wallet = watchOnly((WalletsService x) => x.wallets[x.activeWallet]);
+  List<PopupMenuEntry> createDropDownMenuItems(
+      WalletService wallet, BaseTheme currentTheme) {
+    // var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
+    // var wallet = watchOnly((WalletsService x) => x.wallets[x.activeWallet]);
 
     var ddmi = <PopupMenuEntry>[];
     for (int i = 0; i < wallet.accountsList.length; i++) {
@@ -218,7 +194,7 @@ class ActiveAccountState extends State<ActiveAccount>
               .getAddress()
               .substring(0, 16),
           // wallet.accounts[i].getAddress().substring(0, 16),
-          style: currentTheme.textStyle.copyWith(fontSize: 14),
+          style: currentTheme.textStyle.copyWith(fontSize: 14.0),
         ),
       ));
     }

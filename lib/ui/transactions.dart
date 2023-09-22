@@ -4,7 +4,9 @@ import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/api/account_history_response.dart';
 import 'package:bananokeeper/placeholders/transctions.dart';
+import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -31,14 +33,23 @@ class _transactionsBody extends State<transactionsBody>
 
   @override
   Widget build(BuildContext context) {
-    return Container(child: buildMainSettings(context));
-  }
+    // var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
 
-  Widget buildMainSettings(BuildContext context) {
-    // String currentAccount =
-    //     watchX((WalletsService x) => x.wallets[x.activeWallet].currentAccount);
-    var account = watchOnly((WalletsService x) => x.wallets[x.activeWallet]
-        .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
+    int walletID = watchOnly((WalletsService x) => x.activeWallet);
+    String walletName =
+        watchOnly((WalletsService x) => x.walletsList[walletID]);
+    WalletService wallet = services<WalletService>(instanceName: walletName);
+
+    int accountIndex =
+        watchOnly((WalletService x) => x.activeIndex, instanceName: walletName);
+
+    String accOrgName = wallet.accountsList[accountIndex];
+
+    var account = services<Account>(instanceName: accOrgName);
+
+    List<AccountHistory> history =
+        watchOnly((Account x) => x.history, instanceName: accOrgName);
+
     return Expanded(
       child: RefreshIndicator(
         onRefresh: () => addItemToList(account),
@@ -55,14 +66,14 @@ class _transactionsBody extends State<transactionsBody>
               future: account.getHistory(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  if (account.history.isEmpty) {
+                  if (history.isEmpty) {
                     return TransactionsPlaceholder();
                   }
                   //return const CircularProgressIndicator();
                 } else if (snapshot.connectionState == ConnectionState.done) {
-                  if (!account.completed) {
-                    account.handleResponse();
-                  }
+                  // if (!completed) {
+                  //   account.handleResponse();
+                  // }
                   // If we got an error
                   if (snapshot.hasError) {
                     return TransactionsPlaceholder();
@@ -74,7 +85,7 @@ class _transactionsBody extends State<transactionsBody>
                     // );
                   }
                 }
-                if (account.history.isEmpty) {
+                if (history.isEmpty) {
                   return unopenedCard();
                 } else {
                   return _transListViewBuilder(account);

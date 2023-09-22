@@ -15,13 +15,18 @@ import 'package:flutter/foundation.dart';
 
 class WalletsService extends ChangeNotifier {
   List<WalletService> wallets = <WalletService>[];
+  List<String> walletsList = [];
 
   late int activeWallet;
   late int latestWalletID;
 
   setActiveWallet(nID) {
     activeWallet = nID;
-    String orgName = wallets[activeWallet].original_name;
+
+    // String orgName = wallets[activeWallet].original_name;
+    String orgName =
+        services<WalletService>(instanceName: walletsList[activeWallet])
+            .original_name;
     services<SharedPrefsModel>().saveActiveWallet(orgName);
     notifyListeners();
   }
@@ -30,10 +35,6 @@ class WalletsService extends ChangeNotifier {
     // print('wallets2.dart: setLAtestWalletID: setting to ID $nID');
     latestWalletID = nID;
     notifyListeners();
-  }
-
-  generateSeed() {
-    return NanoSeeds.generateSeed();
   }
 
   //to use when creating/importing NEW wallet into the app
@@ -48,19 +49,10 @@ class WalletsService extends ChangeNotifier {
       name = "Wallet $latestWalletID";
     }
     if (seed == "") {
-      seed = generateSeed();
+      seed = Utils().generateSeed();
     }
 
-    setLatestWalletID(++latestWalletID);
     String encryptedSeed = await Utils().encryptSeed(seed);
-/*
-{
-        'original_name': original_name,
-        'name': name,
-        'active_index': 0,
-        'seed_encrypted': encryptedSeed,
-      },
- */
 
     WalletService wallet =
         WalletService(seed, name, original_name, encryptedSeed);
@@ -68,11 +60,16 @@ class WalletsService extends ChangeNotifier {
 
     addWallet(wallet);
     wallets[wallets.length - 1].createAccount(0);
+    services.registerSingleton<WalletService>(wallet,
+        instanceName: original_name);
+    services<WalletService>(instanceName: original_name).createAccount(0);
     if (kDebugMode) {
       // print("wallets_service.dart: createNewWallet: ");
       // print(
       // "wallets_service.dart: createNewWallet: latestWaleltID before saving: $latestWalletID");
     }
+    setLatestWalletID(++latestWalletID);
+
     services<SharedPrefsModel>().saveLatestWalletID(latestWalletID);
 
     notifyListeners();
@@ -80,21 +77,21 @@ class WalletsService extends ChangeNotifier {
 
   //used when importing from DB
   importWallet(
-      [String seed = "",
-      String name = "",
-      String original_name = "",
-      int active_index = 0]) {
+      String seed, String name, String original_name, int active_index) {
     if (name == "") {
       name = "Wallet $latestWalletID";
       setLatestWalletID(++latestWalletID);
       services<SharedPrefsModel>().saveLatestWalletID(latestWalletID);
     }
     if (seed == "") {
-      seed = generateSeed();
+      seed = Utils().generateSeed();
     }
 
     WalletService wallet = WalletService(seed, name, original_name, "");
     addWallet(wallet);
+    services.registerSingleton<WalletService>(wallet,
+        instanceName: original_name);
+
     if (kDebugMode) {
       // print(
       //     "wallets_service.dart: createWallet: created $name - $original_name");
@@ -109,26 +106,28 @@ class WalletsService extends ChangeNotifier {
     }
     String seed =
         "0000000000000000000000000000000000000000000000000000000000000000";
-    importWallet(seed);
+    createNewWallet(seed);
   }
 
   addWallet(WalletService wallet) {
-    // print("Adding wallet ${wallet.getWalletName()}");
     wallets.add(wallet);
-    // setActiveWallet(wallets.length - 1);
+    walletsList.add(wallet.original_name);
   }
 
   deleteWallet(index) {
-    if (wallets.asMap().containsKey(index)) {
-      if (wallets.length == 1) {
-        wallets.clear();
-
+    if (walletsList.asMap().containsKey(index)) {
+      // if (wallets.asMap().containsKey(index)) {
+      if (walletsList.length == 1) {
+        // if (wallets.length == 1) {
         //should send user to InitialPage here?
-
+        walletsList.clear();
         // wallets.clear();
       } else {
         services<DBManager>().deleteWallet(wallets[index].original_name);
-        wallets.removeAt(index);
+        // wallets.removeAt(index);
+
+        services.unregister<WalletService>(instanceName: walletsList[index]);
+        walletsList.removeAt(index);
       }
       setActiveWallet(0);
     }

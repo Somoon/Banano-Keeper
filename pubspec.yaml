@@ -50,7 +50,6 @@ dependencies:
   nanodart: ^2.0.0
   flutter_slidable: ^3.0.0
   auto_size_text: ^3.0.0
-#  simple_barcode_scanner: ^0.0.8
   qr_code_dart_scan: ^0.7.1
   qr_scanner_overlay: ^0.0.2
   local_auth: ^2.1.6
@@ -69,8 +68,7 @@ dependencies:
   qr_flutter: ^4.1.0
   queue: ^3.1.0+2
 #  cryptography: ^2.5.0
-#   banano_library:
-#     path: local_packages/banano_library
+
 
 dev_dependencies:
   flutter_test:

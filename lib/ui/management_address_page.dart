@@ -53,13 +53,31 @@ class AccountManagementPageState extends State<AccountManagementPage>
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     // var statusBarHeight = MediaQuery.of(context).viewPadding.top;
 
-    int walletIndex = services<WalletsService>().activeWallet;
-    int accLen =
-        services<WalletsService>().wallets[walletIndex].accountsList.length;
-    for (int index = 0; index < accLen; index++) {
-      String accOrgName =
-          services<WalletsService>().wallets[walletIndex].accountsList[index];
+    int walletIndex = watchOnly((WalletsService x) => x.activeWallet);
 
+    String walletName =
+        watchOnly((WalletsService x) => x.walletsList[walletIndex]);
+
+    WalletService wallet = services<WalletService>(instanceName: walletName);
+
+    int accLen = wallet.accountsList.length;
+
+    // if (kDebugMode) {
+    //   print(
+    //       "management address page: walletIndex $walletIndex -- walletName = ${walletName}");
+    //   print(
+    //       "management address page: wallet: ${wallet.original_name} -- accounts: $accLen");
+    //   print(wallet.accountsList);
+    // }
+    //
+
+    for (int index = 0; index < accLen; index++) {
+      String accOrgName = wallet.accountsList[index];
+
+      // if (kDebugMode) {
+      //   print("Checking account: $index $accOrgName");
+      //
+      // }
       var account = services<Account>(instanceName: accOrgName);
 
       if (!account.doneovR && !account.completed) {
@@ -115,13 +133,16 @@ class AccountManagementPageState extends State<AccountManagementPage>
   }
 
   Widget addressList() {
-    var accountsList =
-        watchOnly((WalletsService x) => x.wallets[x.activeWallet].accountsList);
+    int walletID = watchOnly((WalletsService x) => x.activeWallet);
+    String walletName =
+        watchOnly((WalletsService x) => x.walletsList[walletID]);
+    WalletService currentWallet =
+        services<WalletService>(instanceName: walletName);
+    var accountsList = currentWallet.accountsList;
 
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     double width = MediaQuery.of(context).size.width;
-    var currentWallet =
-        watchOnly((WalletsService x) => x.wallets[x.activeWallet]);
+
     return Expanded(
       child: SizedBox(
         width: double.infinity,
@@ -197,17 +218,16 @@ class AccountManagementPageState extends State<AccountManagementPage>
     return SlidableAction(
       // An action can be bigger than the others.
       onPressed: (_) {
-        int walletIndex = services<WalletsService>().activeWallet;
+        int walletID = watchOnly((WalletsService x) => x.activeWallet);
+        String walletName =
+            watchOnly((WalletsService x) => x.walletsList[walletID]);
+        WalletService wallet =
+            services<WalletService>(instanceName: walletName);
 
-        String accOrgName =
-            services<WalletsService>().wallets[walletIndex].accountsList[index];
+        String accOrgName = wallet.accountsList[index];
+        Account account = services<Account>(instanceName: accOrgName);
 
-        var account = services<Account>(instanceName: accOrgName);
-
-        int activeWallet = watchOnly((WalletsService x) => x.activeWallet);
-        String tempName = services<WalletsService>()
-            .wallets[activeWallet]
-            .getAccountName(index);
+        String tempName = wallet.getAccountName(index);
         renameController.text = tempName;
         var appLocalizations = AppLocalizations.of(context);
 
@@ -352,14 +372,15 @@ class AccountManagementPageState extends State<AccountManagementPage>
 
   Column slidableTileData(
       BaseTheme currentTheme, double width, accounts, int index) {
-    int walletIndex = services<WalletsService>().activeWallet;
+    int walletID = watchOnly((WalletsService x) => x.activeWallet);
+    String walletName =
+        watchOnly((WalletsService x) => x.walletsList[walletID]);
+    WalletService currentWallet =
+        services<WalletService>(instanceName: walletName);
 
-    String accOrgName =
-        services<WalletsService>().wallets[walletIndex].accountsList[index];
+    String accOrgName = currentWallet.accountsList[index];
+    Account account = services<Account>(instanceName: accOrgName);
 
-    var account = services<Account>(instanceName: accOrgName);
-    var currentWallet =
-        watchOnly((WalletsService x) => x.wallets[x.activeWallet]);
     bool isActiveAccount =
         (currentWallet.currentAccount.value == account.getAddress());
     // if (!account.doneovR) {
@@ -461,38 +482,6 @@ class AccountManagementPageState extends State<AccountManagementPage>
 
                     blurBalance(
                         !accountOpen, displayBalance(account, currentTheme)),
-                    // FutureBuilder(
-                    //   future: //(accounts[index].overviewResp.isEmpty &&
-                    //       //accounts[index].getBalance() == 0
-                    //       // ?
-                    //       account.getOverview(),
-                    //   //  : Future<null>),
-                    //   builder: (context, snapshot) {
-                    //     if (snapshot.connectionState ==
-                    //         ConnectionState.waiting) {
-                    //       if (account.overviewResp.isEmpty &&
-                    //           account.getBalance() == 0) {
-                    //         return blurBalance(
-                    //             true, displayBalance(account, currentTheme));
-                    //       }
-                    //     } else if (snapshot.connectionState ==
-                    //         ConnectionState.done) {
-                    //       account.handleOverviewResponse();
-                    //       // If we got an error
-                    //       if (snapshot.hasError) {
-                    //         return blurBalance(
-                    //             true, displayBalance(account, currentTheme));
-                    //       }
-                    //     }
-                    //     if (account.overviewResp.isEmpty) {
-                    //       return blurBalance(
-                    //           true, displayBalance(account, currentTheme));
-                    //     } else {
-                    //       return blurBalance(
-                    //           false, displayBalance(account, currentTheme));
-                    //     }
-                    //   },
-                    // ),
                   ],
                 ),
               ),
@@ -609,10 +598,8 @@ class AccountManagementPageState extends State<AccountManagementPage>
 
   void doRename(int index) {
     setState(() {
-      int activeWallet = watchOnly((WalletsService x) => x.activeWallet);
-
-      services<WalletsService>()
-          .wallets[activeWallet]
+      String walletName = services<WalletsService>().walletsList[index];
+      services<WalletService>(instanceName: walletName)
           .editAccountName(index, renameController.text);
     });
   }
@@ -712,7 +699,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
             style: TextStyle(
               color: currentTheme.text,
             ),
-            //////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////
             ///
             ///
 
@@ -750,7 +737,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                   width: 1,
                 ),
               ),
-              //////////////////////////////////////////////////////////////////////
+              //////////////////////////////////////////////////////////////////
               ///
               ///
               ///
@@ -773,17 +760,17 @@ class AccountManagementPageState extends State<AccountManagementPage>
 
   void addAccount([index = "0"]) {
     // if (indexController.value != null || indexController.value != "") {}
+    int activeWallet = services<WalletsService>().activeWallet;
 
-    var currentWallet =
-        get<WalletsService>().wallets[get<WalletsService>().activeWallet];
+    String walletName = services<WalletsService>().walletsList[activeWallet];
+
+    var currentWallet = services<WalletService>(instanceName: walletName);
 
     var index = indexController.text;
 
     if (index == "" || index == "0") {
       currentWallet.createAccount();
     } else {
-      // services<WalletsService>()
-      //     .wallets[activeWallet]
       int intIndex = int.parse(index);
       if (!currentWallet.indexExist(intIndex)) {
         currentWallet.createAccount(intIndex);

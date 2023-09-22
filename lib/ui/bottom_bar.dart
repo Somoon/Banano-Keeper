@@ -6,6 +6,7 @@ import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/queue_service.dart';
+import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:decimal/decimal.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -56,17 +57,17 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    int walletIndex = services<WalletsService>().activeWallet;
-    int accountIndex =
-        services<WalletsService>().wallets[walletIndex].activeIndex;
+    int walletID = watchOnly((WalletsService x) => x.activeWallet);
+    String walletName =
+        watchOnly((WalletsService x) => x.walletsList[walletID]);
+    WalletService wallet = services<WalletService>(instanceName: walletName);
 
-    String accOrgName = services<WalletsService>()
-        .wallets[walletIndex]
-        .accountsList[accountIndex];
+    int accountIndex =
+        watchOnly((WalletService x) => x.activeIndex, instanceName: walletName);
+
+    String accOrgName = wallet.accountsList[accountIndex];
 
     var account = services<Account>(instanceName: accOrgName);
-    // var account = watchOnly((WalletsService x) => x.wallets[x.activeWallet]
-    //     .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
 
     // double height = MediaQuery.of(context).size.height;
     return ScaffoldMessenger(

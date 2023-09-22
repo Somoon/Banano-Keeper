@@ -202,4 +202,8 @@ class Utils {
     }
     return QRData;
   }
+
+  generateSeed() {
+    return NanoSeeds.generateSeed();
+  }
 }

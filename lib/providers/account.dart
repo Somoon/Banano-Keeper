@@ -188,7 +188,6 @@ class Account extends ChangeNotifier {
             (forceUpdate) // && overviewResp.isEmpty)
         ) {
       var overview = await AccountAPI().getOverview(getAddress());
-      // "ban_14xjizffqiwjamztn4edhmbinnaxuy4fzk7c7d6gywxigydrrxftp4qgzabh");
 
       overviewResp = jsonDecode(overview.body);
 

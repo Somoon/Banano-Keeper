@@ -7,6 +7,7 @@ import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/pow_source.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
+import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/ui/dialogs/pow_dialog.dart';
 import 'package:bananokeeper/ui/dialogs/security_dialog.dart';
@@ -50,13 +51,16 @@ class _sideDrawer extends State<sideDrawer>
     String currentAccount =
         watchX((WalletsService x) => x.wallets[x.activeWallet].currentAccount);
 
-    int walletIndex = services<WalletsService>().activeWallet;
-    int accountIndex =
-        services<WalletsService>().wallets[walletIndex].activeIndex;
+    int walletIndex = watchOnly((WalletsService x) => x.activeWallet);
 
-    String accOrgName = services<WalletsService>()
-        .wallets[walletIndex]
-        .accountsList[accountIndex];
+    String walletName =
+        watchOnly((WalletsService x) => x.walletsList[walletIndex]);
+
+    WalletService wallet = services<WalletService>(instanceName: walletName);
+
+    int accountIndex = wallet.activeIndex;
+
+    String accOrgName = wallet.accountsList[accountIndex];
 
     var account = services<Account>(instanceName: accOrgName);
 

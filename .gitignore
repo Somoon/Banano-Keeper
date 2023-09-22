@@ -44,3 +44,6 @@ app.*.map.json
 /android/app/release
 /android/play-upload-keystore.jks
 /android/key.properties
+
+
+.gitignore

@@ -68,8 +68,8 @@
   "mnemonicPhrase": "Mnemonic Phrase",
   "accNameErrMsg": "Account name length can be up to 20 characters.",
   "removeAddress": "Remove address?",
-  "removeAddressWarning": "Account can be re-added using the \\'Add\\' button above.",
-  "lastAddressSnackBar": "You can\\'t delete the last address in the wallet.",
+  "removeAddressWarning": "Account can be re-added using the 'Add' button above.",
+  "lastAddressSnackBar": "You can't delete the last address in the wallet.",
   "importWalletTitle": "Import {state}",
   "@importWalletTitle": {
     "placeholders": {

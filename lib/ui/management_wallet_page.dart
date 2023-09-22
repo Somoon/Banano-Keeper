@@ -7,6 +7,7 @@ import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/ui/import_wallet.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
+import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -107,7 +108,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
   }
 
   Widget addressList(activeWallet) {
-    List<WalletService> wallets = get<WalletsService>().wallets;
+    // List<WalletService> wallets = get<WalletsService>().wallets;
+
+    List<String> walletsList = services<WalletsService>().walletsList;
 
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     double width = MediaQuery.of(context).size.width;
@@ -126,12 +129,12 @@ class WalletManagementPageState extends State<WalletManagementPage>
             physics: BouncingScrollPhysics(),
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
-            itemCount: wallets.length,
+            itemCount: walletsList.length,
             itemBuilder: (BuildContext context, int index) {
               bool isActiveWallet = (activeWallet == index);
 
-              return walletListCard(
-                  currentTheme, width, index, isActiveWallet, wallets, context);
+              return walletListCard(currentTheme, width, index, isActiveWallet,
+                  walletsList, context);
             },
           ),
         ),
@@ -140,8 +143,11 @@ class WalletManagementPageState extends State<WalletManagementPage>
   }
 
   Card walletListCard(BaseTheme currentTheme, double width, int index,
-      bool isActiveWallet, wallets, BuildContext context) {
+      bool isActiveWallet, List<String> walletsList, BuildContext context) {
     double width2 = MediaQuery.of(context).size.width;
+
+    String walletName = watchOnly((WalletsService x) => x.walletsList[index]);
+    WalletService wallet = services<WalletService>(instanceName: walletName);
 
     return Card(
       color: currentTheme.primary,
@@ -183,7 +189,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                     SizedBox(
                       width: width * 0.4,
                       child: AutoSizeText(
-                        wallets[index].getWalletName(),
+                        wallet.getWalletName(),
                         style: TextStyle(
                           color: currentTheme.text,
                           fontSize: currentTheme.fontSize,
@@ -201,8 +207,12 @@ class WalletManagementPageState extends State<WalletManagementPage>
               width: 65,
               child: TextButton(
                 onPressed: () {
+                  String walletName =
+                      watchOnly((WalletsService x) => x.walletsList[index]);
+
                   String tempName =
-                      services<WalletsService>().wallets[index].getWalletName();
+                      services<WalletService>(instanceName: walletName)
+                          .getWalletName();
 
                   renameController.text = tempName;
                   var appLocalizations = AppLocalizations.of(context);
@@ -341,7 +351,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
               width: 65,
               child: TextButton(
                 onPressed: () {
-                  backupWallet(context, index, wallets, currentTheme);
+                  backupWallet(context, index, walletsList, currentTheme);
                 },
                 style: currentTheme.btnStyleRect.copyWith(
                     backgroundColor:
@@ -358,7 +368,8 @@ class WalletManagementPageState extends State<WalletManagementPage>
               width: 65,
               child: TextButton(
                 onPressed: () async {
-                  await dismissDialog(context, index, wallets, currentTheme);
+                  await dismissDialog(
+                      context, index, walletsList, currentTheme);
                   setState(() {});
                 },
                 style: currentTheme.btnStyleRect.copyWith(
@@ -377,7 +388,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
   }
 
   Future<bool?> dismissDialog(BuildContext context, int index,
-      List<WalletService> wallets, BaseTheme currentTheme) async {
+      List<String> walletsList, BaseTheme currentTheme) async {
     var appLocalizations = AppLocalizations.of(context);
 
     return showDialog<bool>(
@@ -398,7 +409,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
             actions: [
               TextButton(
                 onPressed: () async {
-                  if (wallets.length == 1) {
+                  if (walletsList.length == 1) {
                     var snackBar = SnackBar(
                       content: Text(
                         appLocalizations.lastWalletSnackBar,
@@ -456,7 +467,8 @@ class WalletManagementPageState extends State<WalletManagementPage>
     );
   }
 
-  void backupWallet(context, index, wallets, currentTheme) async {
+  void backupWallet(
+      context, index, List<String> walletsList, currentTheme) async {
     bool canauth = await BiometricUtil().canAuth();
     bool verified = false;
     var appLocalizations = AppLocalizations.of(context);
@@ -473,7 +485,8 @@ class WalletManagementPageState extends State<WalletManagementPage>
 
     if (verified) {
       bool createStateNewWallet = true;
-      String seed = wallets[index].seed;
+      String walletName = services<WalletsService>().walletsList[index];
+      String seed = services<WalletService>(instanceName: walletName).seed;
       List<String> mnemonicPhrase = NanoMnemomics.seedToMnemonic(seed);
 
       List<Widget> oddWords = [];
@@ -678,8 +691,8 @@ class WalletManagementPageState extends State<WalletManagementPage>
 
   void doRename(int index) {
     setState(() {
-      services<WalletsService>()
-          .wallets[index]
+      String walletName = services<WalletsService>().walletsList[index];
+      services<WalletService>(instanceName: walletName)
           .editWalletName(renameController.text);
     });
   }
@@ -710,7 +723,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
           ),
         ),
         onPressed: () async {
-          String seed = services<WalletsService>().generateSeed();
+          String seed = Utils().generateSeed();
           List<String> mnemonicPhrase = NanoMnemomics.seedToMnemonic(seed);
 
           List<Widget> oddWords = [];
@@ -1002,8 +1015,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
   }
 
   Color getColor(Set<MaterialState> states) {
-    var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-
+    var currentTheme = services<ThemeModel>().curTheme;
     return currentTheme.text;
   }
 

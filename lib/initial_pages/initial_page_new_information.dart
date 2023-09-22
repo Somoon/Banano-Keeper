@@ -5,6 +5,7 @@ import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/ui/pin/setup_pin.dart';
+import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -40,7 +41,7 @@ class InitialPageInformationState extends State<InitialPageInformation>
 
   bool isCheckedNewWallet = false;
   bool createStateNewWallet = true;
-  String seed = services<WalletsService>().generateSeed();
+  String seed = Utils().generateSeed();
 
   @override
   Widget build(BuildContext context) {

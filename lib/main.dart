@@ -5,6 +5,7 @@ import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/providers/pow_source.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
+import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/themes.dart';
 import 'package:bananokeeper/utils/utils.dart';
@@ -115,14 +116,12 @@ Future<void> loadWalletsFromDB(
           );
     }
     if (original_name == activeWalletName) {
-      int walletslen = services<WalletsService>().wallets.length - 1;
-      //lazy way of making sure we dont try to set active account to something doesnt exist
-      int accsLen =
-          services<WalletsService>().wallets[walletslen].accountsList.length;
+      int walletID = services<WalletsService>().activeWallet;
+      String walletName = services<WalletsService>().walletsList[walletID];
+      WalletService wallet = services<WalletService>(instanceName: walletName);
+      int accsLen = wallet.accountsList.length;
       if (activeAccountIndex < accsLen) {
-        services<WalletsService>()
-            .wallets[walletslen]
-            .setActiveIndex(activeAccountIndex);
+        wallet.setActiveIndex(activeAccountIndex);
       }
     }
 
@@ -137,12 +136,6 @@ void main() async {
   // register services
   initServices();
   await setupUserData();
-
-  // Setup logger, only show warning and higher in release mode.
-
-  // Setup firebase
-  // await Firebase.initializeApp();
-  // Run app
 
   //remove splash ready to start
   FlutterNativeSplash.remove();
