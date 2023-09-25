@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nanodart/nanodart.dart';
 import 'package:decimal/decimal.dart';
+import 'package:flutter/foundation.dart';
 
 class Utils {
   BigInt banRaw = BigInt.parse('100000000000000000000000000000');
@@ -29,7 +30,7 @@ class Utils {
   }
 
   String shortenAccount(String ban_address, [longer = false]) {
-    var shorted = "plcaeholder";
+    var shorted = ban_address;
     if (ban_address.length == 64) {
       if (longer) {
         shorted =
@@ -97,13 +98,16 @@ class Utils {
     try {
       deviceId = await PlatformDeviceId.getDeviceId;
     } on PlatformException {
+      if (kDebugMode) {
+        print('getDeviceID ERROR');
+      }
       deviceId = 'Failed to get deviceId.';
     }
     return deviceId;
   }
 
   Future<String> encryptSeed(seed, [String? dID]) async {
-    dID = await Utils().getDeviceID() ?? "";
+    dID = await Utils().getDeviceID();
     // pin ??= await services<SharedPrefsModel>().getPin();
     // String password = "$dID$pin";
     String password = dID!;
@@ -115,8 +119,6 @@ class Utils {
 
   Future<String> decryptSeed(encryptedSeed, [String? dID]) async {
     dID = await Utils().getDeviceID() ?? "";
-    // var pin = await services<SharedPrefsModel>().getPin() ?? "";
-    // String password = "$dID$pin";
     String password = dID!;
     Uint8List decrypted;
     String seed;
