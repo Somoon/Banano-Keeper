@@ -5,6 +5,7 @@ import 'package:bananokeeper/initial_pages/initial_page_import.dart';
 import 'package:bananokeeper/initial_pages/initial_page_new_information.dart';
 import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/providers/pow_source.dart';
+import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
@@ -43,6 +44,7 @@ class InitialPageOneState extends State<InitialPageOne> with GetItStateMixin {
     services.unregister<UserData>();
     services.unregister<DBManager>();
     services.unregister<PoWSource>();
+    services.unregister<QueueService>();
 
     // register services
     initServices();
