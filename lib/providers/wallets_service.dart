@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_import
 
 import 'package:bananokeeper/db/dbManager.dart';
+import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
@@ -14,7 +15,7 @@ import 'package:nanodart/nanodart.dart';
 import 'package:flutter/foundation.dart';
 
 class WalletsService extends ChangeNotifier {
-  List<WalletService> wallets = <WalletService>[];
+  // List<WalletService> wallets = <WalletService>[];
   List<String> walletsList = [];
 
   late int activeWallet;
@@ -31,7 +32,10 @@ class WalletsService extends ChangeNotifier {
     notifyListeners();
   }
 
-  setLatestWalletID(nID) {
+  /// sets the latest wallet ID to given ID
+  ///
+  /// @param  nID  the wallet ID
+  setLatestWalletID(int nID) {
     // print('wallets2.dart: setLAtestWalletID: setting to ID $nID');
     latestWalletID = nID;
     notifyListeners();
@@ -59,7 +63,7 @@ class WalletsService extends ChangeNotifier {
     await services<DBManager>().insertWallet(name, wallet.toMap());
 
     addWallet(wallet);
-    wallets[wallets.length - 1].createAccount(0);
+    // wallets[wallets.length - 1].createAccount(0);
     services.registerSingleton<WalletService>(wallet,
         instanceName: original_name);
     services<WalletService>(instanceName: original_name).createAccount(0);
@@ -110,32 +114,48 @@ class WalletsService extends ChangeNotifier {
   }
 
   addWallet(WalletService wallet) {
-    wallets.add(wallet);
+    // wallets.add(wallet);
     walletsList.add(wallet.original_name);
   }
 
-  deleteWallet(index) {
-    if (walletsList.asMap().containsKey(index)) {
-      // if (wallets.asMap().containsKey(index)) {
-      if (walletsList.length == 1) {
-        // if (wallets.length == 1) {
-        //should send user to InitialPage here?
-        walletsList.clear();
-        // wallets.clear();
-      } else {
-        services<DBManager>().deleteWallet(wallets[index].original_name);
-        // wallets.removeAt(index);
+  /// Deletes given wallet index from DB and the app
+  ///
+  /// @param index wallet index
+  deleteWallet(int index) {
 
+    if (walletsList.asMap().containsKey(index)) {
+      if (walletsList.length == 1) {
+        services<DBManager>().deleteWallet(walletsList[index]);
+        unregisterAccounts(walletsList[index]);
+        services.unregister<WalletService>(instanceName: walletsList[index]);
+        walletsList.clear();
+      } else {
+        unregisterAccounts(walletsList[index]);
+        services<DBManager>().deleteWallet(walletsList[index]);
         services.unregister<WalletService>(instanceName: walletsList[index]);
         walletsList.removeAt(index);
+        setActiveWallet(0);
+
       }
-      setActiveWallet(0);
     }
     notifyListeners();
   }
 
+  /// unregisters accounts of a to be deleted wallet
+  ///
+  /// @param orgWalletName original wallet name to call service
+  void unregisterAccounts(String orgWalletName)
+  {
+    List<String> accountsList = services<WalletService>(instanceName: orgWalletName).accountsList;
+    for(int i = 0; i< accountsList.length; i++)
+      {
+        services.unregister<Account>(instanceName: accountsList[i]);
+      }
+  }
+
   resetService() {
-    wallets.clear();
+    // wallets.clear();
+    walletsList.clear();
     setActiveWallet(0);
     setLatestWalletID(0);
   }

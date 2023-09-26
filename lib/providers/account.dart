@@ -12,6 +12,7 @@ import 'package:bananokeeper/api/account_history_response.dart';
 import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:decimal/decimal.dart';
@@ -42,7 +43,7 @@ class Account extends ChangeNotifier {
   setBalance(String newBalance) {
     int activeWallet = services<WalletsService>().activeWallet;
     String originalName =
-        services<WalletsService>().wallets[activeWallet].original_name;
+        services<WalletsService>().walletsList[activeWallet];
     services<DBManager>().updateAccountBalance(originalName, index, newBalance);
     balance = newBalance;
     // print("-------------------------------- setBalance: $balance");
@@ -74,7 +75,7 @@ class Account extends ChangeNotifier {
   void setRep(String newRep) {
     int activeWallet = services<WalletsService>().activeWallet;
     String originalName =
-        services<WalletsService>().wallets[activeWallet].original_name;
+        services<WalletsService>().walletsList[activeWallet];
     services<DBManager>().updateAccountRep(originalName, index, newRep);
     representative = newRep;
     notifyListeners();
@@ -87,7 +88,7 @@ class Account extends ChangeNotifier {
   void setLastUpdate(int time) {
     int activeWallet = services<WalletsService>().activeWallet;
     String originalName =
-        services<WalletsService>().wallets[activeWallet].original_name;
+        services<WalletsService>().walletsList[activeWallet];
     services<DBManager>()
         .updateAccountTime(originalName, index, time.toString());
     lastUpdate = time;
@@ -273,8 +274,11 @@ class Account extends ChangeNotifier {
                     receivableHash);
 
                 int activeWallet = services<WalletsService>().activeWallet;
-                String privateKey = services<WalletsService>()
-                    .wallets[activeWallet]
+                String walletName = services<WalletsService>()
+                    .walletsList[activeWallet];
+
+                String privateKey = services<WalletService>(instanceName: walletName)
+
                     .getPrivateKey(index);
                 // Signing a block
                 String sign =
@@ -321,8 +325,12 @@ class Account extends ChangeNotifier {
     String previous = "".padLeft(64, "0");
 
     int activeWallet = services<WalletsService>().activeWallet;
-    String privateKey =
-        services<WalletsService>().wallets[activeWallet].getPrivateKey(index);
+    String walletName = services<WalletsService>()
+        .walletsList[activeWallet];
+
+    String privateKey = services<WalletService>(instanceName: walletName)
+
+        .getPrivateKey(index);
 
     if (kDebugMode) {
       print("private key $privateKey");

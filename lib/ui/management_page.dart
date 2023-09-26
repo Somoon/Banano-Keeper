@@ -1,3 +1,4 @@
+import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:flutter/material.dart';
 
@@ -91,9 +92,8 @@ class ManagementPageState extends State<ManagementPage> with GetItStateMixin {
   void doRename() {
     setState(() {
       int activeWallet = watchOnly((WalletsService x) => x.activeWallet);
-
-      services<WalletsService>()
-          .wallets[activeWallet]
+String walletName = services<WalletsService>().walletsList[activeWallet];
+      services<WalletService>(instanceName: walletName)
           .setWalletName(walletRenameController.text);
     });
   }

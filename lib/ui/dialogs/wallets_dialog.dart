@@ -1,3 +1,4 @@
+import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:flutter/material.dart';
 
@@ -29,8 +30,8 @@ class WalletManagementDialogState extends State<WalletManagementDialog>
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     int activeWallet = watchOnly((WalletsService x) => x.activeWallet);
-    var wallets = watchOnly((WalletsService x) => x.wallets);
-    String activeWalletName = wallets[activeWallet].getWalletName();
+    var wallets = watchOnly((WalletsService x) => x.walletsList);
+    String activeWalletName = services<WalletService>().getWalletName();
     var primary = watchOnly((ThemeModel x) => x.curTheme.primary);
 
     return Container(
@@ -209,8 +210,9 @@ class WalletManagementDialogState extends State<WalletManagementDialog>
     setState(() {
       int activeWallet = watchOnly((WalletsService x) => x.activeWallet);
 
-      services<WalletsService>()
-          .wallets[activeWallet]
+      String walletName = services<WalletsService>()
+          .walletsList[activeWallet];
+      services<WalletService>(instanceName: walletName)
           .setWalletName(walletRenameController.text);
     });
   }

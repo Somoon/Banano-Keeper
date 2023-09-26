@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
+import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/ui/import_wallet.dart';
 import 'package:bananokeeper/ui/pin/setup_pin.dart';
@@ -20,6 +21,8 @@ import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 
 import 'dart:io';
+
+import '../db/dbManager.dart';
 
 class InitialPageImport extends StatefulWidget with GetItStatefulWidgetMixin {
   InitialPageImport({super.key});
@@ -119,6 +122,7 @@ class InitialPageImportState extends State<InitialPageImport>
                           (states) => currentTheme.text.withOpacity(0.3)),
                     ),
                     onPressed: () {
+                      services<WalletsService>().deleteWallet(0);
                       Navigator.of(context).pop(true);
                     },
                     child: Text(
@@ -190,7 +194,9 @@ class InitialPageImportState extends State<InitialPageImport>
             // importSeedTextController.clear();
             await services<WalletsService>().setActiveWallet(0);
 
-            services<WalletsService>().wallets[0].setActiveIndex(0);
+            String walletName = services<WalletsService>().walletsList[0];
+
+            services<WalletService>(instanceName: walletName).setActiveIndex(0);
             services<SharedPrefsModel>().initliazeValues();
             setState(() {
               Navigator.of(context).push(
@@ -401,7 +407,9 @@ class InitialPageImportState extends State<InitialPageImport>
                 importMnemonicTextController.clear();
                 services<WalletsService>().setActiveWallet(0);
 
-                services<WalletsService>().wallets[0].setActiveIndex(0);
+                String walletName = services<WalletsService>().walletsList[0];
+
+                services<WalletService>(instanceName: walletName).setActiveIndex(0);
                 services<SharedPrefsModel>().initliazeValues();
                 setState(() {
                   Navigator.of(context).push(

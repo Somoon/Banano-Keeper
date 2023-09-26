@@ -46,17 +46,18 @@ class _sideDrawer extends State<sideDrawer>
     var activeLanguage = watchOnly((LocalizationModel x) => x.getLanguage());
 
     //Wallet and address
-    String activeWalletName = watchOnly(
-        (WalletsService x) => x.wallets[x.activeWallet].getWalletName());
-    String currentAccount =
-        watchX((WalletsService x) => x.wallets[x.activeWallet].currentAccount);
+    // String activeWalletName = watchOnly(
+    //     (WalletsService x) => x.wallets[x.activeWallet].getWalletName());
+
 
     int walletIndex = watchOnly((WalletsService x) => x.activeWallet);
 
-    String walletName =
+    String activeWalletName =
         watchOnly((WalletsService x) => x.walletsList[walletIndex]);
 
-    WalletService wallet = services<WalletService>(instanceName: walletName);
+    WalletService wallet = services<WalletService>(instanceName: activeWalletName);
+    String currentAccount =
+    watchX((WalletService x) => x.currentAccount, instanceName: activeWalletName);
 
     int accountIndex = wallet.activeIndex;
 
