@@ -92,7 +92,7 @@ Future<void> loadWalletsFromDB(
       active_index,
     );
     if (original_name == activeWalletName) {
-      int walletslen = services<WalletsService>().wallets.length - 1;
+      int walletslen = services<WalletsService>().walletsList.length - 1;
       services<WalletsService>().activeWallet = walletslen;
     }
 
@@ -106,7 +106,8 @@ Future<void> loadWalletsFromDB(
         await services<DBManager>().getWalletData(original_name);
     for (var row in walletIndices) {
       // print(row);
-      services<WalletsService>().wallets[index].importAccount(
+
+      services<WalletService>(instanceName: original_name).importAccount(
             row['index_id'],
             row['index_name'],
             row['address'],

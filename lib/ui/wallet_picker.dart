@@ -1,6 +1,7 @@
 // import 'dart:async';
 
 import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:flutter/material.dart';
 
 // import 'package:bananokeeper/providers/get_it_main.dart';
@@ -27,9 +28,11 @@ class _walletPicker extends State<walletPicker>
 
   Widget buildMainSettings(BuildContext context) {
     int activeWallet = watchOnly((WalletsService x) => x.activeWallet);
-    var wallets = watchOnly((WalletsService x) => x.wallets);
+    List<String> walletList = watchOnly((WalletsService x) => x.walletsList);
+    // var wallets = watchOnly((WalletsService x) => x.wallets);
+    String orgWalletName = walletList[activeWallet];
     String activeWalletName = watchOnly(
-        (WalletsService x) => x.wallets[activeWallet].getWalletName());
+        (WalletService x) => x.getWalletName(), instanceName: orgWalletName);
     Color textColor = watchOnly((ThemeModel x) => x.curTheme.text);
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     // double width = MediaQuery.of(context).size.width;
@@ -43,7 +46,7 @@ class _walletPicker extends State<walletPicker>
       // position: ,
       offset: const Offset(-25.3, 20),
       color: currentTheme.primary,
-      initialValue: wallets[activeWallet],
+      initialValue: services<WalletService>(instanceName: orgWalletName).getWalletName(),
       // Callback that sets the selected popup menu item.
       onSelected: (item) {
         services<WalletsService>().setActiveWallet(item);
@@ -74,13 +77,16 @@ class _walletPicker extends State<walletPicker>
 
   List<PopupMenuEntry> createDropDownMenuItems() {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-    var wallets = watchOnly((WalletsService x) => x.wallets);
+    var walletsList = services<WalletsService>().walletsList;
     var ddmi = <PopupMenuEntry>[];
-    for (int i = 0; i < wallets.length; i++) {
+    for (int i = 0; i < walletsList.length; i++) {
+      // var wallets = watchOnly((WalletsService x) => x.wallets);
+      String orgWalletName = walletsList[i];
       ddmi.add(PopupMenuItem(
         value: i,
         child: Text(
-          wallets[i].name,
+
+          services<WalletService>(instanceName: orgWalletName).getWalletName(),
           style: TextStyle(
             color: currentTheme.text,
           ),

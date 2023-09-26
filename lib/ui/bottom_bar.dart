@@ -127,11 +127,12 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
         //     .accounts[x.wallets[x.activeWallet].getActiveIndex()]
         //     .getBalance());
         int walletIndex = services<WalletsService>().activeWallet;
-        int accountIndex =
-            services<WalletsService>().wallets[walletIndex].activeIndex;
+        String walletName = services<WalletsService>().walletsList[walletIndex];
 
-        String accOrgName = services<WalletsService>()
-            .wallets[walletIndex]
+        int accountIndex =
+            services<WalletService>(instanceName: walletName).activeIndex;
+
+        String accOrgName = services<WalletService>(instanceName: walletName)
             .accountsList[accountIndex];
 
         String activeAccountBalance =
@@ -560,8 +561,11 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                     BigInt.parse(newRaw),
                     destAddress);
                 int activeWallet = services<WalletsService>().activeWallet;
-                String privateKey = services<WalletsService>()
-                    .wallets[activeWallet]
+                String walletName = services<WalletsService>()
+                    .walletsList[activeWallet];
+
+                String privateKey = services<WalletService>(instanceName: walletName)
+
                     .getPrivateKey(account.index);
                 // Signing a block
                 String sign =

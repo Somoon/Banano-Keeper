@@ -44,7 +44,7 @@ class DBTestState extends State<DBTest> with GetItStateMixin {
                 TextButton(
                   onPressed: () async {
                     String walletname =
-                        services<WalletsService>().wallets[0].original_name;
+                        services<WalletsService>().walletsList[0];
                     wallets_data =
                         await services<DBManager>().getWalletData(walletname);
                     // print(await services<DBManager>()

@@ -1,8 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 import 'dart:ui';
 
+import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
+import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/ui/pin/setup_pin.dart';
 import 'package:bananokeeper/utils/utils.dart';
@@ -283,6 +285,8 @@ class InitialPageInformationState extends State<InitialPageInformation>
                         (states) => currentTheme.text.withOpacity(0.3)),
                   ),
                   onPressed: () {
+                    print("CLICKED BACK");
+                    services<WalletsService>().deleteWallet(0);
                     Navigator.of(context).pop(true);
                   },
                   child: Text(
@@ -303,10 +307,11 @@ class InitialPageInformationState extends State<InitialPageInformation>
                       services<WalletsService>().setLatestWalletID(0);
 
                       await services<WalletsService>().createNewWallet(seed);
-                      print("${services<WalletsService>().wallets.length}");
                       services<WalletsService>().setActiveWallet(0);
 
-                      services<WalletsService>().wallets[0].setActiveIndex(0);
+                      String walletName = services<WalletsService>().walletsList[0];
+
+                      services<WalletService>(instanceName: walletName).setActiveIndex(0);
                       services<SharedPrefsModel>().initliazeValues();
                       print(
                           "LATEST ID ${services<WalletsService>().latestWalletID}");

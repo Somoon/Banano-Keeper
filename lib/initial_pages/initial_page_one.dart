@@ -8,6 +8,7 @@ import 'package:bananokeeper/providers/pow_source.dart';
 import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
+import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:flutter/material.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -17,6 +18,8 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../providers/account.dart';
 
 class InitialPageOne extends StatefulWidget with GetItStatefulWidgetMixin {
   InitialPageOne({super.key});
@@ -36,15 +39,8 @@ class InitialPageOneState extends State<InitialPageOne> with GetItStateMixin {
   }
 
   void doInit() async {
-    services<SharedPrefsModel>().clearAll();
-    services.unregister<WalletsService>();
-    services.unregister<ThemeModel>();
-    services.unregister<LocalizationModel>();
-    services.unregister<SharedPrefsModel>();
-    services.unregister<UserData>();
-    services.unregister<DBManager>();
-    services.unregister<PoWSource>();
-    services.unregister<QueueService>();
+
+    resetServices();
 
     // register services
     initServices();
