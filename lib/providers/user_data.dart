@@ -8,7 +8,8 @@
 import 'package:flutter/material.dart';
 
 class UserData extends ChangeNotifier {
-  //pin/Biometric
+  //type either:
+  //pin or Biometric
   late String lockType = "pin";
   String pin = "";
   late int lockoutTime = 0;
@@ -17,6 +18,8 @@ class UserData extends ChangeNotifier {
   late String powSource = "Kalium";
   late String blockExplorer = "";
   late bool Notifs = false;
+
+  //Auth related
 
   setPin(String newPIN) {
     pin = newPIN;
@@ -35,6 +38,8 @@ class UserData extends ChangeNotifier {
   getLockType() {
     return lockType;
   }
+
+  //PoW related
 
   String getPoWSource() {
     return powSource;

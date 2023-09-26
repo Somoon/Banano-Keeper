@@ -25,8 +25,6 @@ import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 import 'package:bananokeeper/themes.dart';
 import 'dart:io';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 class BottomBarApp extends StatefulWidget with GetItStatefulWidgetMixin {
   BottomBarApp({super.key});
   @override
@@ -561,12 +559,12 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                     BigInt.parse(newRaw),
                     destAddress);
                 int activeWallet = services<WalletsService>().activeWallet;
-                String walletName = services<WalletsService>()
-                    .walletsList[activeWallet];
+                String walletName =
+                    services<WalletsService>().walletsList[activeWallet];
 
-                String privateKey = services<WalletService>(instanceName: walletName)
-
-                    .getPrivateKey(account.index);
+                String privateKey =
+                    services<WalletService>(instanceName: walletName)
+                        .getPrivateKey(account.index);
                 // Signing a block
                 String sign =
                     NanoSignatures.signBlock(calculatedHash, privateKey);

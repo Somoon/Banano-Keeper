@@ -5,7 +5,7 @@ import 'dart:ui';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
-import 'package:bananokeeper/ui/import_wallet.dart';
+import 'package:bananokeeper/ui/management/import_wallet.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/foundation.dart';
