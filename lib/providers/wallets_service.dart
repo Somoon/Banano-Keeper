@@ -18,10 +18,14 @@ class WalletsService extends ChangeNotifier {
   ///
   /// @param  nID  the wallet ID
   setActiveWallet(nID) {
-    activeWallet = nID;
-    String orgName = walletsList[activeWallet];
-    services<SharedPrefsModel>().saveActiveWallet(orgName);
-    notifyListeners();
+    if(nID < walletsList.length)
+      {
+        activeWallet = nID;
+        String orgName = walletsList[activeWallet];
+        services<SharedPrefsModel>().saveActiveWallet(orgName);
+        notifyListeners();
+      }
+
   }
 
   /// sets the latest wallet ID to given ID

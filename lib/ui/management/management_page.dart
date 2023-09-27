@@ -18,13 +18,10 @@ class ManagementPage extends StatefulWidget with GetItStatefulWidgetMixin {
 }
 
 class ManagementPageState extends State<ManagementPage> with GetItStateMixin {
-  final walletRenameController = TextEditingController();
 
-  FocusNode walletRenameControllerFocusNode = FocusNode();
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
-    walletRenameController.dispose();
+
     super.dispose();
   }
 
@@ -75,26 +72,6 @@ class ManagementPageState extends State<ManagementPage> with GetItStateMixin {
     );
   }
 
-  createButton(String label, Widget stuff) {
-    var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
 
-    return TextButton(
-      onPressed: () {
-        stuff;
-      },
-      child: Text(
-        label,
-        style: TextStyle(color: currentTheme.text),
-      ),
-    );
-  }
 
-  void doRename() {
-    setState(() {
-      int activeWallet = watchOnly((WalletsService x) => x.activeWallet);
-String walletName = services<WalletsService>().walletsList[activeWallet];
-      services<WalletService>(instanceName: walletName)
-          .setWalletName(walletRenameController.text);
-    });
-  }
 }

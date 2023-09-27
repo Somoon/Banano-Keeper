@@ -144,6 +144,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
 
   Card walletListCard(BaseTheme currentTheme, double width, int index,
       bool isActiveWallet, List<String> walletsList, BuildContext context) {
+    print("building card for wallet $index");
     double width2 = MediaQuery.of(context).size.width;
 
     String walletName = watchOnly((WalletsService x) => x.walletsList[index]);

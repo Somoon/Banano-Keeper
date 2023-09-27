@@ -2,7 +2,6 @@
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/db/dbManager.dart';
-import 'package:bananokeeper/db/dbtest.dart';
 import 'package:bananokeeper/initial_pages/initial_page_one.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -17,7 +16,6 @@ import 'package:bananokeeper/ui/dialogs/themes_dialog.dart';
 import 'package:bananokeeper/ui/management/management_address_page.dart';
 import 'package:bananokeeper/ui/management/management_page.dart';
 import 'package:bananokeeper/ui/management/management_wallet_page.dart';
-import 'package:bananokeeper/ui/pin/setup_pin.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -434,7 +432,7 @@ class _sideDrawer extends State<sideDrawer>
   Future<void> changeRepPage(BaseTheme currentTheme, Account account) {
     // final LocalAuthentication auth = LocalAuthentication();
 
-    var appLocalizations = AppLocalizations.of(context);
+    // var appLocalizations = AppLocalizations.of(context);
     double height = MediaQuery.of(context).size.height;
     return showModalBottomSheet<void>(
         enableDrag: true,

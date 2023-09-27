@@ -112,10 +112,13 @@ class ActiveAccountState extends State<ActiveAccount>
                                       services<WalletsService>().activeWallet;
                                   String walletName = services<WalletsService>()
                                       .walletsList[walletID];
+                                  if(item !=  services<WalletService>(
+                                      instanceName: walletName).getActiveIndex()) {
+                                    services<WalletService>(
+                                        instanceName: walletName)
+                                        .setActiveIndex(item);
+                                      }
 
-                                  services<WalletService>(
-                                          instanceName: walletName)
-                                      .setActiveIndex(item);
                                 });
                               },
                               itemBuilder: (BuildContext context) =>
