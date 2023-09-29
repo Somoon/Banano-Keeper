@@ -13,6 +13,7 @@ import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/queue_service.dart';
+import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/utils/utils.dart';
@@ -218,7 +219,7 @@ class Account extends ChangeNotifier {
               print(
                   "Account is not opened yet, we have receivable, starting open process...");
             }
-            openAcc();
+            await openAcc();
           }
           if (opened) {
             String newBalance = overviewResp['balanceRaw'];
@@ -293,7 +294,6 @@ class Account extends ChangeNotifier {
                 setBalance(newBalance);
                 previous = jsonDecode(res)['hash'];
                 await onRefreshUpdateHistory();
-                notifyListeners();
               }
             }
 
@@ -316,9 +316,14 @@ class Account extends ChangeNotifier {
     String amountRaw = receivablesData[0]['amountRaw'];
     String hash = receivablesData[0]['hash'];
 
-    //def test
-    String representative =
+    //default new account's representative to address with least weight
+    var reps = services<UserData>().representatives;
+    if (reps == null) {
+      await services<UserData>().updateRepresentatives();
+    }
+    String representative = services<UserData>().representatives?[0].address ??
         "ban_1moonanoj76om1e9gnji5mdfsopnr5ddyi6k3qtcbs8nogyjaa6p8j87sgid";
+
     //for open state
     String previous = "".padLeft(64, "0");
 
@@ -344,9 +349,17 @@ class Account extends ChangeNotifier {
 
     String hashResponse =
         await AccountAPI().processRequest(openBlock.toJson(), "open");
-    // if (kDebugMode) {
-    //   print(hashResponse);
-    // }
+
+    if (jsonDecode(hashResponse)['hash'] != null &&
+        NanoHelpers.isHexString(jsonDecode(hashResponse)['hash'])) {
+      setRep(representative);
+      setBalance(amountRaw);
+    } else {
+      if (kDebugMode) {
+        print(hashResponse);
+      }
+    }
+
     // too add to list
     onRefreshUpdateHistory();
     opened = true;
@@ -372,8 +385,8 @@ class Account extends ChangeNotifier {
 
     String sign = NanoSignatures.signBlock(calculatedHash, privateKey);
 
-    StateBlock sendBlock =
-        StateBlock(address, previous, newRep, balance, '0'.padLeft(64), sign);
+    StateBlock sendBlock = StateBlock(
+        address, previous, newRep, balance, "".padLeft(64, "0"), sign);
 
     var sendHash =
         await AccountAPI().processRequest(sendBlock.toJson(), "change");

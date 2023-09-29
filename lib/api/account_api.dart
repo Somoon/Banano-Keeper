@@ -97,44 +97,4 @@ class AccountAPI {
 
     return response;
   }
-
-  /*
-      onPressed: () async {
-            //get current balance
-            var accOverview = await getOverview(account);
-            var accOverviewData = jsonDecode(accOverview.body);
-            balance = accOverviewData['balanceRaw'];
-
-            var hist = await getHistory(account, 1);
-            var historyData = jsonDecode(hist.body);
-            previous = historyData[0]['hash'];
-
-            var newRaw = balance;
-
-            var newRep =
-                "ban_14xjizffqiwjamztn4edhmbinnaxuy4fzk7c7d6gywxigydrrxftp4qgzabh";
-            var sign = await createOpenBlock(
-                account, previous, newRep, newRaw, zeros, privateKey);
-
-            print(sign);
-
-            Map<String, dynamic> block = {
-              "type": "state",
-              "account": account,
-              "previous": previous,
-              "representative": newRep,
-              "balance": newRaw,
-              "link": zeros,
-              "signature": sign,
-              // "private"
-            };
-            processRequest(block, "change");
-            //
-            // await openBlock();
-            // var a = await getHistory();
-          },
-
-
-
-   */
 }

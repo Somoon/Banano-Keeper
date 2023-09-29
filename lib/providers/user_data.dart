@@ -56,7 +56,7 @@ class UserData extends ChangeNotifier {
   }
 
   /// Rep data
-  late List<Representative> representatives;
+  List<Representative>? representatives;
   int repUpdate = 0; //store last call for rep list. we update once a day.
 
   updateRepresentatives() async {
@@ -74,7 +74,6 @@ class UserData extends ChangeNotifier {
 
       _representatives
           .sort((a, b) => a.weightPercentage.compareTo(b.weightPercentage));
-      print(_representatives[0].weightPercentage);
       representatives = List.from(_representatives);
       repUpdate = DateTime.now().millisecondsSinceEpoch;
 
@@ -85,8 +84,8 @@ class UserData extends ChangeNotifier {
 
   Representative? getRepData(address) {
     Representative? repItem;
-    if (representatives.isNotEmpty) {
-      repItem = representatives.firstWhere((e) => e.address == address);
+    if (representatives!.isNotEmpty) {
+      repItem = representatives!.firstWhere((e) => e.address == address);
     }
 
     return repItem;

@@ -446,7 +446,8 @@ class _sideDrawer extends State<sideDrawer>
 
     Representative? rep = get<UserData>().getRepData(account.representative);
 
-    List<Representative> repList = watchOnly((UserData x) => x.representatives);
+    List<Representative>? repList =
+        watchOnly((UserData x) => x.representatives);
     String repName = rep?.alias ?? "";
     String score = (rep?.score != null ? "Score: ${rep?.score}/100" : "");
 
@@ -739,7 +740,7 @@ class _sideDrawer extends State<sideDrawer>
       BuildContext context,
       BaseTheme currentTheme,
       AppLocalizations? appLocalizations,
-      List<Representative> repList,
+      List<Representative>? repList,
       Account account) {
     return showDialog<bool>(
       barrierDismissible: true,
@@ -796,7 +797,7 @@ class _sideDrawer extends State<sideDrawer>
                               physics: const AlwaysScrollableScrollPhysics(),
 
                               shrinkWrap: true,
-                              itemCount: repList.length,
+                              itemCount: repList!.length,
 
                               itemBuilder: (context, index) {
                                 return _buildButtonColumn(
