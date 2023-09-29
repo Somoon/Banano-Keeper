@@ -5,7 +5,7 @@ import 'dart:ui';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
-import 'package:bananokeeper/ui/import_wallet.dart';
+import 'package:bananokeeper/ui/management/import_wallet.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/foundation.dart';
@@ -399,7 +399,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
           return AlertDialog(
             backgroundColor: currentTheme.secondary,
             elevation: 2,
-            title: Text(appLocalizations!.removeWallet),
+            title: Center(
+              child: Text(appLocalizations!.removeWallet),
+            ),
             titleTextStyle: currentTheme.textStyle,
             content: Text(appLocalizations.removeWalletWarning),
             contentTextStyle: TextStyle(
@@ -421,7 +423,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                     scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
                   } else {
                     bool canauth = await BiometricUtil().canAuth();
-                    bool verified = false;
+                    bool? verified = false;
 
                     if (!canauth) {
                       verified = await Navigator.of(context).push(
@@ -434,10 +436,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
                           .authenticate(appLocalizations.authMsgWalletDel);
                     }
 
-                    if (verified) {
+                    if (verified != null && verified) {
                       setState(() {
                         services<WalletsService>().deleteWallet(index);
-                        if (kDebugMode) {}
                       });
                     }
                   }

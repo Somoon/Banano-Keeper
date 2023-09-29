@@ -1,17 +1,18 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:ui';
-
-import 'package:bananokeeper/providers/wallets_service.dart';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get_it_mixin/get_it_mixin.dart';
+
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/themes.dart';
-import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:bananokeeper/providers/wallets_service.dart';
+
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'dart:io';
 import 'package:nanodart/nanodart.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';

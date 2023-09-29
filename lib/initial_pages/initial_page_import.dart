@@ -5,7 +5,7 @@ import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
-import 'package:bananokeeper/ui/import_wallet.dart';
+import 'package:bananokeeper/ui/management/import_wallet.dart';
 import 'package:bananokeeper/ui/pin/setup_pin.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -409,7 +409,8 @@ class InitialPageImportState extends State<InitialPageImport>
 
                 String walletName = services<WalletsService>().walletsList[0];
 
-                services<WalletService>(instanceName: walletName).setActiveIndex(0);
+                services<WalletService>(instanceName: walletName)
+                    .setActiveIndex(0);
                 services<SharedPrefsModel>().initliazeValues();
                 setState(() {
                   Navigator.of(context).push(

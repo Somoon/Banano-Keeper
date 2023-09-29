@@ -3,6 +3,7 @@ import 'package:custom_platform_device_id/platform_device_id.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:nanodart/nanodart.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
@@ -207,5 +208,9 @@ class Utils {
 
   generateSeed() {
     return NanoSeeds.generateSeed();
+  }
+
+  bool isDirectionRTL(BuildContext context) {
+    return (Directionality.of(context).index == 0);
   }
 }

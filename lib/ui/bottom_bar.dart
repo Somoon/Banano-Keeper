@@ -9,6 +9,7 @@ import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:decimal/decimal.dart';
+import 'package:flutter/foundation.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/providers/account.dart';
@@ -24,8 +25,6 @@ import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 import 'package:bananokeeper/themes.dart';
 import 'dart:io';
-
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BottomBarApp extends StatefulWidget with GetItStatefulWidgetMixin {
   BottomBarApp({super.key});
@@ -561,12 +560,12 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                     BigInt.parse(newRaw),
                     destAddress);
                 int activeWallet = services<WalletsService>().activeWallet;
-                String walletName = services<WalletsService>()
-                    .walletsList[activeWallet];
+                String walletName =
+                    services<WalletsService>().walletsList[activeWallet];
 
-                String privateKey = services<WalletService>(instanceName: walletName)
-
-                    .getPrivateKey(account.index);
+                String privateKey =
+                    services<WalletService>(instanceName: walletName)
+                        .getPrivateKey(account.index);
                 // Signing a block
                 String sign =
                     NanoSignatures.signBlock(calculatedHash, privateKey);
@@ -591,7 +590,9 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                       .add(account.onRefreshUpdateHistory());
                 } else {
                   //ERR?
-                  print(sendHash);
+                  if (kDebugMode) {
+                    print(sendHash);
+                  }
                 }
 
                 setState(() {

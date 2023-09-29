@@ -4,8 +4,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AccountAPI {
-  var history = [];
-
   getHistory(String address, [int count = 10]) async {
     String apiURL =
         'https://api.spyglass.pw/banano/v2/account/confirmed-transactions';
@@ -88,43 +86,15 @@ class AccountAPI {
     return response.body;
   }
 
-  /*
-      onPressed: () async {
-            //get current balance
-            var accOverview = await getOverview(account);
-            var accOverviewData = jsonDecode(accOverview.body);
-            balance = accOverviewData['balanceRaw'];
+  getRepresentatives() async {
+    String apiURL = 'https://api.spyglass.pw/banano/v1/representatives/scores';
+    http.Response response = await http.get(
+      Uri.parse(apiURL),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
 
-            var hist = await getHistory(account, 1);
-            var historyData = jsonDecode(hist.body);
-            previous = historyData[0]['hash'];
-
-            var newRaw = balance;
-
-            var newRep =
-                "ban_14xjizffqiwjamztn4edhmbinnaxuy4fzk7c7d6gywxigydrrxftp4qgzabh";
-            var sign = await createOpenBlock(
-                account, previous, newRep, newRaw, zeros, privateKey);
-
-            print(sign);
-
-            Map<String, dynamic> block = {
-              "type": "state",
-              "account": account,
-              "previous": previous,
-              "representative": newRep,
-              "balance": newRaw,
-              "link": zeros,
-              "signature": sign,
-              // "private"
-            };
-            processRequest(block, "change");
-            //
-            // await openBlock();
-            // var a = await getHistory();
-          },
-
-
-
-   */
+    return response;
+  }
 }

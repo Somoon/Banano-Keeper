@@ -1,7 +1,6 @@
 name: bananokeeper
-description: a Banano and Nano cross-platform wallet
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
+description: a Banano cross-platform wallet
+
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
@@ -67,6 +66,7 @@ dependencies:
   rename: ^2.1.1
   qr_flutter: ^4.1.0
   queue: ^3.1.0+2
+  gap: ^3.0.1
 #  cryptography: ^2.5.0
 
 

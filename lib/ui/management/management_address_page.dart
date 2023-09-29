@@ -534,7 +534,9 @@ class AccountManagementPageState extends State<AccountManagementPage>
         return AlertDialog(
           backgroundColor: currentTheme.secondary,
           elevation: 2,
-          title: Text(appLocalizations!.removeAddress),
+          title: Center(
+            child: Text(appLocalizations!.removeAddress),
+          ),
           titleTextStyle: currentTheme.textStyle,
           content: Text(appLocalizations.removeAddressWarning),
           contentTextStyle: TextStyle(
@@ -659,10 +661,15 @@ class AccountManagementPageState extends State<AccountManagementPage>
               // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    bottomLeft: Radius.circular(10),
-                  ),
+                  borderRadius: Utils().isDirectionRTL(context)
+                      ? BorderRadius.only(
+                          topRight: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
+                        )
+                      : BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          bottomLeft: Radius.circular(10),
+                        ),
                 ),
               ),
 
@@ -677,7 +684,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
               setState(() {
                 if (indexController.text != "" &&
                     indexController.text != null) {
-                  addAccount();
+                  addAccount(indexController.text);
                   indexController.clear();
                 }
               });
@@ -706,10 +713,15 @@ class AccountManagementPageState extends State<AccountManagementPage>
             decoration: InputDecoration(
               contentPadding: EdgeInsets.only(left: 5),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
-                ),
+                borderRadius: !Utils().isDirectionRTL(context)
+                    ? BorderRadius.only(
+                        topRight: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
+                      )
+                    : BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        bottomLeft: Radius.circular(10),
+                      ),
                 borderSide: BorderSide(
                   color: currentTheme.buttonOutline,
                   width: 1,
@@ -717,10 +729,15 @@ class AccountManagementPageState extends State<AccountManagementPage>
               ),
               focusedBorder: OutlineInputBorder(
                 //Outline border type for TextFeild
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
-                ),
+                borderRadius: !Utils().isDirectionRTL(context)
+                    ? BorderRadius.only(
+                        topRight: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
+                      )
+                    : BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        bottomLeft: Radius.circular(10),
+                      ),
                 borderSide: BorderSide(
                   color: currentTheme.buttonOutline,
                   width: 1,
@@ -728,10 +745,15 @@ class AccountManagementPageState extends State<AccountManagementPage>
               ),
               border: OutlineInputBorder(
                 //Outline border type for TextFeild
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
-                ),
+                borderRadius: !Utils().isDirectionRTL(context)
+                    ? BorderRadius.only(
+                        topRight: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
+                      )
+                    : BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        bottomLeft: Radius.circular(10),
+                      ),
                 borderSide: BorderSide(
                   color: currentTheme.buttonOutline,
                   width: 1,
@@ -743,10 +765,10 @@ class AccountManagementPageState extends State<AccountManagementPage>
               ///
               ///
               ///
-              labelText: "#",
-              labelStyle: TextStyle(
-                color: currentTheme.offColor,
-              ),
+              // labelText: "#",
+              // labelStyle: TextStyle(
+              //   color: currentTheme.offColor,
+              // ),
             ),
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
@@ -758,19 +780,18 @@ class AccountManagementPageState extends State<AccountManagementPage>
     );
   }
 
-  void addAccount([index = "0"]) {
-    // if (indexController.value != null || indexController.value != "") {}
+  void addAccount(index) {
     int activeWallet = services<WalletsService>().activeWallet;
 
     String walletName = services<WalletsService>().walletsList[activeWallet];
 
     var currentWallet = services<WalletService>(instanceName: walletName);
 
-    var index = indexController.text;
-
-    if (index == "" || index == "0") {
+    if (index == "0") {
       currentWallet.createAccount();
     } else {
+      var index = indexController.text;
+
       int intIndex = int.parse(index);
       if (!currentWallet.indexExist(intIndex)) {
         currentWallet.createAccount(intIndex);
