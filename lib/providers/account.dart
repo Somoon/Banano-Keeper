@@ -12,6 +12,7 @@ import 'package:bananokeeper/api/account_history_response.dart';
 import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/utils/utils.dart';
@@ -42,8 +43,7 @@ class Account extends ChangeNotifier {
 
   setBalance(String newBalance) {
     int activeWallet = services<WalletsService>().activeWallet;
-    String originalName =
-        services<WalletsService>().walletsList[activeWallet];
+    String originalName = services<WalletsService>().walletsList[activeWallet];
     services<DBManager>().updateAccountBalance(originalName, index, newBalance);
     balance = newBalance;
     // print("-------------------------------- setBalance: $balance");
@@ -74,8 +74,7 @@ class Account extends ChangeNotifier {
 
   void setRep(String newRep) {
     int activeWallet = services<WalletsService>().activeWallet;
-    String originalName =
-        services<WalletsService>().walletsList[activeWallet];
+    String originalName = services<WalletsService>().walletsList[activeWallet];
     services<DBManager>().updateAccountRep(originalName, index, newRep);
     representative = newRep;
     notifyListeners();
@@ -87,8 +86,7 @@ class Account extends ChangeNotifier {
 
   void setLastUpdate(int time) {
     int activeWallet = services<WalletsService>().activeWallet;
-    String originalName =
-        services<WalletsService>().walletsList[activeWallet];
+    String originalName = services<WalletsService>().walletsList[activeWallet];
     services<DBManager>()
         .updateAccountTime(originalName, index, time.toString());
     lastUpdate = time;
@@ -274,12 +272,12 @@ class Account extends ChangeNotifier {
                     receivableHash);
 
                 int activeWallet = services<WalletsService>().activeWallet;
-                String walletName = services<WalletsService>()
-                    .walletsList[activeWallet];
+                String walletName =
+                    services<WalletsService>().walletsList[activeWallet];
 
-                String privateKey = services<WalletService>(instanceName: walletName)
-
-                    .getPrivateKey(index);
+                String privateKey =
+                    services<WalletService>(instanceName: walletName)
+                        .getPrivateKey(index);
                 // Signing a block
                 String sign =
                     NanoSignatures.signBlock(calculatedHash, privateKey);
@@ -325,12 +323,10 @@ class Account extends ChangeNotifier {
     String previous = "".padLeft(64, "0");
 
     int activeWallet = services<WalletsService>().activeWallet;
-    String walletName = services<WalletsService>()
-        .walletsList[activeWallet];
+    String walletName = services<WalletsService>().walletsList[activeWallet];
 
-    String privateKey = services<WalletService>(instanceName: walletName)
-
-        .getPrivateKey(index);
+    String privateKey =
+        services<WalletService>(instanceName: walletName).getPrivateKey(index);
 
     if (kDebugMode) {
       print("private key $privateKey");
@@ -354,6 +350,45 @@ class Account extends ChangeNotifier {
     // too add to list
     onRefreshUpdateHistory();
     opened = true;
+  }
+
+  changeRepresentative(String newRep) async {
+    await services<QueueService>().add(getOverview(true));
+    await services<QueueService>().add(handleOverviewResponse(true));
+
+    var hist = await AccountAPI().getHistory(address, 1);
+    var historyData = jsonDecode(hist.body);
+    String previous = historyData[0]['hash'];
+
+    int accountType = NanoAccountType.BANANO;
+    String calculatedHash = NanoBlocks.computeStateHash(accountType, address,
+        previous, newRep, BigInt.parse(balance), '0'.padLeft(64, '0'));
+
+    int activeWallet = services<WalletsService>().activeWallet;
+    String walletName = services<WalletsService>().walletsList[activeWallet];
+
+    String privateKey =
+        services<WalletService>(instanceName: walletName).getPrivateKey(index);
+
+    String sign = NanoSignatures.signBlock(calculatedHash, privateKey);
+
+    StateBlock sendBlock =
+        StateBlock(address, previous, newRep, balance, '0'.padLeft(64), sign);
+
+    var sendHash =
+        await AccountAPI().processRequest(sendBlock.toJson(), "change");
+
+    if (jsonDecode(sendHash)['hash'] != null &&
+        NanoHelpers.isHexString(jsonDecode(sendHash)['hash'])) {
+      setRep(newRep);
+      services<QueueService>().add(onRefreshUpdateHistory());
+      return true;
+    } else {
+      if (kDebugMode) {
+        print(sendHash);
+      }
+      return false;
+    }
   }
 
   toMap() {

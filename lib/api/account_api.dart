@@ -4,8 +4,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AccountAPI {
-  var history = [];
-
   getHistory(String address, [int count = 10]) async {
     String apiURL =
         'https://api.spyglass.pw/banano/v2/account/confirmed-transactions';
@@ -86,6 +84,18 @@ class AccountAPI {
     // print(response.statusCode);
     print(response.body);
     return response.body;
+  }
+
+  getRepresentatives() async {
+    String apiURL = 'https://api.spyglass.pw/banano/v1/representatives/scores';
+    http.Response response = await http.get(
+      Uri.parse(apiURL),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    return response;
   }
 
   /*

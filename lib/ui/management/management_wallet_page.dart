@@ -144,7 +144,6 @@ class WalletManagementPageState extends State<WalletManagementPage>
 
   Card walletListCard(BaseTheme currentTheme, double width, int index,
       bool isActiveWallet, List<String> walletsList, BuildContext context) {
-    print("building card for wallet $index");
     double width2 = MediaQuery.of(context).size.width;
 
     String walletName = watchOnly((WalletsService x) => x.walletsList[index]);
@@ -400,7 +399,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
           return AlertDialog(
             backgroundColor: currentTheme.secondary,
             elevation: 2,
-            title: Text(appLocalizations!.removeWallet),
+            title: Center(
+              child: Text(appLocalizations!.removeWallet),
+            ),
             titleTextStyle: currentTheme.textStyle,
             content: Text(appLocalizations.removeWalletWarning),
             contentTextStyle: TextStyle(
@@ -422,7 +423,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                     scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
                   } else {
                     bool canauth = await BiometricUtil().canAuth();
-                    bool verified = false;
+                    bool? verified = false;
 
                     if (!canauth) {
                       verified = await Navigator.of(context).push(
@@ -435,10 +436,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
                           .authenticate(appLocalizations.authMsgWalletDel);
                     }
 
-                    if (verified) {
+                    if (verified != null && verified) {
                       setState(() {
                         services<WalletsService>().deleteWallet(index);
-                        if (kDebugMode) {}
                       });
                     }
                   }

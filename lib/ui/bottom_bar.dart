@@ -9,6 +9,7 @@ import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:decimal/decimal.dart';
+import 'package:flutter/foundation.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/providers/account.dart';
@@ -589,7 +590,9 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                       .add(account.onRefreshUpdateHistory());
                 } else {
                   //ERR?
-                  print(sendHash);
+                  if (kDebugMode) {
+                    print(sendHash);
+                  }
                 }
 
                 setState(() {
