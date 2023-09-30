@@ -3,10 +3,8 @@ import 'package:custom_platform_device_id/platform_device_id.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:nanodart/nanodart.dart';
 import 'package:decimal/decimal.dart';
-import 'package:flutter/foundation.dart';
 
 class Utils {
   BigInt banRaw = BigInt.parse('100000000000000000000000000000');
@@ -30,27 +28,27 @@ class Utils {
     return result;
   }
 
-  String shortenAccount(String ban_address, [longer = false]) {
-    var shorted = ban_address;
-    if (ban_address.length == 64) {
+  String shortenAccount(String banAddress, [longer = false]) {
+    var shorted = banAddress;
+    if (banAddress.length == 64) {
       if (longer) {
         shorted =
-            "${ban_address.substring(0, 24)}...${ban_address.substring(50, 64)}";
+            "${banAddress.substring(0, 24)}...${banAddress.substring(50, 64)}";
       } else {
         shorted =
-            "${ban_address.substring(0, 16)}...${ban_address.substring(56, 64)}";
+            "${banAddress.substring(0, 16)}...${banAddress.substring(56, 64)}";
       }
     }
     return shorted;
   }
 
-  Widget colorffix(String ban_address, currentTheme) {
-    if (ban_address.length == 64) {
+  Widget colorffix(String banAddress, currentTheme) {
+    if (banAddress.length == 64) {
       Widget str = RichText(
         text: TextSpan(
           children: [
             TextSpan(
-              text: ban_address.substring(0, 16),
+              text: banAddress.substring(0, 16),
               style: TextStyle(
                 color: currentTheme.text,
                 fontSize: currentTheme.fontSize - 5,
@@ -59,7 +57,7 @@ class Utils {
               ),
             ),
             TextSpan(
-              text: ban_address.substring(17, 55),
+              text: banAddress.substring(17, 55),
               style: TextStyle(
                 color: currentTheme.textDisabled,
                 fontSize: currentTheme.fontSize - 5,
@@ -68,7 +66,7 @@ class Utils {
               ),
             ),
             TextSpan(
-              text: ban_address.substring(56, 64),
+              text: banAddress.substring(56, 64),
               style: TextStyle(
                 color: currentTheme.text,
                 fontSize: currentTheme.fontSize - 5,
@@ -83,7 +81,7 @@ class Utils {
       return str;
     }
     return AutoSizeText(
-      ban_address,
+      banAddress,
       maxLines: 2,
       style: TextStyle(
         color: currentTheme.text,
@@ -188,20 +186,20 @@ class Utils {
   //banano:ban_1hpgfkej3jqfci5rwwofqa1r3ckipc7i69z1wgztps4hzed3mq11ow5op5i5?amount=705000000000000000000000000000
   //for deep links too?
   getQRCodeData(String? value) {
-    Map<String, String> QRData = {"address": "", "amountRaw": ""};
+    Map<String, String> qRData = {"address": "", "amountRaw": ""};
     if (value != null) {
       value = value.toLowerCase();
-      QRData['address'] =
+      qRData['address'] =
           NanoAccounts.findAccountInString(NanoAccountType.BANANO, value) ?? "";
       var split = value.split('?amount=');
       if (split.length > 1) {
         Uri? uri = Uri.tryParse(value);
         if (uri != null && uri.queryParameters['amount'] != null) {
-          QRData['amountRaw'] = uri.queryParameters['amount']!;
+          qRData['amountRaw'] = uri.queryParameters['amount']!;
         }
       }
     }
-    return QRData;
+    return qRData;
   }
 
   generateSeed() {

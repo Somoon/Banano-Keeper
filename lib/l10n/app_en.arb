@@ -1,16 +1,9 @@
 {
-  "helloWorld": "HHOLAAAAA!",
-  "@helloWorld": {
-    "description": "The conventional newborn programmer greeting"
-  },
   "receive": "Receive",
   "@receive": {
     "description": "The conventional newborn programmer greeting"
   },
   "send": "Send",
-  "@send": {
-    "description": "The conventional newborn programmer greeting"
-  },
   "address": "address",
   "wallet":  "wallet",
   "manageAccounts": "Manage Accounts",
@@ -42,6 +35,7 @@
   "selectWallet": "Select wallet",
   "accountSettings": "Account Settings",
   "representative": "Representative",
+  "representatives": "Representatives",
   "appSettings": "App Settings",
   "themes": "Themes",
   "security": "Security",
@@ -59,6 +53,15 @@
       "state": {
         "type": "String",
         "example": "seed"
+      }
+    }
+  },
+  "newWalletTitle": "New {state}",
+  "@newWalletTitle": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "Seed Info"
       }
     }
   },
@@ -101,5 +104,46 @@
   "amountFieldErrNegative": "Error: amount can't be negative.",
   "amountFieldErrMore": "Error: amount can't be more than balance.",
   "enterAddressHint": "Enter Address",
-  "addressFieldErrAddr": "Error: Incorrect ban address."
+  "addressFieldErrAddr": "Error: Incorrect ban address.",
+  "repInfoDialogExplanation": "Representative accounts (or nodes) that are always online, vote on the validity of transactions published to the network. When a transaction has enough votes to achieve consensus, it is officially approved by the network. each representative has a ‘voting weight’, which is determined by the balance of the accounts that have delegated their votes to it. \nby choosing your representative, you allocate the balance of your account to their voting weight. your balance remains in your non-custodial control, ready to spend whenever you want. If your representative goes offline, your account is totally unaffected - it just means your funds are no longer used to secure the network. \nIt is better to choose a trustworthy representative with low voting weight and high uptime (score).",
+  "repInfoDialogTitle": "What is a representative",
+  "repVotingWeight": "Voting weight: {state}%",
+  "@repVotingWeight": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "0.01"
+      }
+    }
+  },
+  "currentRep": "Current Representative:",
+  "moreInfo": "More info:",
+  "chooseFromList": "Choose from list",
+  "enterManually": "Enter manually",
+  "changeRepTitle": "Change Representative",
+  "changeButton": "Change",
+  "repAlias": "Alias: {state}",
+  "@repAlias": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "Moonano"
+      }
+    }
+  },
+  "repScore": "Score: {state}/100",
+  "@repScore": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "90"
+      }
+    }
+  },
+  "authMsgChangeRep": "Authenticate to change representative.",
+  "authMsgChangePIN": "Authenticate to change PIN.",
+  "loadingWidgetChangeRepMsg": "Changing representative...",
+  "loadingWidgetDefaultMsg": "Loading...",
+  "loadingWidgetSendMsg": " Sending...",
+  "changePINButton": "Change PIN"
 }

@@ -1,19 +1,18 @@
 // ignore_for_file: prefer_const_constructors
-import 'dart:ui';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import 'package:bananokeeper/db/dbManager.dart';
-import 'package:bananokeeper/providers/localization_service.dart';
+// import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/ui/pin/setup_pin.dart';
 import 'package:bananokeeper/utils/utils.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/themes.dart';
-import 'package:get_it_mixin/get_it_mixin.dart';
 
+import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:nanodart/nanodart.dart';
@@ -109,8 +108,10 @@ class InitialPageInformationState extends State<InitialPageInformation>
             titleTextStyle: currentTheme.textStyle,
             title: Text(
               (createStateNewWallet
-                  ? "New Seed Info"
-                  : "New Mnemonic Phrase Info"),
+                  ? AppLocalizations.of(context)!
+                      .newWalletTitle(AppLocalizations.of(context)!.seedInfo)
+                  : AppLocalizations.of(context)!.newWalletTitle(
+                      AppLocalizations.of(context)!.mnemonicInfo)),
             ),
             actions: [
               TextButton(
@@ -186,19 +187,19 @@ class InitialPageInformationState extends State<InitialPageInformation>
                   children: [
                     TextButton.icon(
                       onPressed: () {
-                        String tempstr;
+                        String tempString;
                         if (createStateNewWallet) {
-                          tempstr = seed;
+                          tempString = seed;
                         } else {
-                          tempstr = mnemonicPhrase.join(" ");
+                          tempString = mnemonicPhrase.join(" ");
                         }
 
                         Clipboard.setData(
-                          ClipboardData(text: tempstr),
+                          ClipboardData(text: tempString),
                         );
                         setState(() {});
                       },
-                      icon: Text("Copy"),
+                      icon: Text(AppLocalizations.of(context)!.copy),
                       label: Icon(Icons.copy),
                       style: ButtonStyle(
                         overlayColor: MaterialStateColor.resolveWith(
@@ -254,8 +255,9 @@ class InitialPageInformationState extends State<InitialPageInformation>
                             child: AutoSizeText(
                               appLocalizations!.backedNewWalletMSG(
                                   (createStateNewWallet
-                                      ? "seed"
-                                      : "mnemonic phrase")),
+                                      ? appLocalizations.seed.toLowerCase()
+                                      : appLocalizations.mnemonicPhrase
+                                          .toLowerCase())),
                               // 'I have backed up the new wallet ${}.',
                               style: TextStyle(
                                 color: currentTheme.textDisabled,
@@ -285,12 +287,14 @@ class InitialPageInformationState extends State<InitialPageInformation>
                         (states) => currentTheme.text.withOpacity(0.3)),
                   ),
                   onPressed: () {
-                    print("CLICKED BACK");
+                    if (kDebugMode) {
+                      print("CLICKED BACK");
+                    }
                     services<WalletsService>().deleteWallet(0);
                     Navigator.of(context).pop(true);
                   },
                   child: Text(
-                    appLocalizations.back ?? "",
+                    appLocalizations.back,
                     style: TextStyle(
                       color: currentTheme.text,
                       fontSize: currentTheme.fontSize,
@@ -309,12 +313,16 @@ class InitialPageInformationState extends State<InitialPageInformation>
                       await services<WalletsService>().createNewWallet(seed);
                       services<WalletsService>().setActiveWallet(0);
 
-                      String walletName = services<WalletsService>().walletsList[0];
+                      String walletName =
+                          services<WalletsService>().walletsList[0];
 
-                      services<WalletService>(instanceName: walletName).setActiveIndex(0);
+                      services<WalletService>(instanceName: walletName)
+                          .setActiveIndex(0);
                       services<SharedPrefsModel>().initliazeValues();
-                      print(
-                          "LATEST ID ${services<WalletsService>().latestWalletID}");
+                      if (kDebugMode) {
+                        print(
+                            "LATEST ID ${services<WalletsService>().latestWalletID}");
+                      }
                       setState(() {
                         Navigator.of(context).push(
                           MaterialPageRoute(
@@ -325,7 +333,7 @@ class InitialPageInformationState extends State<InitialPageInformation>
                     }
                   },
                   child: Text(
-                    appLocalizations.next ?? "",
+                    appLocalizations.next,
                     style: TextStyle(
                       color: (isCheckedNewWallet
                           ? currentTheme.text

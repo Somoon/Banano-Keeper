@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../providers/get_it_main.dart';
-import '../../providers/shared_prefs_service.dart';
-import '../../themes.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/shared_prefs_service.dart';
+import 'package:bananokeeper/themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 
 class ThemesDialog extends StatefulWidget with GetItStatefulWidgetMixin {

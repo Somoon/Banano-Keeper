@@ -55,7 +55,7 @@ class ListRepChange {
               elevation: 2,
               title: Center(
                 child: Text(
-                  "Representatives",
+                  AppLocalizations.of(context)!.representatives,
                   style: TextStyle(
                     fontSize: 24,
                     color: currentTheme.text,
@@ -127,7 +127,7 @@ class ListRepChange {
                             Navigator.of(context).pop();
                           },
                           child: Text(
-                            appLocalizations?.cancel ?? "",
+                            appLocalizations!.cancel,
                             style: TextStyle(
                               color: currentTheme.text,
                               fontSize: currentTheme.fontSize,
@@ -154,9 +154,9 @@ class ListRepChange {
 
     String repAliasOrAddress = rep.alias ?? Utils().shortenAccount(rep.address);
 
-    String score = "Score: ${rep.score}/100";
-    String votingWeight =
-        "Voting weight: ${rep.weightPercentage.toStringAsFixed(2)}";
+    String score = appLocalizations.repScore(rep.score.toString());
+    String votingWeight = appLocalizations
+        .repVotingWeight(rep.weightPercentage.toStringAsFixed(2));
 
     return Column(
       children: [
@@ -254,13 +254,13 @@ class ListRepChange {
             false;
       } else {
         verified = await BiometricUtil()
-            .authenticate("Authenticate to change representative");
+            .authenticate(AppLocalizations.of(context)!.authMsgChangeRep);
         //appLocalizations.authMsgWalletDel);
       }
 
       if (verified) {
-        LoadingIndicatorDialog()
-            .show(context, text: "Changing representative...");
+        LoadingIndicatorDialog().show(context,
+            text: AppLocalizations.of(context)!.loadingWidgetChangeRepMsg);
 
         bool result = await account.changeRepresentative(repAddress);
         LoadingIndicatorDialog().dismiss();

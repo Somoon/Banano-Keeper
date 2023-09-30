@@ -226,7 +226,7 @@ class _home_body extends State<home_body>
       // physics: const ClampingScrollPhysics(),
       physics: const AlwaysScrollableScrollPhysics(),
 
-      shrinkWrap: true,
+      shrinkWrap: false,
       itemCount: account.history.length,
       // prototypeItem: Padding(
       //   padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -396,7 +396,7 @@ class _home_body extends State<home_body>
       // physics: const ClampingScrollPhysics(),
       physics: const AlwaysScrollableScrollPhysics(),
 
-      shrinkWrap: true,
+      shrinkWrap: false,
       children: [
         Card(
           color: currentTheme.secondary,

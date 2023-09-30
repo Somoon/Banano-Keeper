@@ -1,19 +1,12 @@
 {
-  "helloWorld": "مرحبا",
-  "@helloWorld": {
-    "description": "The conventional newborn programmer greeting"
-  },
   "receive": "أستقبل",
   "@receive": {
     "description": "The conventional newborn programmer greeting"
   },
   "send": "أرسل",
-  "@send": {
-    "description": "The conventional newborn programmer greeting"
-  },
   "address": "العنوان",
   "wallet":  "المحفظة",
-  "manageAccounts": "إدارة العناوين",
+  "manageAccounts": "إدارة الحسابات",
   "manageWallets": "إدارة المحافظ",
   "add": "أضف",
   "addNo":"أضف #",
@@ -42,13 +35,14 @@
   "selectWallet": "إختيار المحفظة",
   "accountSettings": "إعدادات الحساب",
   "representative": "الممثل",
+  "representatives": "الممثلين",
   "appSettings": "إعدادت التطبيق",
   "themes": "الالوان",
   "security": "الحماية",
   "language": "اللغة",
   "resetApp": "إعادة تهيئة التطبيق",
   "walletNameErrMsg": "Wallet name length can be up to 20 characters.",
-  "removeWallet": "Remove wallet?",
+  "removeWallet": "إزالة المحفظة؟",
   "removeWalletWarning": "Warning: make sure you have a backup of your seed or Mnemonic words. this is irreversible.",
   "lastWalletSnackBar": "This is the only wallet you have. Please reset from the side-menu.",
   "authMsgWalletDel": "Authenticate to delete wallet.",
@@ -62,12 +56,21 @@
       }
     }
   },
+  "newWalletTitle": "New {state}",
+  "@newWalletTitle": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "Seed Info"
+      }
+    }
+  },
   "seedInfo": "Seed Info",
   "mnemonicInfo": "Mnemonic Phrase Info",
   "seed": "Seed",
   "mnemonicPhrase": "Mnemonic Phrase",
   "accNameErrMsg": "Account name length can be up to 20 characters.",
-  "removeAddress": "Remove address?",
+  "removeAddress": "إزالة الحساب؟",
   "removeAddressWarning": "Account can be re-added using the 'Add' button above.",
   "lastAddressSnackBar": "You can't delete the last address in the wallet.",
   "importWalletTitle": "Import {state}",
@@ -88,19 +91,60 @@
   "not24Words": "Error: not 24 words.",
   "transactions": "Transactions",
   "selectAddressHint": "Select Address",
-  "sendCard": "SEND",
-  "receiveCard": "RECEIVE",
-  "changeCard": "CHANGE",
-  "unopenedAccount": "Unopened Account",
+  "sendCard": "إرسال",
+  "receiveCard": "إستقبال",
+  "changeCard": "تغيير",
+  "unopenedAccount": "حساب غير مفتوح",
   "unopenedReceiveMsg": "Receive Banano to open your new account.",
-  "copyAddress": "Copy Address",
+  "copyAddress": "نسخ العنوان",
   "scanQRCode": "Scan QR Code",
-  "enterAmountHint": "Enter Amount",
+  "enterAmountHint": "أدخل الكمية",
   "maxAmountIcon": "MAX",
   "amountFieldErrZero": "Error: amount can't be zero.",
   "amountFieldErrNegative": "Error: amount can't be negative.",
   "amountFieldErrMore": "Error: amount can't be more than balance.",
   "enterAddressHint": "Enter Address",
-  "addressFieldErrAddr": "Error: Incorrect ban address."
+  "addressFieldErrAddr": "Error: Incorrect ban address.",
+  "repInfoDialogExplanation": "Representative accounts (or nodes) that are always online, vote on the validity of transactions published to the network. When a transaction has enough votes to achieve consensus, it is officially approved by the network. each representative has a ‘voting weight’, which is determined by the balance of the accounts that have delegated their votes to it. \nby choosing your representative, you allocate the balance of your account to their voting weight. your balance remains in your non-custodial control, ready to spend whenever you want. If your representative goes offline, your account is totally unaffected - it just means your funds are no longer used to secure the network. \nIt is better to choose a trustworthy representative with low voting weight and high uptime (score).",
+  "repInfoDialogTitle": "What is a representative",
+  "repVotingWeight": "Voting weight: {state}%",
+  "@repVotingWeight": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "0.01"
+      }
+    }
+  },
+  "currentRep": "الممثل الحالي:",
+  "moreInfo": "معلومات إضافية:",
+  "chooseFromList": "إختيار من القائمة",
+  "enterManually": "أدخل يدويا",
+  "changeRepTitle": "تغيير الممثل",
+  "changeButton": "تغيير",
+  "repAlias": "{state} الأسم:",
+  "@repAlias": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "Moonano"
+      }
+    }
+  },
+  "repScore": "Score: {state}/100",
+  "@repScore": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "90"
+      }
+    }
+  },
+  "authMsgChangeRep": "Authenticate to change representative.",
+  "authMsgChangePIN": "Authenticate to change PIN.",
+  "loadingWidgetChangeRepMsg": "يتم تغيير الممثل...",
+  "loadingWidgetDefaultMsg": "في قيد الإنتظار...",
+  "loadingWidgetSendMsg": "يتم اللإرسال...",
+  "changePINButton": "Change PIN"
 
 }

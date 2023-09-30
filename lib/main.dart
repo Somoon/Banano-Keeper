@@ -81,7 +81,6 @@ Future<void> setupUserData() async {
 
 Future<void> loadWalletsFromDB(
     String activeWalletName, int activeAccountIndex) async {
-  int index = 0;
   var walletsData = await services<DBManager>().getWallets();
   for (var walletData in walletsData) {
     var seed = await Utils().decryptSeed(walletData['seed_encrypted']);
@@ -127,8 +126,6 @@ Future<void> loadWalletsFromDB(
         wallet.setActiveIndex(activeAccountIndex);
       }
     }
-
-    index++;
   }
 }
 

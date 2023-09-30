@@ -1,28 +1,26 @@
 // ignore_for_file: prefer_const_constructors
 import 'dart:ui';
+import 'dart:io';
 
-import 'package:bananokeeper/providers/localization_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/ui/management/import_wallet.dart';
 import 'package:bananokeeper/ui/pin/setup_pin.dart';
 import 'package:bananokeeper/utils/utils.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/themes.dart';
-import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:bananokeeper/db/dbManager.dart';
 
+import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:nanodart/nanodart.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
-
-import 'dart:io';
-
-import '../db/dbManager.dart';
 
 class InitialPageImport extends StatefulWidget with GetItStatefulWidgetMixin {
   InitialPageImport({super.key});
@@ -77,9 +75,13 @@ class InitialPageImportState extends State<InitialPageImport>
               backgroundColor: currentTheme.primaryAppBar,
               automaticallyImplyLeading: false,
               centerTitle: true,
+              titleSpacing: 10.0,
               titleTextStyle: currentTheme.textStyle,
               title: AutoSizeText(
-                "Import Wallet",
+                (importState
+                    ? appLocalizations!.importWalletTitle(appLocalizations.seed)
+                    : appLocalizations!
+                        .importWalletTitle(appLocalizations.mnemonicPhrase)),
                 maxLines: 1,
               ),
               actions: [
@@ -126,7 +128,7 @@ class InitialPageImportState extends State<InitialPageImport>
                       Navigator.of(context).pop(true);
                     },
                     child: Text(
-                      appLocalizations?.back ?? "",
+                      appLocalizations.back,
                       style: TextStyle(
                         color: currentTheme.text,
                         fontSize: currentTheme.fontSize,
@@ -164,7 +166,7 @@ class InitialPageImportState extends State<InitialPageImport>
       child: Column(
         children: [
           Text(
-            "Enter your seed:",
+            appLocalizations!.enterSeed,
             style: currentTheme.textStyle,
           ),
           SizedBox(
@@ -207,18 +209,18 @@ class InitialPageImportState extends State<InitialPageImport>
             });
           }
         },
+        style: ButtonStyle(
+          overlayColor: MaterialStateColor.resolveWith(
+              (states) => currentTheme.text.withOpacity(0.3)),
+        ),
         child: Text(
-          appLocalizations.next ?? "",
+          appLocalizations.next,
           style: TextStyle(
             color: (isCheckedNewWallet
                 ? currentTheme.text
                 : currentTheme.textDisabled),
             fontSize: currentTheme.fontSize,
           ),
-        ),
-        style: ButtonStyle(
-          overlayColor: MaterialStateColor.resolveWith(
-              (states) => currentTheme.text.withOpacity(0.3)),
         ),
       ),
     );
@@ -295,7 +297,7 @@ class InitialPageImportState extends State<InitialPageImport>
             } else {
               var snackBar = SnackBar(
                 content: Text(
-                  'QR Scan is not supported on windows.',
+                  AppLocalizations.of(context)!.qrNotSupported,
                   style: TextStyle(
                     color: currentTheme.textDisabled,
                   ),
@@ -315,11 +317,11 @@ class InitialPageImportState extends State<InitialPageImport>
             bool isCorrectHex = NanoSeeds.isValidSeed(value);
             print('isCorrectHex? $isCorrectHex');
             if (!isCorrectHex) {
-              return 'Invalid seed';
+              return AppLocalizations.of(context)!.invalidSeed;
             }
 
             return value.length > 64
-                ? 'seed length cannot be longer than 64 characters'
+                ? AppLocalizations.of(context)!.invalidSeedLength
                 : null;
           }
         }
@@ -345,28 +347,27 @@ class InitialPageImportState extends State<InitialPageImport>
 
   Widget importMnemonic(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-    var appLocalizations = AppLocalizations.of(context);
 
     return Padding(
       padding: EdgeInsets.only(left: 20, right: 20, top: 40),
       child: Column(
         children: [
           Text(
-            "Enter your 24-words secret phrase:",
+            AppLocalizations.of(context)!.enter24Words,
             style: currentTheme.textStyle,
           ),
           SizedBox(
             height: 10,
           ),
           ///////////////////////////
-          MnemonicTextField(currentTheme),
+          mnemonicTextField(currentTheme),
 
           SizedBox(
             height: 10,
           ),
 
           AutoSizeText(
-            (mnemonicIsValid ? "" : "${wordsErr.join(" ")}"),
+            (mnemonicIsValid ? "" : wordsErr.join(" ")),
             style: TextStyle(
               color: currentTheme.red,
               fontSize: currentTheme.fontSize,
@@ -394,7 +395,8 @@ class InitialPageImportState extends State<InitialPageImport>
             });
             if (wordsErr.isNotEmpty) {
               setState(() {
-                wordsErr.insert(0, "The following words are incorrect: \n ");
+                wordsErr.insert(
+                    0, "${AppLocalizations.of(context)!.incorrectWords} \n ");
                 mnemonicIsValid = false;
               });
             } else {
@@ -425,12 +427,16 @@ class InitialPageImportState extends State<InitialPageImport>
             setState(() {
               mnemonicIsValid = false;
               wordsErr.clear();
-              wordsErr.add("Error: not 24 words.");
+              wordsErr.add(AppLocalizations.of(context)!.not24Words);
             });
           }
         },
+        style: ButtonStyle(
+          overlayColor: MaterialStateColor.resolveWith(
+              (states) => currentTheme.text.withOpacity(0.3)),
+        ),
         child: Text(
-          appLocalizations.next ?? "",
+          appLocalizations.next,
           style: TextStyle(
             color: (isCheckedNewWallet
                 ? currentTheme.text
@@ -438,15 +444,11 @@ class InitialPageImportState extends State<InitialPageImport>
             fontSize: currentTheme.fontSize,
           ),
         ),
-        style: ButtonStyle(
-          overlayColor: MaterialStateColor.resolveWith(
-              (states) => currentTheme.text.withOpacity(0.3)),
-        ),
       ),
     );
   }
 
-  TextFormField MnemonicTextField(BaseTheme currentTheme) {
+  TextFormField mnemonicTextField(BaseTheme currentTheme) {
     return TextFormField(
       maxLines: null,
       focusNode: ControllerFocusNode2,
@@ -516,7 +518,7 @@ class InitialPageImportState extends State<InitialPageImport>
             } else {
               var snackBar = SnackBar(
                 content: Text(
-                  'QR Scan is not supported on windows.',
+                  AppLocalizations.of(context)!.qrNotSupported,
                   style: TextStyle(
                     color: currentTheme.textDisabled,
                   ),

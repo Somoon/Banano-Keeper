@@ -1,8 +1,5 @@
-import 'package:bananokeeper/providers/wallet_service.dart';
-import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:flutter/material.dart';
 
-import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 
@@ -18,10 +15,8 @@ class ManagementPage extends StatefulWidget with GetItStatefulWidgetMixin {
 }
 
 class ManagementPageState extends State<ManagementPage> with GetItStateMixin {
-
   @override
   void dispose() {
-
     super.dispose();
   }
 
@@ -71,7 +66,4 @@ class ManagementPageState extends State<ManagementPage> with GetItStateMixin {
       ),
     );
   }
-
-
-
 }

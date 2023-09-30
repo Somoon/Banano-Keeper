@@ -94,12 +94,6 @@ class UserData extends ChangeNotifier {
   Representative? getRepData(String address) {
     Representative? repItem;
 
-    // if (representatives!.isNotEmpty &&
-    //     NanoAccounts.isValid(NanoAccountType.BANANO, address)) {
-    //   repItem = representatives!
-    //       .firstWhere((e) => e.address == address, orElse: () => repItem);
-    // }
-
     try {
       repItem = representatives!.firstWhere((e) => e.address == address);
     } catch (e) {

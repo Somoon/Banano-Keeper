@@ -167,7 +167,7 @@ class WalletService extends ChangeNotifier {
   }
 
   void createAccount(
-      [int? index,
+      [int index = 0,
       nickname = "",
       address = "",
       balance = "0",

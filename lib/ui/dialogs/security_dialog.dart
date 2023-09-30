@@ -1,12 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/ui/pin/setup_pin.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
-import 'package:flutter/material.dart';
-
-import '../../providers/get_it_main.dart';
-import '../../providers/shared_prefs_service.dart';
-import '../../themes.dart';
+import 'package:bananokeeper/themes.dart';
+import 'package:gap/gap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SecurityDialog extends StatefulWidget with GetItStatefulWidgetMixin {
   SecurityDialog({super.key});
@@ -36,12 +35,13 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
           children: <Widget>[
             Column(
               children: [
-                createChangePINButton("Change PIN"),
+                createChangePINButton(currentTheme),
+                // createStartupBehaviourButton(),
+
                 // createThemeButton("Login Auth"),
-                // createThemeButton("Change PIN"),
               ],
             ),
-            const SizedBox(height: 15),
+            const Gap(15),
             const Divider(
               thickness: 1,
             ),
@@ -50,7 +50,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
                 Navigator.pop(context);
               },
               child: Text(
-                'Close',
+                AppLocalizations.of(context)!.close,
                 style: TextStyle(color: currentTheme.text),
               ),
             ),
@@ -60,14 +60,13 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
     );
   }
 
-  Widget createChangePINButton(label) {
-    var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
+  Widget createChangePINButton(currentTheme) {
     return SizedBox(
       width: double.infinity,
       child: TextButton(
         onPressed: () async {
           bool canauth = await BiometricUtil().canAuth();
-          bool verified = false;
+          bool? verified = false;
 
           if (!canauth) {
             verified = await Navigator.of(context).push(
@@ -77,10 +76,10 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
             );
           } else {
             verified = await BiometricUtil()
-                .authenticate("Authenticate to change PIN.");
+                .authenticate(AppLocalizations.of(context)!.authMsgChangePIN);
           }
 
-          if (verified) {
+          if (verified != null && verified) {
             setState(() {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -93,7 +92,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
           // Navigator.pop(context);
         },
         child: Text(
-          label,
+          AppLocalizations.of(context)!.changePINButton,
           style: TextStyle(color: currentTheme.text),
         ),
       ),

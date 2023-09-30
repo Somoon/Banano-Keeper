@@ -1,5 +1,6 @@
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/pow_source.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -58,14 +59,18 @@ class AccountAPI {
 
   processRequest(block, subtype) async {
     String apiURL = services<PoWSource>().getAPIURL();
-    print("processRequest $apiURL");
+    if (kDebugMode) {
+      print("processRequest $apiURL");
+    }
     Map<String, dynamic> request = {
       "action": "process",
       "block": json.encode(block),
       "do_work": true,
       "subtype": subtype
     };
-    print(request);
+    if (kDebugMode) {
+      print(request);
+    }
     http.Response response = await http.post(
       Uri.parse(apiURL),
       headers: <String, String>{
@@ -74,15 +79,21 @@ class AccountAPI {
       body: jsonEncode(request),
     );
     if (response.statusCode != 200) {
-      print("ERR code ${response.statusCode}");
+      if (kDebugMode) {
+        print("ERR code ${response.statusCode}");
+      }
     }
     Map decoded = json.decode(response.body);
     if (decoded.containsKey("error")) {
-      print("ERR $decoded");
+      if (kDebugMode) {
+        print("ERR $decoded");
+      }
     }
 
     // print(response.statusCode);
-    print(response.body);
+    if (kDebugMode) {
+      print(response.body);
+    }
     return response.body;
   }
 

@@ -1,8 +1,11 @@
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bananokeeper/api/representative_json.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/themes.dart';
 import 'package:bananokeeper/ui/loading_widget.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
@@ -18,7 +21,13 @@ class ManualRepChange {
   static final ManualRepChange _singleton = ManualRepChange._internal();
   late BuildContext _context;
   bool isDisplayed = false;
-
+  bool isValidAddress = false;
+  String repName = "";
+  String score = "";
+  String weight = "";
+  Representative? rep;
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
   factory ManualRepChange() {
     return _singleton;
   }
@@ -31,6 +40,8 @@ class ManualRepChange {
       return false;
     }
     _context = context;
+    isValidAddress = false;
+
     return showModalBottomSheet<bool>(
         enableDrag: true,
         isScrollControlled: true,
@@ -56,168 +67,95 @@ class ManualRepChange {
                   ),
                   child: SizedBox(
                     height: height / 1.25,
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 10),
-                            height: 5,
-                            width: MediaQuery.of(context).size.width * 0.15,
-                            decoration: BoxDecoration(
-                              color: currentTheme.secondary,
-                              borderRadius: BorderRadius.circular(100.0),
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  right: 10,
-                                ),
-                                child: SizedBox(
-                                  child: TextButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        addressController.clear();
-                                        Navigator.of(context).pop(false);
-                                      });
-                                    },
-                                    style: ButtonStyle(
-                                      foregroundColor:
-                                          MaterialStatePropertyAll<Color>(
-                                              currentTheme.textDisabled),
-                                      // backgroundColor:
-                                      //     MaterialStatePropertyAll<
-                                      //         Color>(primary),
-                                    ),
-                                    child: const Icon(Icons.close),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 15, right: 15),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20.0),
+                      child: ScaffoldMessenger(
+                        key: scaffoldMessengerKey,
+                        child: Scaffold(
+                          backgroundColor: currentTheme.primary,
+                          body: Center(
                             child: Column(
                               children: [
-                                AutoSizeText(
-                                  "Change ${AppLocalizations.of(context)!.representative}",
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: currentTheme.text,
+                                Container(
+                                  margin: const EdgeInsets.only(top: 10),
+                                  height: 5,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.15,
+                                  decoration: BoxDecoration(
+                                    color: currentTheme.secondary,
+                                    borderRadius: BorderRadius.circular(100.0),
                                   ),
                                 ),
-
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        right: 10,
+                                      ),
+                                      child: SizedBox(
+                                        child: TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              addressController.clear();
+                                              Navigator.of(context).pop(false);
+                                            });
+                                          },
+                                          style: ButtonStyle(
+                                            foregroundColor:
+                                                MaterialStatePropertyAll<Color>(
+                                                    currentTheme.textDisabled),
+                                            // backgroundColor:
+                                            //     MaterialStatePropertyAll<
+                                            //         Color>(primary),
+                                          ),
+                                          child: const Icon(Icons.close),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
                                 Padding(
-                                    padding: const EdgeInsets.all(25.0),
-                                    child: Column(
-                                      children: [
-                                        const Gap(50),
-                                        sendAddressTextField(
-                                            currentTheme, context, setState),
-                                        const Gap(80),
-                                        SizedBox(
-                                          width: double.infinity,
-                                          height: 48,
-                                          child: OutlinedButton(
-                                            style: ButtonStyle(
-                                              overlayColor: MaterialStateColor
-                                                  .resolveWith((states) =>
-                                                      currentTheme.text
-                                                          .withOpacity(0.3)),
-                                              // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
-                                              shape: MaterialStateProperty.all<
-                                                  RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-                                              ),
-
-                                              side: MaterialStatePropertyAll<
-                                                  BorderSide>(
-                                                BorderSide(
-                                                  color: currentTheme
-                                                      .buttonOutline,
-                                                  width: 1,
-                                                ),
-                                              ),
-                                            ),
-                                            onPressed: () async {
-                                              changeRep(context, account);
-                                            },
-                                            child: Text(
-                                              "Change",
-                                              // AppLocalizations.of(context)!.add,
-                                              style: TextStyle(
-                                                color: currentTheme.text,
-                                                fontSize: currentTheme.fontSize,
-                                              ),
-                                            ),
-                                          ),
+                                  padding: const EdgeInsets.only(
+                                      left: 15, right: 15),
+                                  child: Column(
+                                    children: [
+                                      AutoSizeText(
+                                        appLocalizations!.changeRepTitle,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.bold,
+                                          color: currentTheme.text,
                                         ),
-                                        const Gap(30),
-                                        SizedBox(
-                                          width: double.infinity,
-                                          height: 48,
-                                          child: OutlinedButton(
-                                            style: ButtonStyle(
-                                              overlayColor: MaterialStateColor
-                                                  .resolveWith((states) =>
-                                                      currentTheme.text
-                                                          .withOpacity(0.3)),
-                                              // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
-                                              shape: MaterialStateProperty.all<
-                                                  RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-                                              ),
-
-                                              side: MaterialStatePropertyAll<
-                                                  BorderSide>(
-                                                BorderSide(
-                                                  color: currentTheme
-                                                      .buttonOutline,
-                                                  width: 1,
-                                                ),
-                                              ),
-                                            ),
-                                            onPressed: () async {
-                                              setState(() {
-                                                Navigator.of(context).pop();
-                                              });
-                                            },
-                                            child: Text(
-                                              appLocalizations?.cancel ?? "",
-                                              // AppLocalizations.of(context)!.add,
-                                              style: TextStyle(
-                                                color: currentTheme.text,
-                                                fontSize: currentTheme.fontSize,
-                                              ),
-                                            ),
-                                          ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(25.0),
+                                        child: Column(
+                                          children: [
+                                            const Gap(80),
+                                            sendAddressTextField(currentTheme,
+                                                context, setState),
+                                            if (isValidAddress &&
+                                                rep != null) ...[
+                                              displayAdditionalInfo(
+                                                  currentTheme,
+                                                  appLocalizations),
+                                            ] else ...[
+                                              // const Gap(80),
+                                            ],
+                                          ],
                                         ),
-                                      ],
-                                    )),
-
-                                // createSendButton(account, currentTheme,
-                                //     appLocalizations, width),
-                                // const SizedBox(
-                                //   height: 10,
-                                // ),
-                                // createQRButton(currentTheme,
-                                //     appLocalizations, width),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                        ],
+                          bottomNavigationBar: displayButtons(context, setState,
+                              currentTheme, account, appLocalizations),
+                        ),
                       ),
                     ),
                   ),
@@ -228,7 +166,136 @@ class ManualRepChange {
         });
   }
 
-  bool validAddr = false;
+  displayButtons(BuildContext context, StateSetter setState,
+      BaseTheme currentTheme, Account account, appLocalizations) {
+    return SizedBox(
+      height: 170,
+      child: BottomAppBar(
+        color: currentTheme.primary,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(35, 10, 35, 30),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton(
+                  style: ButtonStyle(
+                    overlayColor: MaterialStateColor.resolveWith(
+                        (states) => currentTheme.text.withOpacity(0.3)),
+                    // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+
+                    side: MaterialStatePropertyAll<BorderSide>(
+                      BorderSide(
+                        color: currentTheme.buttonOutline,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  onPressed: () async {
+                    changeRep(context, account);
+                  },
+                  child: Text(
+                    appLocalizations!.changeButton,
+                    // AppLocalizations.of(context)!.add,
+                    style: TextStyle(
+                      color: currentTheme.text,
+                      fontSize: currentTheme.fontSize,
+                    ),
+                  ),
+                ),
+              ),
+              const Gap(30),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton(
+                  style: ButtonStyle(
+                    overlayColor: MaterialStateColor.resolveWith(
+                        (states) => currentTheme.text.withOpacity(0.3)),
+                    // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+
+                    side: MaterialStatePropertyAll<BorderSide>(
+                      BorderSide(
+                        color: currentTheme.buttonOutline,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  onPressed: () async {
+                    setState(() {
+                      addressController.clear();
+                      Navigator.of(context).pop();
+                    });
+                  },
+                  child: Text(
+                    appLocalizations!.cancel,
+                    // AppLocalizations.of(context)!.add,
+                    style: TextStyle(
+                      color: currentTheme.text,
+                      fontSize: currentTheme.fontSize,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget displayAdditionalInfo(currentTheme, appLocalizations) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        // crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Gap(30),
+          AutoSizeText(
+            appLocalizations!.repAlias(repName),
+            maxLines: 1,
+            style: TextStyle(
+              color: currentTheme.text,
+              fontSize: 16,
+            ),
+          ),
+          const Gap(20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                weight,
+                style: TextStyle(
+                  color: currentTheme.offColor,
+                ),
+              ),
+              const Gap(20),
+              Text(
+                score,
+                style: TextStyle(
+                  color: currentTheme.offColor,
+                ),
+              ),
+            ],
+          ),
+          const Gap(40),
+        ],
+      ),
+    );
+  }
+
   final addressController = TextEditingController();
   FocusNode addressControllerFocusNode = FocusNode();
   TextFormField sendAddressTextField(
@@ -267,10 +334,19 @@ class ManualRepChange {
             bool isCorrectHex =
                 NanoAccounts.isValid(NanoAccountType.BANANO, copiedText);
 
-            if (isCorrectHex) {
-              addressController.text = copiedText;
-            }
-            setState(() {});
+            setState(() {
+              if (isCorrectHex) {
+                addressController.text = copiedText;
+                isValidAddress = true;
+                rep = services<UserData>().getRepData(addressController.text);
+                repName = rep?.alias ?? "";
+                score = (rep?.score != null ? "Score: ${rep?.score}/100" : "");
+                weight =
+                    "Voting weight: ${rep?.weightPercentage.toStringAsFixed(2)}%";
+              } else {
+                isValidAddress = false;
+              }
+            });
           },
           icon: const Icon(
             Icons.paste_outlined,
@@ -327,7 +403,19 @@ class ManualRepChange {
                                   NanoAccounts.isValid(
                                       NanoAccountType.BANANO, result.text)) {
                                 addressController.text = result.text;
+                                isValidAddress = true;
+                                rep = services<UserData>()
+                                    .getRepData(addressController.text);
+                                repName = rep?.alias ?? "";
+                                score = (rep?.score != null
+                                    ? "Score: ${rep?.score}/100"
+                                    : "");
+                                weight =
+                                    "Voting weight: ${rep?.weightPercentage.toStringAsFixed(2)}%";
+
                                 Navigator.of(context).pop();
+                              } else {
+                                isValidAddress = false;
                               }
                             },
                           ),
@@ -339,18 +427,17 @@ class ManualRepChange {
                     ),
                   ));
               setState(() {});
+            } else {
+              var snackBar = SnackBar(
+                content: Text(
+                  AppLocalizations.of(context)!.qrNotSupported,
+                  style: TextStyle(
+                    color: currentTheme.textDisabled,
+                  ),
+                ),
+              );
+              scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
             }
-            // else {
-            //   var snackBar = SnackBar(
-            //     content: Text(
-            //       appLocalizations!.qrNotSupported,
-            //       style: TextStyle(
-            //         color: currentTheme.textDisabled,
-            //       ),
-            //     ),
-            //   );
-            //   scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
-            // }
           },
           icon: const Icon(Icons.qr_code_scanner_rounded),
           color: currentTheme.textDisabled,
@@ -361,14 +448,22 @@ class ManualRepChange {
         if (value != null) {
           if (value.length >= 64) {
             if (NanoAccounts.isValid(NanoAccountType.BANANO, value)) {
-              validAddr = true;
+              isValidAddress = true;
+              rep = services<UserData>().getRepData(addressController.text);
+              repName = rep?.alias ?? "";
+              score = (rep?.score != null
+                  ? AppLocalizations.of(context)!
+                      .repScore(rep?.score.toString() ?? "0.00")
+                  : "");
+              weight = AppLocalizations.of(context)!.repVotingWeight(
+                  rep?.weightPercentage.toStringAsFixed(2) ?? "0.00");
             } else {
-              validAddr = false;
+              isValidAddress = false;
               return AppLocalizations.of(context)!.addressFieldErrAddr;
             }
           }
         }
-        validAddr = false;
+        // isValidAddress = false;
         return null;
       },
       style: TextStyle(
@@ -393,13 +488,13 @@ class ManualRepChange {
             false;
       } else {
         verified = await BiometricUtil()
-            .authenticate("Authenticate to change representative");
+            .authenticate(AppLocalizations.of(context)!.authMsgChangeRep);
         //appLocalizations.authMsgWalletDel);
       }
 
       if (verified) {
-        LoadingIndicatorDialog()
-            .show(context, text: "Changing representative...");
+        LoadingIndicatorDialog().show(context,
+            text: AppLocalizations.of(context)!.loadingWidgetChangeRepMsg);
 
         bool result =
             await account.changeRepresentative(addressController.text);
