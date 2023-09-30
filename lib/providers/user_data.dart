@@ -9,8 +9,11 @@ import 'dart:convert';
 
 import 'package:bananokeeper/api/account_api.dart';
 import 'package:bananokeeper/api/representative_json.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:nanodart/nanodart.dart';
 
 class UserData extends ChangeNotifier {
   //type either:
@@ -57,11 +60,12 @@ class UserData extends ChangeNotifier {
 
   /// Rep data
   List<Representative>? representatives;
-  int repUpdate = 0; //store last call for rep list. we update once a day.
+  int repUpdate = 0;
 
+  /// update the cached rep list from the internet is one passed since last fetch
   updateRepresentatives() async {
     int ct = DateTime.now().millisecondsSinceEpoch;
-    int ms = ct - repUpdate;
+    int ms = ct - getRepUpdateTime();
     int days = Duration(milliseconds: ms).inDays;
 
     if (days > 0) {
@@ -75,19 +79,56 @@ class UserData extends ChangeNotifier {
       _representatives
           .sort((a, b) => a.weightPercentage.compareTo(b.weightPercentage));
       representatives = List.from(_representatives);
-      repUpdate = DateTime.now().millisecondsSinceEpoch;
+      setRepUpdateTime(DateTime.now().millisecondsSinceEpoch);
 
-      //store copy of representatives to sharedPrefs + repUpdate
+      await services<SharedPrefsModel>().saveRepresentatives(representatives!);
+
+      services<SharedPrefsModel>().getRepresentatives();
       notifyListeners();
     }
   }
 
-  Representative? getRepData(address) {
+  /// return data of rep if it exist
+  ///
+  /// @param address address of the representative
+  Representative? getRepData(String address) {
     Representative? repItem;
-    if (representatives!.isNotEmpty) {
+
+    // if (representatives!.isNotEmpty &&
+    //     NanoAccounts.isValid(NanoAccountType.BANANO, address)) {
+    //   repItem = representatives!
+    //       .firstWhere((e) => e.address == address, orElse: () => repItem);
+    // }
+
+    try {
       repItem = representatives!.firstWhere((e) => e.address == address);
+    } catch (e) {
+      repItem = null;
     }
 
     return repItem;
+  }
+
+  /// sets the cached representatives list.
+  ///
+  /// @param repList list of representatives
+  void setRepresentativesList(List<Representative> repList) {
+    representatives = List<Representative>.from(repList);
+    notifyListeners();
+  }
+
+  /// update stored time to fetch new rep list from the internet
+  ///
+  /// @param mSeconds time
+  setRepUpdateTime(int mSeconds) {
+    services<SharedPrefsModel>().saveRepUpdateTime(mSeconds);
+
+    repUpdate = mSeconds;
+    notifyListeners();
+  }
+
+  /// return stored time to fetch new rep list from the internet
+  int getRepUpdateTime() {
+    return repUpdate;
   }
 }

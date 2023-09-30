@@ -1,0 +1,425 @@
+import 'dart:io';
+
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bananokeeper/providers/account.dart';
+import 'package:bananokeeper/providers/auth_biometric.dart';
+import 'package:bananokeeper/themes.dart';
+import 'package:bananokeeper/ui/loading_widget.dart';
+import 'package:bananokeeper/ui/pin/verify_pin.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gap/gap.dart';
+import 'package:nanodart/nanodart.dart';
+import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
+import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
+
+class ManualRepChange {
+  static final ManualRepChange _singleton = ManualRepChange._internal();
+  late BuildContext _context;
+  bool isDisplayed = false;
+
+  factory ManualRepChange() {
+    return _singleton;
+  }
+
+  ManualRepChange._internal();
+
+  Future<bool?> show(BuildContext context, currentTheme, double height,
+      appLocalizations, Account account) async {
+    if (isDisplayed) {
+      return false;
+    }
+    _context = context;
+    return showModalBottomSheet<bool>(
+        enableDrag: true,
+        isScrollControlled: true,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        backgroundColor: currentTheme.primary,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return GestureDetector(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: currentTheme.primary,
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    color: currentTheme.primary,
+                  ),
+                  child: SizedBox(
+                    height: height / 1.25,
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(top: 10),
+                            height: 5,
+                            width: MediaQuery.of(context).size.width * 0.15,
+                            decoration: BoxDecoration(
+                              color: currentTheme.secondary,
+                              borderRadius: BorderRadius.circular(100.0),
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  right: 10,
+                                ),
+                                child: SizedBox(
+                                  child: TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        addressController.clear();
+                                        Navigator.of(context).pop(false);
+                                      });
+                                    },
+                                    style: ButtonStyle(
+                                      foregroundColor:
+                                          MaterialStatePropertyAll<Color>(
+                                              currentTheme.textDisabled),
+                                      // backgroundColor:
+                                      //     MaterialStatePropertyAll<
+                                      //         Color>(primary),
+                                    ),
+                                    child: const Icon(Icons.close),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15, right: 15),
+                            child: Column(
+                              children: [
+                                AutoSizeText(
+                                  "Change ${AppLocalizations.of(context)!.representative}",
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: currentTheme.text,
+                                  ),
+                                ),
+
+                                Padding(
+                                    padding: const EdgeInsets.all(25.0),
+                                    child: Column(
+                                      children: [
+                                        const Gap(50),
+                                        sendAddressTextField(
+                                            currentTheme, context, setState),
+                                        const Gap(80),
+                                        SizedBox(
+                                          width: double.infinity,
+                                          height: 48,
+                                          child: OutlinedButton(
+                                            style: ButtonStyle(
+                                              overlayColor: MaterialStateColor
+                                                  .resolveWith((states) =>
+                                                      currentTheme.text
+                                                          .withOpacity(0.3)),
+                                              // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
+                                              shape: MaterialStateProperty.all<
+                                                  RoundedRectangleBorder>(
+                                                RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                ),
+                                              ),
+
+                                              side: MaterialStatePropertyAll<
+                                                  BorderSide>(
+                                                BorderSide(
+                                                  color: currentTheme
+                                                      .buttonOutline,
+                                                  width: 1,
+                                                ),
+                                              ),
+                                            ),
+                                            onPressed: () async {
+                                              changeRep(context, account);
+                                            },
+                                            child: Text(
+                                              "Change",
+                                              // AppLocalizations.of(context)!.add,
+                                              style: TextStyle(
+                                                color: currentTheme.text,
+                                                fontSize: currentTheme.fontSize,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const Gap(30),
+                                        SizedBox(
+                                          width: double.infinity,
+                                          height: 48,
+                                          child: OutlinedButton(
+                                            style: ButtonStyle(
+                                              overlayColor: MaterialStateColor
+                                                  .resolveWith((states) =>
+                                                      currentTheme.text
+                                                          .withOpacity(0.3)),
+                                              // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
+                                              shape: MaterialStateProperty.all<
+                                                  RoundedRectangleBorder>(
+                                                RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                ),
+                                              ),
+
+                                              side: MaterialStatePropertyAll<
+                                                  BorderSide>(
+                                                BorderSide(
+                                                  color: currentTheme
+                                                      .buttonOutline,
+                                                  width: 1,
+                                                ),
+                                              ),
+                                            ),
+                                            onPressed: () async {
+                                              setState(() {
+                                                Navigator.of(context).pop();
+                                              });
+                                            },
+                                            child: Text(
+                                              appLocalizations?.cancel ?? "",
+                                              // AppLocalizations.of(context)!.add,
+                                              style: TextStyle(
+                                                color: currentTheme.text,
+                                                fontSize: currentTheme.fontSize,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+
+                                // createSendButton(account, currentTheme,
+                                //     appLocalizations, width),
+                                // const SizedBox(
+                                //   height: 10,
+                                // ),
+                                // createQRButton(currentTheme,
+                                //     appLocalizations, width),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        });
+  }
+
+  bool validAddr = false;
+  final addressController = TextEditingController();
+  FocusNode addressControllerFocusNode = FocusNode();
+  TextFormField sendAddressTextField(
+      BaseTheme currentTheme, BuildContext context, StateSetter setState) {
+    return TextFormField(
+      maxLines: 3,
+      minLines: 1,
+      textAlign: TextAlign.center,
+      focusNode: addressControllerFocusNode,
+      controller: addressController,
+      autofocus: false,
+      textAlignVertical: TextAlignVertical.center,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        filled: true,
+        fillColor: currentTheme.secondary,
+        isDense: false,
+        isCollapsed: false,
+        contentPadding: const EdgeInsets.all(10),
+        hintText: AppLocalizations.of(context)!.enterAddressHint,
+        hintStyle: TextStyle(color: currentTheme.textDisabled),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        // hintText: tempName, //activeWalletName,
+        // hintStyle:
+        //     TextStyle(color: currentTheme.textDisabled),
+
+        suffixIcon: IconButton(
+          onPressed: () async {
+            ClipboardData? cdata =
+                await Clipboard.getData(Clipboard.kTextPlain);
+            String copiedText = cdata?.text ?? "";
+            bool isCorrectHex =
+                NanoAccounts.isValid(NanoAccountType.BANANO, copiedText);
+
+            if (isCorrectHex) {
+              addressController.text = copiedText;
+            }
+            setState(() {});
+          },
+          icon: const Icon(
+            Icons.paste_outlined,
+          ),
+          color: currentTheme.textDisabled,
+        ),
+        // Container(
+        //   margin: const EdgeInsets.all(8),
+        //   // width: 15,
+        //   child: ElevatedButton(
+        //     style: ElevatedButton.styleFrom(
+        //       minimumSize: const Size(15, 35),
+        //       backgroundColor: currentTheme.primaryBottomBar,
+        //       shape: RoundedRectangleBorder(
+        //         borderRadius: BorderRadius.circular(30.0),
+        //       ),
+        //     ),
+        //     child: Icon(
+        //       size: 18,
+        //       Icons.paste_outlined,
+        //       color: currentTheme.text,
+        //     ),
+        //     onPressed: () async {
+        //       ClipboardData? cdata =
+        //           await Clipboard.getData(Clipboard.kTextPlain);
+        //       String copiedText = cdata?.text ?? "";
+        //       bool isCorrectHex =
+        //           NanoAccounts.isValid(NanoAccountType.BANANO, copiedText);
+        //
+        //       if (isCorrectHex) {
+        //         addressController.text = copiedText;
+        //       }
+        //     },
+        //   ),
+        // ),
+        prefixIcon: IconButton(
+          onPressed: () async {
+            if (!Platform.isWindows) {
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Scaffold(
+                      body: Stack(
+                        children: [
+                          QRCodeDartScanView(
+                            scanInvertedQRCode: true,
+                            typeScan: TypeScan.live,
+                            formats: const [BarcodeFormat.QR_CODE],
+                            resolutionPreset:
+                                QRCodeDartScanResolutionPreset.high,
+                            onCapture: (Result result) {
+                              // print(result.text);
+                              if (result is String &&
+                                  NanoAccounts.isValid(
+                                      NanoAccountType.BANANO, result.text)) {
+                                addressController.text = result.text;
+                                Navigator.of(context).pop();
+                              }
+                            },
+                          ),
+                          QRScannerOverlay(
+                            overlayColor: Colors.black.withOpacity(0.9),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ));
+              setState(() {});
+            }
+            // else {
+            //   var snackBar = SnackBar(
+            //     content: Text(
+            //       appLocalizations!.qrNotSupported,
+            //       style: TextStyle(
+            //         color: currentTheme.textDisabled,
+            //       ),
+            //     ),
+            //   );
+            //   scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
+            // }
+          },
+          icon: const Icon(Icons.qr_code_scanner_rounded),
+          color: currentTheme.textDisabled,
+        ),
+      ),
+      autovalidateMode: AutovalidateMode.always,
+      validator: (value) {
+        if (value != null) {
+          if (value.length >= 64) {
+            if (NanoAccounts.isValid(NanoAccountType.BANANO, value)) {
+              validAddr = true;
+            } else {
+              validAddr = false;
+              return AppLocalizations.of(context)!.addressFieldErrAddr;
+            }
+          }
+        }
+        validAddr = false;
+        return null;
+      },
+      style: TextStyle(
+        color: currentTheme.text,
+        fontFamily: 'monospace',
+        fontSize: 13,
+      ),
+    );
+  }
+
+  changeRep(BuildContext context, Account account) async {
+    if (NanoAccounts.isValid(NanoAccountType.BANANO, addressController.text)) {
+      bool canauth = await BiometricUtil().canAuth();
+      bool verified = false;
+
+      if (!canauth) {
+        verified = await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => VerifyPIN(),
+              ),
+            ) ??
+            false;
+      } else {
+        verified = await BiometricUtil()
+            .authenticate("Authenticate to change representative");
+        //appLocalizations.authMsgWalletDel);
+      }
+
+      if (verified) {
+        LoadingIndicatorDialog()
+            .show(context, text: "Changing representative...");
+
+        bool result =
+            await account.changeRepresentative(addressController.text);
+        LoadingIndicatorDialog().dismiss();
+        if (result) {
+          addressController.clear();
+          Navigator.of(context).pop(true);
+
+          // Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      }
+    }
+  }
+
+  dismiss() {
+    if (isDisplayed) {
+      addressController.dispose();
+      addressControllerFocusNode.dispose();
+      Navigator.of(_context).pop();
+      isDisplayed = false;
+    }
+  }
+}

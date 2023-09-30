@@ -53,6 +53,8 @@ Future<void> setupUserData() async {
     services<ThemeModel>().setTheme(userValues[2]);
     services<UserData>().setPin(userValues[6]);
     services<PoWSource>().setAPI(userValues[7]);
+    services<UserData>().setRepresentativesList(userValues[8]);
+    services<UserData>().setRepUpdateTime(userValues[9]);
 
     //get active wallet and index
 
@@ -108,13 +110,13 @@ Future<void> loadWalletsFromDB(
       // print(row);
 
       services<WalletService>(instanceName: original_name).importAccount(
-            row['index_id'],
-            row['index_name'],
-            row['address'],
-            row['balance'],
-            int.parse(row['last_update']),
-            row['representative'],
-          );
+        row['index_id'],
+        row['index_name'],
+        row['address'],
+        row['balance'],
+        int.parse(row['last_update']),
+        row['representative'],
+      );
     }
     if (original_name == activeWalletName) {
       int walletID = services<WalletsService>().activeWallet;

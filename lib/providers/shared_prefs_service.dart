@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:bananokeeper/api/representative_json.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async' show Future;
@@ -25,14 +28,45 @@ class SharedPrefsModel {
     return stringValue;
   }
 
-  saveTheme(String lang) async {
-    sharedPref.setString('theme', lang);
+  saveTheme(String theme) async {
+    sharedPref.setString('theme', theme);
   }
 
   getTheme() async {
     //Return String
     String stringValue = sharedPref.getString('theme') ?? "Yellow";
     return stringValue;
+  }
+
+  saveRepUpdateTime(int repUpdate) async {
+    sharedPref.setInt('repUpdate', repUpdate);
+  }
+
+  getRepUpdateTime() async {
+    int intValue = sharedPref.getInt('repUpdate') ?? 0;
+    return intValue;
+  }
+
+  saveRepresentatives(List<Representative> repList) async {
+    List<String> listArr = [];
+    for (Representative rep in repList) {
+      Map<String, dynamic> mappedRep = rep.toJson();
+      listArr.add(jsonEncode(mappedRep));
+    }
+
+    sharedPref.setStringList('representatives', listArr);
+  }
+
+  Future<List<Representative>> getRepresentatives() async {
+    List<Representative> savedRepList = [];
+    List<String> stringValue =
+        sharedPref.getStringList('representatives') ?? [];
+    for (var item in stringValue) {
+      Representative newRep = Representative.fromJson(jsonDecode(item));
+      savedRepList.add(newRep);
+    }
+
+    return savedRepList;
   }
 
   saveActiveWallet(String walletname) async {
@@ -89,6 +123,8 @@ class SharedPrefsModel {
     var latestWalletID = 0;
     String powSource = "Kalium";
     String pin = "0";
+    List<Representative> repList = [];
+    int repUpdate = 0;
     if (isInit) {
       lang = await getLang();
       theme = await getTheme();
@@ -97,6 +133,8 @@ class SharedPrefsModel {
       latestWalletID = await getLatestWalletID();
       pin = await getPin();
       powSource = await getPoWSource();
+      repList = await getRepresentatives();
+      repUpdate = await getRepUpdateTime();
     }
 
     return [
@@ -108,6 +146,8 @@ class SharedPrefsModel {
       latestWalletID, //5
       pin, //6
       powSource, //7
+      repList, //8
+      repUpdate, //9
     ];
   }
 
@@ -144,5 +184,9 @@ class SharedPrefsModel {
     if (sharedPref.containsKey("theme")) sharedPref.remove("theme");
     if (sharedPref.containsKey("language")) sharedPref.remove("language");
     if (sharedPref.containsKey("pin")) sharedPref.remove("pin");
+    if (sharedPref.containsKey("representatives")) {
+      sharedPref.remove("representatives");
+    }
+    if (sharedPref.containsKey("repUpdate")) sharedPref.remove("repUpdate");
   }
 }

@@ -24,3 +24,4 @@ Currently, only Android version is compiled and ready to be tested.
 <img src="images/gh/new.png" width="200"> <img src="images/gh/main.png" width="200">
 <img src="images/gh/accounts.png" width="200"> <img src="images/gh/wallets.png" width="200">
 <img src="images/gh/langs.png" width="200"> <img src="images/gh/themes.png" width="200">
+<img src="images/gh/rep.png" width="200">
