@@ -1,8 +1,11 @@
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bananokeeper/api/representative_json.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/themes.dart';
 import 'package:bananokeeper/ui/loading_widget.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
@@ -18,7 +21,11 @@ class ManualRepChange {
   static final ManualRepChange _singleton = ManualRepChange._internal();
   late BuildContext _context;
   bool isDisplayed = false;
-
+  bool isValidAddress = false;
+  String repName = "";
+  String score = "";
+  String weight = "";
+  Representative? rep;
   factory ManualRepChange() {
     return _singleton;
   }
@@ -31,6 +38,7 @@ class ManualRepChange {
       return false;
     }
     _context = context;
+
     return showModalBottomSheet<bool>(
         enableDrag: true,
         isScrollControlled: true,
@@ -112,100 +120,116 @@ class ManualRepChange {
                                 ),
 
                                 Padding(
-                                    padding: const EdgeInsets.all(25.0),
-                                    child: Column(
-                                      children: [
-                                        const Gap(50),
-                                        sendAddressTextField(
-                                            currentTheme, context, setState),
+                                  padding: const EdgeInsets.all(25.0),
+                                  child: Column(
+                                    children: [
+                                      const Gap(50),
+                                      sendAddressTextField(
+                                          currentTheme, context, setState),
+                                      if (isValidAddress && rep != null) ...[
+                                        displayAdditionalInfo(currentTheme),
+                                      ] else ...[
                                         const Gap(80),
-                                        SizedBox(
-                                          width: double.infinity,
-                                          height: 48,
-                                          child: OutlinedButton(
-                                            style: ButtonStyle(
-                                              overlayColor: MaterialStateColor
-                                                  .resolveWith((states) =>
-                                                      currentTheme.text
-                                                          .withOpacity(0.3)),
-                                              // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
-                                              shape: MaterialStateProperty.all<
-                                                  RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-                                              ),
-
-                                              side: MaterialStatePropertyAll<
-                                                  BorderSide>(
-                                                BorderSide(
-                                                  color: currentTheme
-                                                      .buttonOutline,
-                                                  width: 1,
-                                                ),
-                                              ),
-                                            ),
-                                            onPressed: () async {
-                                              changeRep(context, account);
-                                            },
-                                            child: Text(
-                                              "Change",
-                                              // AppLocalizations.of(context)!.add,
-                                              style: TextStyle(
-                                                color: currentTheme.text,
-                                                fontSize: currentTheme.fontSize,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const Gap(30),
-                                        SizedBox(
-                                          width: double.infinity,
-                                          height: 48,
-                                          child: OutlinedButton(
-                                            style: ButtonStyle(
-                                              overlayColor: MaterialStateColor
-                                                  .resolveWith((states) =>
-                                                      currentTheme.text
-                                                          .withOpacity(0.3)),
-                                              // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
-                                              shape: MaterialStateProperty.all<
-                                                  RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          10.0),
-                                                ),
-                                              ),
-
-                                              side: MaterialStatePropertyAll<
-                                                  BorderSide>(
-                                                BorderSide(
-                                                  color: currentTheme
-                                                      .buttonOutline,
-                                                  width: 1,
-                                                ),
-                                              ),
-                                            ),
-                                            onPressed: () async {
-                                              setState(() {
-                                                Navigator.of(context).pop();
-                                              });
-                                            },
-                                            child: Text(
-                                              appLocalizations?.cancel ?? "",
-                                              // AppLocalizations.of(context)!.add,
-                                              style: TextStyle(
-                                                color: currentTheme.text,
-                                                fontSize: currentTheme.fontSize,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
                                       ],
-                                    )),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          SizedBox(
+                                            width: double.infinity,
+                                            height: 48,
+                                            child: OutlinedButton(
+                                              style: ButtonStyle(
+                                                overlayColor: MaterialStateColor
+                                                    .resolveWith((states) =>
+                                                        currentTheme.text
+                                                            .withOpacity(0.3)),
+                                                // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
+                                                shape:
+                                                    MaterialStateProperty.all<
+                                                        RoundedRectangleBorder>(
+                                                  RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
+                                                  ),
+                                                ),
+
+                                                side: MaterialStatePropertyAll<
+                                                    BorderSide>(
+                                                  BorderSide(
+                                                    color: currentTheme
+                                                        .buttonOutline,
+                                                    width: 1,
+                                                  ),
+                                                ),
+                                              ),
+                                              onPressed: () async {
+                                                changeRep(context, account);
+                                              },
+                                              child: Text(
+                                                "Change",
+                                                // AppLocalizations.of(context)!.add,
+                                                style: TextStyle(
+                                                  color: currentTheme.text,
+                                                  fontSize:
+                                                      currentTheme.fontSize,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const Gap(30),
+                                          SizedBox(
+                                            width: double.infinity,
+                                            height: 48,
+                                            child: OutlinedButton(
+                                              style: ButtonStyle(
+                                                overlayColor: MaterialStateColor
+                                                    .resolveWith((states) =>
+                                                        currentTheme.text
+                                                            .withOpacity(0.3)),
+                                                // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
+                                                shape:
+                                                    MaterialStateProperty.all<
+                                                        RoundedRectangleBorder>(
+                                                  RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
+                                                  ),
+                                                ),
+
+                                                side: MaterialStatePropertyAll<
+                                                    BorderSide>(
+                                                  BorderSide(
+                                                    color: currentTheme
+                                                        .buttonOutline,
+                                                    width: 1,
+                                                  ),
+                                                ),
+                                              ),
+                                              onPressed: () async {
+                                                setState(() {
+                                                  addressController.clear();
+                                                  Navigator.of(context).pop();
+                                                });
+                                              },
+                                              child: Text(
+                                                appLocalizations?.cancel ?? "",
+                                                // AppLocalizations.of(context)!.add,
+                                                style: TextStyle(
+                                                  color: currentTheme.text,
+                                                  fontSize:
+                                                      currentTheme.fontSize,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
 
                                 // createSendButton(account, currentTheme,
                                 //     appLocalizations, width),
@@ -228,7 +252,46 @@ class ManualRepChange {
         });
   }
 
-  bool validAddr = false;
+  Widget displayAdditionalInfo(currentTheme) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        // crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Gap(30),
+          AutoSizeText(
+            "Alias: $repName",
+            maxLines: 1,
+            style: TextStyle(
+              color: currentTheme.text,
+              fontSize: 16,
+            ),
+          ),
+          const Gap(20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                weight,
+                style: TextStyle(
+                  color: currentTheme.offColor,
+                ),
+              ),
+              const Gap(20),
+              Text(
+                score,
+                style: TextStyle(
+                  color: currentTheme.offColor,
+                ),
+              ),
+            ],
+          ),
+          const Gap(40),
+        ],
+      ),
+    );
+  }
+
   final addressController = TextEditingController();
   FocusNode addressControllerFocusNode = FocusNode();
   TextFormField sendAddressTextField(
@@ -267,10 +330,19 @@ class ManualRepChange {
             bool isCorrectHex =
                 NanoAccounts.isValid(NanoAccountType.BANANO, copiedText);
 
-            if (isCorrectHex) {
-              addressController.text = copiedText;
-            }
-            setState(() {});
+            setState(() {
+              if (isCorrectHex) {
+                addressController.text = copiedText;
+                isValidAddress = true;
+                rep = services<UserData>().getRepData(addressController.text);
+                repName = rep?.alias ?? "";
+                score = (rep?.score != null ? "Score: ${rep?.score}/100" : "");
+                weight =
+                    "Voting weight: ${rep?.weightPercentage.toStringAsFixed(2)}%";
+              } else {
+                isValidAddress = false;
+              }
+            });
           },
           icon: const Icon(
             Icons.paste_outlined,
@@ -327,7 +399,19 @@ class ManualRepChange {
                                   NanoAccounts.isValid(
                                       NanoAccountType.BANANO, result.text)) {
                                 addressController.text = result.text;
+                                isValidAddress = true;
+                                rep = services<UserData>()
+                                    .getRepData(addressController.text);
+                                repName = rep?.alias ?? "";
+                                score = (rep?.score != null
+                                    ? "Score: ${rep?.score}/100"
+                                    : "");
+                                weight =
+                                    "Voting weight: ${rep?.weightPercentage.toStringAsFixed(2)}%";
+
                                 Navigator.of(context).pop();
+                              } else {
+                                isValidAddress = false;
                               }
                             },
                           ),
@@ -361,14 +445,19 @@ class ManualRepChange {
         if (value != null) {
           if (value.length >= 64) {
             if (NanoAccounts.isValid(NanoAccountType.BANANO, value)) {
-              validAddr = true;
+              isValidAddress = true;
+              rep = services<UserData>().getRepData(addressController.text);
+              repName = rep?.alias ?? "";
+              score = (rep?.score != null ? "Score: ${rep?.score}/100" : "");
+              weight =
+                  "Voting weight: ${rep?.weightPercentage.toStringAsFixed(2)}%";
             } else {
-              validAddr = false;
+              isValidAddress = false;
               return AppLocalizations.of(context)!.addressFieldErrAddr;
             }
           }
         }
-        validAddr = false;
+        isValidAddress = false;
         return null;
       },
       style: TextStyle(

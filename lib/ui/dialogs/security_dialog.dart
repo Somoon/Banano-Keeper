@@ -1,11 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/ui/pin/setup_pin.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
-import 'package:flutter/material.dart';
-
-import '../../providers/get_it_main.dart';
-import '../../providers/shared_prefs_service.dart';
-import '../../themes.dart';
+import 'package:bananokeeper/themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 
 class SecurityDialog extends StatefulWidget with GetItStatefulWidgetMixin {
@@ -67,7 +64,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
       child: TextButton(
         onPressed: () async {
           bool canauth = await BiometricUtil().canAuth();
-          bool verified = false;
+          bool? verified = false;
 
           if (!canauth) {
             verified = await Navigator.of(context).push(
@@ -80,7 +77,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
                 .authenticate("Authenticate to change PIN.");
           }
 
-          if (verified) {
+          if (verified != null && verified) {
             setState(() {
               Navigator.of(context).push(
                 MaterialPageRoute(

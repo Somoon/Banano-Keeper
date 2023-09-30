@@ -23,20 +23,11 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
   // ------------------------------------
   @override
   void initState() {
-    // Access the instance of the registered AppModel
-    // As we don't know for sure if AppModel is already ready we use getAsync
-    // services
-    //     .isReady<WalletsService>()
-    //     .then((_) => services<WalletsService>().createMockWallet());
-    // Alternative
-    // getIt.getAsync<AppModel>().addListener(update);
-
     super.initState();
   }
 
   @override
   void dispose() {
-    //services<WalletsService>().removeListener(update);
     super.dispose();
   }
 
@@ -82,7 +73,7 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
           data: Theme.of(context).copyWith(
             canvasColor: currentTheme.sideDrawerColor,
           ),
-          child: sideDrawer(),
+          child: SideDrawer(),
         ),
       ),
       backgroundColor: currentTheme.primary,
@@ -121,35 +112,32 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
       textDirection: TextDirection.ltr,
       child: Row(
         children: [
-          Container(
+          SizedBox(
             // color: Colors.blue,
             width: 250,
-            child: sideDrawer(),
+            child: SideDrawer(),
           ),
           Expanded(
-            child: Container(
-              // color: activeTheme.curTheme.primary,
-              child: Scaffold(
-                backgroundColor: currentTheme.primary,
+            child: Scaffold(
+              backgroundColor: currentTheme.primary,
 
-                //--------------- Wallet Settings -----------------------
-                appBar: AppBar(
-                  toolbarHeight: 50,
-                  backgroundColor: currentTheme.primaryAppBar,
-                  centerTitle: true,
-                  title: Column(
-                    children: [
-                      walletPicker(),
-                      // Divider(color: Colors.black54),
-                    ],
-                  ),
-                  elevation: 0,
+              //--------------- Wallet Settings -----------------------
+              appBar: AppBar(
+                toolbarHeight: 50,
+                backgroundColor: currentTheme.primaryAppBar,
+                centerTitle: true,
+                title: Column(
+                  children: [
+                    walletPicker(),
+                    // Divider(color: Colors.black54),
+                  ],
                 ),
-                // ------ MAIN BODY ------------------
-                body: home_body(),
-
-                bottomNavigationBar: BottomBarApp(),
+                elevation: 0,
               ),
+              // ------ MAIN BODY ------------------
+              body: home_body(),
+
+              bottomNavigationBar: BottomBarApp(),
             ),
           )
         ],

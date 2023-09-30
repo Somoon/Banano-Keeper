@@ -1,8 +1,8 @@
 // import 'dart:async';
 
-import 'dart:ui';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/api/representative_json.dart';
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/initial_pages/initial_page_one.dart';
@@ -12,37 +12,34 @@ import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/pow_source.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
+import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/ui/dialogs/pow_dialog.dart';
 import 'package:bananokeeper/ui/dialogs/security_dialog.dart';
 import 'package:bananokeeper/ui/dialogs/themes_dialog.dart';
-import 'package:bananokeeper/ui/loading_widget.dart';
 import 'package:bananokeeper/ui/management/management_address_page.dart';
 import 'package:bananokeeper/ui/management/management_page.dart';
 import 'package:bananokeeper/ui/management/management_wallet_page.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
-import 'package:bananokeeper/ui/representative_pages/list_rep_change.dart';
-import 'package:bananokeeper/ui/representative_pages/manual_rep_change.dart';
 import 'package:bananokeeper/ui/representative_pages/rep_page.dart';
+import 'package:bananokeeper/ui/dialogs/lang_dialog.dart';
 import 'package:bananokeeper/utils/utils.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:bananokeeper/themes.dart';
 
-import '../providers/localization_service.dart';
-import '../themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
-
-import 'dialogs/lang_dialog.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gap/gap.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
-class sideDrawer extends StatefulWidget with GetItStatefulWidgetMixin {
-  sideDrawer({super.key});
+class SideDrawer extends StatefulWidget with GetItStatefulWidgetMixin {
+  SideDrawer({super.key});
 
-  _sideDrawer createState() => _sideDrawer();
+  @override
+  // ignore: library_private_types_in_public_api
+  _SideDrawer createState() => _SideDrawer();
 }
 
-class _sideDrawer extends State<sideDrawer>
+class _SideDrawer extends State<SideDrawer>
     with WidgetsBindingObserver, GetItStateMixin {
   @override
   Widget build(BuildContext context) {
@@ -211,128 +208,6 @@ class _sideDrawer extends State<sideDrawer>
         context,
         MaterialPageRoute(builder: (context) => InitialPageOne()),
         ModalRoute.withName("/initialpageone"));
-  }
-
-  Widget newBottomSheetButton(
-      String label, String peekActive, Widget dialogWidget) {
-    double height = MediaQuery.of(context).size.height;
-    var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-    return TextButton(
-      child: Column(
-        children: [
-          Align(
-            alignment: Alignment.center,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: currentTheme.text,
-                fontSize: currentTheme.fontSize,
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 2,
-          ),
-          Align(
-            alignment: Alignment.center,
-            child: Text(
-              peekActive,
-              style: TextStyle(
-                color: currentTheme.textDisabled,
-                fontSize: currentTheme.fontSize - 6,
-              ),
-            ),
-          ),
-        ],
-      ),
-      onPressed: () {
-        showModalBottomSheet<void>(
-          enableDrag: true,
-          isScrollControlled: true,
-          context: context,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          builder: (BuildContext context) {
-            var statusBarHeight = MediaQuery.of(context).viewPadding.top;
-
-            return SafeArea(
-              minimum: EdgeInsets.only(
-                top: (statusBarHeight == 0.0 ? 50 : statusBarHeight),
-              ),
-              child: Container(
-                color: currentTheme.secondary,
-                child: SizedBox(
-                  height: height, // - 160,
-                  child: Center(
-                    child: Column(
-                      children: [
-                        /*
-                        Container(
-                          alignment: Alignment.center,
-                          margin: EdgeInsets.only(top: 10),
-                          height: 5,
-                          width: MediaQuery.of(context).size.width * 0.15,
-                          decoration: BoxDecoration(
-                            // ==== TO CHANGE ===
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(100.0),
-                          ),
-                        ),
-                        */
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            const Text("back arrow?"),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                right: 10,
-                              ),
-                              child: SizedBox(
-                                child: TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(context);
-                                  },
-                                  style: ButtonStyle(
-                                    foregroundColor:
-                                        MaterialStatePropertyAll<Color>(
-                                            currentTheme.textDisabled),
-                                    // backgroundColor:
-                                    //     MaterialStatePropertyAll<
-                                    //         Color>(primary),
-                                  ),
-                                  child: const Icon(Icons.close),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        dialogWidget,
-                      ],
-                    ),
-                    // child: Column(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   mainAxisSize: MainAxisSize.min,
-                    //   children: <Widget>[
-                    //     WalletManagementDialog(),
-                    //     ElevatedButton(
-                    //       child: const Text('Close'),
-                    //       onPressed: () => Navigator.pop(context),
-                    //     ),
-                    //   ],
-                    // ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-        setState(() {});
-      },
-    );
   }
 
   /// creates a button that display a dialog to choose an item and peek at the active item

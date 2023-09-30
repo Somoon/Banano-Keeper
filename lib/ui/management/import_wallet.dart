@@ -345,7 +345,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
             height: 10,
           ),
           ///////////////////////////
-          MnemonicTextField(currentTheme),
+          mnemonicTextField(currentTheme),
 
           SizedBox(
             height: 10,
@@ -421,7 +421,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
     );
   }
 
-  TextFormField MnemonicTextField(BaseTheme currentTheme) {
+  TextFormField mnemonicTextField(BaseTheme currentTheme) {
     var appLocalizations = AppLocalizations.of(context);
     return TextFormField(
       maxLines: null,
