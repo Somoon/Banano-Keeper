@@ -13,6 +13,7 @@ import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:nanodart/nanodart.dart';
 
 class UserData extends ChangeNotifier {
   //type either:
@@ -92,8 +93,17 @@ class UserData extends ChangeNotifier {
   /// @param address address of the representative
   Representative? getRepData(String address) {
     Representative? repItem;
-    if (representatives!.isNotEmpty) {
+
+    // if (representatives!.isNotEmpty &&
+    //     NanoAccounts.isValid(NanoAccountType.BANANO, address)) {
+    //   repItem = representatives!
+    //       .firstWhere((e) => e.address == address, orElse: () => repItem);
+    // }
+
+    try {
       repItem = representatives!.firstWhere((e) => e.address == address);
+    } catch (e) {
+      repItem = null;
     }
 
     return repItem;

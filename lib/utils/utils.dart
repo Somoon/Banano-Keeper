@@ -109,8 +109,6 @@ class Utils {
 
   Future<String> encryptSeed(seed, [String? dID]) async {
     dID = await Utils().getDeviceID();
-    // pin ??= await services<SharedPrefsModel>().getPin();
-    // String password = "$dID$pin";
     String password = dID!;
 
     Uint8List encrypted = NanoCrypt.encrypt(seed, password);
