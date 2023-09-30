@@ -246,7 +246,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     Text(
-                      appLocalizations!.renameAccountName ?? "",
+                      appLocalizations!.renameAccountName,
                       style: TextStyle(
                         color: currentTheme.text,
                         fontSize: currentTheme.fontSize,
@@ -318,7 +318,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                                 ),
                               ),
                               child: Text(
-                                appLocalizations.rename ?? "",
+                                appLocalizations.rename,
                                 style: TextStyle(
                                   color: currentTheme.textDisabled,
                                 ),
@@ -351,7 +351,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                         Navigator.pop(context);
                       },
                       child: Text(
-                        appLocalizations.close ?? "",
+                        appLocalizations.close,
                         style: TextStyle(color: currentTheme.text),
                       ),
                     ),
@@ -565,7 +565,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
               },
               child: Text(
                 // 'Yes',
-                appLocalizations?.yes ?? "",
+                appLocalizations.yes,
                 style: currentTheme.textStyle,
               ),
             ),
@@ -574,7 +574,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                 Navigator.of(context).pop();
               },
               child: Text(
-                appLocalizations?.no ?? "",
+                appLocalizations.no,
                 style: currentTheme.textStyle,
               ),
             ),
@@ -785,7 +785,8 @@ class AccountManagementPageState extends State<AccountManagementPage>
 
     String walletName = services<WalletsService>().walletsList[activeWallet];
 
-    var currentWallet = services<WalletService>(instanceName: walletName);
+    WalletService currentWallet =
+        services<WalletService>(instanceName: walletName);
 
     if (index == "0") {
       currentWallet.createAccount();

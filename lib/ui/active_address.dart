@@ -1,19 +1,18 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bananokeeper/api/account_history_response.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:bananokeeper/themes.dart';
-import 'package:get_it_mixin/get_it_mixin.dart';
-
 import 'package:bananokeeper/utils/utils.dart';
+
+import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class ActiveAccount extends StatefulWidget with GetItStatefulWidgetMixin {
   ActiveAccount({super.key});
@@ -34,7 +33,9 @@ class ActiveAccountState extends State<ActiveAccount>
         watchOnly((WalletsService x) => x.walletsList[walletID]);
     WalletService wallet = services<WalletService>(instanceName: walletName);
 
-    int accountIndex = wallet.activeIndex;
+    // int accountIndex = wallet.activeIndex;
+    int accountIndex =
+        watchOnly((WalletService x) => x.activeIndex, instanceName: walletName);
 
     String accOrgName = wallet.accountsList[accountIndex];
 
@@ -112,13 +113,14 @@ class ActiveAccountState extends State<ActiveAccount>
                                       services<WalletsService>().activeWallet;
                                   String walletName = services<WalletsService>()
                                       .walletsList[walletID];
-                                  if(item !=  services<WalletService>(
-                                      instanceName: walletName).getActiveIndex()) {
+                                  if (item !=
+                                      services<WalletService>(
+                                              instanceName: walletName)
+                                          .getActiveIndex()) {
                                     services<WalletService>(
-                                        instanceName: walletName)
+                                            instanceName: walletName)
                                         .setActiveIndex(item);
-                                      }
-
+                                  }
                                 });
                               },
                               itemBuilder: (BuildContext context) =>

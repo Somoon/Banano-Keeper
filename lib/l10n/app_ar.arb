@@ -56,6 +56,15 @@
       }
     }
   },
+  "newWalletTitle": "New {state}",
+  "@newWalletTitle": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "Seed Info"
+      }
+    }
+  },
   "seedInfo": "Seed Info",
   "mnemonicInfo": "Mnemonic Phrase Info",
   "seed": "Seed",
@@ -131,9 +140,11 @@
       }
     }
   },
-  "authMsgChaneRep": "Authenticate to change representative.",
+  "authMsgChangeRep": "Authenticate to change representative.",
+  "authMsgChangePIN": "Authenticate to change PIN.",
   "loadingWidgetChangeRepMsg": "يتم تغيير الممثل...",
   "loadingWidgetDefaultMsg": "في قيد الإنتظار...",
-  "loadingWidgetSendMsg": "يتم اللإرسال..."
+  "loadingWidgetSendMsg": "يتم اللإرسال...",
+  "changePINButton": "Change PIN"
 
 }

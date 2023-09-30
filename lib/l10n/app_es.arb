@@ -56,6 +56,15 @@
       }
     }
   },
+  "newWalletTitle": "New {state}",
+  "@newWalletTitle": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "Seed Info"
+      }
+    }
+  },
   "seedInfo": "Seed Info",
   "mnemonicInfo": "Mnemonic Phrase Info",
   "seed": "Seed",
@@ -131,8 +140,10 @@
       }
     }
   },
-  "authMsgChaneRep": "Authenticate to change representative.",
+  "authMsgChangeRep": "Authenticate to change representative.",
+  "authMsgChangePIN": "Authenticate to change PIN.",
   "loadingWidgetChangeRepMsg": "Changing representative...",
   "loadingWidgetDefaultMsg": "Loading...",
-  "loadingWidgetSendMsg": " Sending..."
+  "loadingWidgetSendMsg": " Sending...",
+  "changePINButton": "Change PIN"
 }

@@ -57,12 +57,15 @@ class _SideDrawer extends State<SideDrawer>
         instanceName: orgWalletName);
 
     WalletService wallet = services<WalletService>(instanceName: orgWalletName);
-    String currentAccount = watchX((WalletService x) => x.currentAccount,
-        instanceName: orgWalletName);
+    // String currentAccount = watchX((WalletService x) => x.currentAccount,
+    //     instanceName: orgWalletName);
 
     int accountIndex = wallet.activeIndex;
 
     String accOrgName = wallet.accountsList[accountIndex];
+
+    String accountName =
+        watchOnly((Account x) => x.getName(), instanceName: accOrgName);
 
     var account = services<Account>(instanceName: accOrgName);
     String representative =
@@ -103,7 +106,7 @@ class _SideDrawer extends State<SideDrawer>
                 createPrimaryDrawerButton(
                   AppLocalizations.of(context)!.manageAccounts,
                   // Utils().shortenAccount(currentAccount),
-                  account.name,
+                  accountName,
                   ManagementPage(
                     AccountManagementPage(),
                     AppLocalizations.of(context)!.manageAccounts,

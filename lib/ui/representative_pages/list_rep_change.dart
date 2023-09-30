@@ -254,7 +254,7 @@ class ListRepChange {
             false;
       } else {
         verified = await BiometricUtil()
-            .authenticate(AppLocalizations.of(context)!.authMsgChaneRep);
+            .authenticate(AppLocalizations.of(context)!.authMsgChangeRep);
         //appLocalizations.authMsgWalletDel);
       }
 

@@ -13,6 +13,7 @@ import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/ui/management/import_wallet.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:bananokeeper/utils/utils.dart';
+import 'package:gap/gap.dart';
 
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -69,11 +70,6 @@ class WalletManagementPageState extends State<WalletManagementPage>
       child: Scaffold(
         body: Container(
           width: double.infinity,
-          // constraints: BoxConstraints(
-          //   minWidth: 100,
-          //   maxWidth: 500,
-          //   // maxHeight: 600,
-          // ),
           decoration: BoxDecoration(
             color: currentTheme.primary,
           ),
@@ -82,9 +78,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              SizedBox(
-                height: 20,
-              ),
+              const Gap(20),
 
               // top buttons
               Row(
@@ -233,7 +227,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
                               Text(
-                                appLocalizations!.renameWalletName ?? "",
+                                appLocalizations!.renameWalletName,
                                 style: TextStyle(
                                   color: currentTheme.text,
                                   fontSize: currentTheme.fontSize,
@@ -292,7 +286,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                                           ),
                                         ),
                                         child: Text(
-                                          appLocalizations.rename ?? "",
+                                          appLocalizations.rename,
                                           style: TextStyle(
                                             color: currentTheme.textDisabled,
                                           ),
@@ -449,7 +443,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                 },
                 child: Text(
                   // 'Yes',
-                  appLocalizations?.yes ?? "",
+                  appLocalizations.yes,
                   style: currentTheme.textStyle,
                 ),
               ),
@@ -458,7 +452,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                   Navigator.of(context).pop();
                 },
                 child: Text(
-                  appLocalizations?.no ?? "",
+                  appLocalizations.no,
                   style: currentTheme.textStyle,
                 ),
               ),
@@ -561,7 +555,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                   ),
                 ),
                 titleTextStyle: currentTheme.textStyle,
-                content: Container(
+                content: SizedBox(
                   width: 300,
                   height: 280,
                   child: Column(
@@ -675,7 +669,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                     },
                     child: Text(
                       // 'Yes',
-                      appLocalizations?.close ?? "",
+                      appLocalizations.close,
                       style: TextStyle(
                         color: currentTheme.text,
                         fontSize: currentTheme.fontSize,
@@ -824,7 +818,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                 ),
               ),
               titleTextStyle: currentTheme.textStyle,
-              content: Container(
+              content: SizedBox(
                 width: 300,
                 height: 320,
                 child: Column(
@@ -979,7 +973,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                   },
                   child: Text(
                     // 'Yes',
-                    appLocalizations?.cancel ?? "",
+                    appLocalizations.cancel,
                     style: TextStyle(
                       color: currentTheme.text,
                       fontSize: currentTheme.fontSize,
@@ -998,7 +992,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                   },
                   child: Text(
                     // 'Yes',
-                    appLocalizations?.create ?? "",
+                    appLocalizations.create,
                     style: TextStyle(
                       color: (isCheckedNewWallet
                           ? currentTheme.text

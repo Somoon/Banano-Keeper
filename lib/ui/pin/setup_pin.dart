@@ -197,14 +197,11 @@ class SetupPinState extends State<SetupPin> with GetItStateMixin {
     switch (pinMatching) {
       case 0:
         return currentTheme.red;
-        break;
       case 1:
         return currentTheme.green;
-        break;
       case 2:
       default:
         return currentTheme.text;
-        break;
     }
   }
 
