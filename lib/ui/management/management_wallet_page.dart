@@ -1,18 +1,19 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:ui';
-
-import 'package:bananokeeper/providers/auth_biometric.dart';
-import 'package:bananokeeper/providers/wallet_service.dart';
-import 'package:bananokeeper/providers/wallets_service.dart';
-import 'package:bananokeeper/ui/management/import_wallet.dart';
-import 'package:bananokeeper/ui/pin/verify_pin.dart';
-import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:bananokeeper/providers/get_it_main.dart';
+
 import 'package:bananokeeper/themes.dart';
+import 'package:bananokeeper/providers/auth_biometric.dart';
+import 'package:bananokeeper/providers/wallet_service.dart';
+import 'package:bananokeeper/providers/wallets_service.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/ui/management/import_wallet.dart';
+import 'package:bananokeeper/ui/pin/verify_pin.dart';
+import 'package:bananokeeper/utils/utils.dart';
+
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';

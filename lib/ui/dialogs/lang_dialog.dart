@@ -1,10 +1,11 @@
-import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:flutter/material.dart';
 
+import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LangDialog extends StatefulWidget with GetItStatefulWidgetMixin {
   LangDialog({super.key});
@@ -17,7 +18,13 @@ class LangDialogState extends State<LangDialog> with GetItStateMixin {
   @override
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
+    List<Map<String, String>> availableLanguages =
+        get<LocalizationModel>().availableLanguages;
 
+    List<Widget> langWidgets = [];
+    for (Map<String, String> aLang in availableLanguages) {
+      langWidgets.add(createLangButton(aLang, AppLocalizations.of(context)));
+    }
     return Container(
       constraints: const BoxConstraints(
         minWidth: 100,
@@ -33,11 +40,10 @@ class LangDialogState extends State<LangDialog> with GetItStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Column(
-              children: [
-                createLangButton("Arabic"),
-                createLangButton("English"),
-                // createLangButton("Spanish"),
-              ],
+              children: langWidgets,
+              // createLangButton("Arabic", AppLocalizations.of(context)),
+              // createLangButton("English", AppLocalizations.of(context)),
+              // createLangButton("Spanish"),
             ),
             const SizedBox(height: 15),
             const Divider(
@@ -48,7 +54,7 @@ class LangDialogState extends State<LangDialog> with GetItStateMixin {
                 Navigator.pop(context);
               },
               child: Text(
-                'Close',
+                AppLocalizations.of(context)!.close,
                 style: TextStyle(color: currentTheme.text),
               ),
             ),
@@ -58,22 +64,22 @@ class LangDialogState extends State<LangDialog> with GetItStateMixin {
     );
   }
 
-  Widget createLangButton(label) {
+  Widget createLangButton(Map<String, String> label, appLocalizations) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     var currentLanguage = watchOnly((LocalizationModel x) => x.getLanguage());
-
     return SizedBox(
       width: double.infinity,
       child: TextButton(
         onPressed: () {
-          _setlang(label);
+          _setlang(label['language']!);
           setState(() {});
           // Navigator.pop(context);
         },
         child: Text(
-          label,
+          // appLocalizations!.
+          label['displayedLanguage']!,
           style: TextStyle(
-              color: (currentLanguage != label
+              color: (currentLanguage['language'] != label['language']!
                   ? currentTheme.text
                   : currentTheme.textDisabled)),
         ),

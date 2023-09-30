@@ -160,7 +160,7 @@ class _SideDrawer extends State<SideDrawer>
                     SecurityDialog()),
 
                 createDialogButton(AppLocalizations.of(context)!.language,
-                    activeLanguage, LangDialog()),
+                    activeLanguage['displayedLanguage']!, LangDialog()),
                 // createDialogButton("Contacts/Bookmark", "1", ThemesDialog()),
                 // createDialogButton("Notifications", "1", ThemesDialog()),
                 // createDialogButton("switch to nano?", "1", ThemesDialog()),
@@ -323,7 +323,10 @@ class _SideDrawer extends State<SideDrawer>
     List<Representative>? repList =
         watchOnly((UserData x) => x.representatives);
     String repName = rep?.alias ?? "";
-    String score = (rep?.score != null ? "Score: ${rep?.score}/100" : "");
+    String score = (rep?.score != null
+        ? AppLocalizations.of(context)!
+            .repScore(rep?.score.toString() ?? "0.00")
+        : "");
 
     var result = await RepPage().show(context, currentTheme, repName, score,
         activeRep, repList, account, rep);

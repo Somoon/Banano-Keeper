@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoadingIndicatorDialog {
   static final LoadingIndicatorDialog _singleton =
@@ -12,7 +13,10 @@ class LoadingIndicatorDialog {
 
   LoadingIndicatorDialog._internal();
 
-  show(BuildContext context, {String text = 'Sending...'}) {
+  show(BuildContext context, {String text = ''}) {
+    text = (text == ''
+        ? AppLocalizations.of(context)!.loadingWidgetDefaultMsg
+        : text);
     if (isDisplayed) {
       return;
     }

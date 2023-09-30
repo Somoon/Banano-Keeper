@@ -1,31 +1,32 @@
 // import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import 'package:bananokeeper/themes.dart';
 import 'package:bananokeeper/api/account_api.dart';
 import 'package:bananokeeper/api/state_block.dart';
+import 'package:bananokeeper/providers/account.dart';
+import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/ui/loading_widget.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
-import 'package:decimal/decimal.dart';
-import 'package:flutter/foundation.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bananokeeper/providers/account.dart';
-import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/utils/utils.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:local_auth/local_auth.dart';
-import 'package:nanodart/nanodart.dart';
+
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:decimal/decimal.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
-import 'package:bananokeeper/themes.dart';
-import 'dart:io';
+import 'package:local_auth/local_auth.dart';
+import 'package:nanodart/nanodart.dart';
 
 class BottomBarApp extends StatefulWidget with GetItStatefulWidgetMixin {
   BottomBarApp({super.key});
@@ -75,39 +76,40 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
       child: BottomAppBar(
         color: currentTheme.primaryBottomBar,
         child: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                //Receive button --------
-                ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: 215,
-                  ),
-                  child: SizedBox(
-                      height: 40,
-                      child: receiveTextButton(
-                          currentTheme, context, height, width, account)),
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              //Receive button --------
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 215,
                 ),
-                const SizedBox(
-                  width: 25,
-                ),
-                //Send button --------
-
-                ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: 215,
-                  ),
-                  child: SizedBox(
+                child: SizedBox(
                     height: 40,
-                    child: sendTextButton(
-                        currentTheme, context, height, width, account),
-                  ),
+                    child: receiveTextButton(
+                        currentTheme, context, height, width, account)),
+              ),
+              const SizedBox(
+                width: 25,
+              ),
+              //Send button --------
+
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 215,
                 ),
-                // if (centerLocations.contains(fabLocation)) const Spacer(),
-              ],
-            )),
+                child: SizedBox(
+                  height: 40,
+                  child: sendTextButton(
+                      currentTheme, context, height, width, account),
+                ),
+              ),
+              // if (centerLocations.contains(fabLocation)) const Spacer(),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -535,7 +537,8 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
               }
 
               if (verified) {
-                LoadingIndicatorDialog().show(context);
+                LoadingIndicatorDialog().show(context,
+                    text: AppLocalizations.of(context)!.loadingWidgetSendMsg);
 
                 await services<QueueService>().add(account.getOverview(true));
                 await services<QueueService>()
