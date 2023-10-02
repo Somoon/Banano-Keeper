@@ -72,42 +72,9 @@ class WalletService extends ChangeNotifier {
     return services<Account>(instanceName: accOrgName).getName();
   }
 
-  int getActiveIndex() {
-    return activeIndex;
-  }
-
-  setActiveIndex(int index) {
-    // print("wallet_service.dart: setActiveIndex: $index");
-    activeIndex = index;
-    // currentAccount.value = accounts[index].getAddress();
-    String accountInstanceName = accountsList[index];
-    currentAccount.value =
-        services<Account>(instanceName: accountInstanceName).getAddress();
-    services<SharedPrefsModel>().saveActiveAccount(index);
-    notifyListeners();
-  }
-
-  bool indexExist(int index) {
-    for (int i = 0; i < accountsList.length; i++) {
-      String accOrgName = accountsList[i];
-      // if (services.isRegistered<Account>(instanceName: accOrgName)) {
-      var acc = services<Account>(instanceName: accOrgName);
-      if (acc.getIndex() == index) {
-        return true;
-      }
-      // }
-    }
-    return false;
-  }
-
-  void addAccount(
-      [int? index,
-      nickname = "",
-      address = "",
-      String balance = "0",
-      lastUpdate,
-      representative,
-      bool newAccount = false]) {
+  void addAccount(int? index, String nickname, String address, String balance,
+      int lastUpdate, String representative,
+      [bool newAccount = false]) {
     // print('-------------------- START OF addAccount ----------------------');
 
     if (index == null) {
@@ -132,13 +99,17 @@ class WalletService extends ChangeNotifier {
         print("address: $address");
       }
     }
-    currentAccount.value = address;
+    // currentAccount.value = address;
 
     if (nickname == "") {
       nickname = "Account $index";
     }
     Account account =
         Account(index, nickname, address, balance, lastUpdate, representative);
+    if (balance != "0") {
+      print("<<M<<<");
+      account.opened = true;
+    }
 
     if (kDebugMode) {
       // print('----------------------------------------------');
@@ -199,6 +170,44 @@ class WalletService extends ChangeNotifier {
       // currentAccount.value = accounts[activeIndex].getAddress();
     }
     return currentAccount.value;
+  }
+
+  int getActiveIndex() {
+    return activeIndex;
+  }
+
+  setActiveIndex(int index) {
+    // print("wallet_service.dart: setActiveIndex: $index");
+    activeIndex = index;
+    // currentAccount.value = accounts[index].getAddress();
+    String accountInstanceName = accountsList[index];
+    // print("wallet_service.dart: setActiveIndex: $accountInstanceName");
+    currentAccount.value =
+        services<Account>(instanceName: accountInstanceName).getAddress();
+    // print("wallet_service.dart: setActiveIndex: ${currentAccount.value}");
+
+    services<SharedPrefsModel>().saveActiveAccount(index);
+    try {
+      // notifyListeners();
+    } catch (e) {
+      if (kDebugMode) {
+        print("setActiveIndex error");
+        print(e);
+      }
+    }
+  }
+
+  bool indexExist(int index) {
+    for (int i = 0; i < accountsList.length; i++) {
+      String accOrgName = accountsList[i];
+      // if (services.isRegistered<Account>(instanceName: accOrgName)) {
+      var acc = services<Account>(instanceName: accOrgName);
+      if (acc.getIndex() == index) {
+        return true;
+      }
+      // }
+    }
+    return false;
   }
 
   void removeIndex(int index) {

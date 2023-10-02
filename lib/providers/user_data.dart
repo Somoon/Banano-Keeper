@@ -21,11 +21,27 @@ class UserData extends ChangeNotifier {
   late String lockType = "pin";
   String pin = "";
   late int lockoutTime = 0;
-  late String currency = "usd";
+  late String currency = "USD";
   late double minToReceive = 0.01;
   late String powSource = "Kalium";
   late String blockExplorer = "";
   late bool Notifs = false;
+
+  setCurrency(String curr) {
+    currency = curr;
+  }
+
+  switchCurrency() {
+    var l = ['USD', 'GBP', 'XNO', 'BTC'];
+    int i = l.indexOf(currency);
+    print(i);
+    if (i == l.length - 1) {
+      setCurrency(l[0]);
+    } else {
+      setCurrency(l[i + 1]);
+    }
+    notifyListeners();
+  }
 
   //Auth related
 

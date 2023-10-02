@@ -50,6 +50,7 @@ class LangDialogState extends State<LangDialog> with GetItStateMixin {
               thickness: 1,
             ),
             TextButton(
+              style: currentTheme.btnStyleNoBorder,
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -70,6 +71,7 @@ class LangDialogState extends State<LangDialog> with GetItStateMixin {
     return SizedBox(
       width: double.infinity,
       child: TextButton(
+        style: currentTheme.btnStyleNoBorder,
         onPressed: () {
           _setlang(label['language']!);
           setState(() {});

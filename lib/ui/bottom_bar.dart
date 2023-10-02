@@ -1,6 +1,7 @@
 // import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -76,7 +77,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
       child: BottomAppBar(
         color: currentTheme.primaryBottomBar,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+          padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -118,9 +119,10 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
       double height, double width, Account account) {
     return TextButton(
       style: TextButton.styleFrom(
-          foregroundColor: currentTheme.text,
-          backgroundColor: currentTheme.primary // foreground
-          ),
+        foregroundColor: currentTheme.text,
+        backgroundColor: currentTheme.primary,
+        elevation: 5,
+      ),
       onPressed: () async {
         final LocalAuthentication auth = LocalAuthentication();
         var appLocalizations = AppLocalizations.of(context);
@@ -139,6 +141,9 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
 
         String activeAccountBalance =
             watchOnly((Account x) => x.getBalance(), instanceName: accOrgName);
+
+        String userCurrency = watchOnly((UserData x) => x.currency);
+
         bool? sent = false;
         sent = await showModalBottomSheet(
           enableDrag: true,
@@ -244,8 +249,8 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Utils().formatBalance(
-                                      activeAccountBalance, currentTheme),
+                                  Utils().formatBalance(activeAccountBalance,
+                                      currentTheme, userCurrency),
                                   const SizedBox(
                                     height: 20,
                                   ),
@@ -316,9 +321,10 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
       double height, double width, Account account) {
     return TextButton(
       style: TextButton.styleFrom(
-          foregroundColor: currentTheme.text,
-          backgroundColor: currentTheme.primary // foreground
-          ),
+        foregroundColor: currentTheme.text,
+        backgroundColor: currentTheme.primary,
+        elevation: 5,
+      ),
       onPressed: () async {
         final LocalAuthentication auth = LocalAuthentication();
         var appLocalizations = AppLocalizations.of(context);

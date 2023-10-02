@@ -34,6 +34,7 @@ abstract class BaseTheme {
   late Color secondary;
   late Color sideDrawerColor;
   late Color text;
+  late Color textSecondary;
   late Color textDisabled;
   late Color offColor;
   late Color buttonOutline;
@@ -61,6 +62,16 @@ abstract class BaseTheme {
       BorderSide(
         color: buttonOutline,
         width: 1,
+      ),
+    ),
+  );
+  late ButtonStyle btnStyleNoBorder = ButtonStyle(
+    overlayColor:
+        MaterialStateColor.resolveWith((states) => text.withOpacity(0.3)),
+    // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
+    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
       ),
     ),
   );
@@ -93,6 +104,7 @@ class YellowTheme extends BaseTheme {
 
   Color sideDrawerColor = const Color(0xFF424651);
   Color text = const Color(0xffeeba2c);
+  Color textSecondary = Colors.white;
   Color textDisabled = offwhite;
   Color buttonOutline = white;
 }
@@ -117,6 +129,8 @@ class DarkTheme extends BaseTheme {
 
   Color sideDrawerColor = const Color(0xFF424651);
   Color text = white;
+  Color textSecondary = Colors.blue;
+
   Color textDisabled = offwhite;
   Color buttonOutline = white;
 }
@@ -133,6 +147,8 @@ class SecondTheme extends BaseTheme {
   Color secondary = const Color(0xFFAD3962);
   Color sideDrawerColor = darkblue;
   Color text = black;
+  Color textSecondary = Colors.lightGreenAccent;
+
   Color textDisabled = Color(0xD2807D7D);
   Color offColor = const Color(0xFFA9A9A9);
   Color buttonOutline = darkblue;
@@ -148,7 +164,9 @@ class SlateTheme extends BaseTheme {
   Color secondary = const Color(0xFFb8d8d8);
   Color sideDrawerColor = const Color(0xFF7a9e9f);
   Color text = const Color(0xFF4f6367);
-  Color textDisabled = const Color(0xFFA9A9A9);
+  Color textSecondary = const Color(0x9A8B42FF);
+
+  Color textDisabled = const Color(0xFFFFFFFF);
   Color offColor = const Color(0xFFeef5db);
   Color buttonOutline = const Color.fromARGB(210, 196, 206, 94);
 }

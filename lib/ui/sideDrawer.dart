@@ -60,7 +60,9 @@ class _SideDrawer extends State<SideDrawer>
     // String currentAccount = watchX((WalletService x) => x.currentAccount,
     //     instanceName: orgWalletName);
 
-    int accountIndex = wallet.activeIndex;
+    int accountIndex = //wallet.activeIndex;
+        watchOnly((WalletService x) => x.getActiveIndex(),
+            instanceName: orgWalletName);
 
     String accOrgName = wallet.accountsList[accountIndex];
 
@@ -74,138 +76,214 @@ class _SideDrawer extends State<SideDrawer>
     // var account = watchOnly((WalletsService x) => x.wallets[x.activeWallet]
     //     .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
     var statusBarHeight = MediaQuery.of(context).viewPadding.top;
-
     String selectedPoWName = watchOnly((PoWSource x) => x.getAPIName());
     //side drawer
-    return Drawer(
-      backgroundColor: currentTheme.sideDrawerColor,
-      child: Container(
-        // color: activeTheme.sideDrawerColor,
-        // decoration: BoxDecoration(
-        //   color: Colors.black,
-        // ),
-        child: SafeArea(
-          minimum: EdgeInsets.only(
-            top: (statusBarHeight == 0.0 ? 50 : statusBarHeight),
-          ),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              children: <Widget>[
-                //Wallet management button
-                createPrimaryDrawerButton(
+    return SafeArea(
+      top: false,
+      minimum: EdgeInsets.only(
+        top: (statusBarHeight == 0.0 ? 50 : statusBarHeight),
+      ),
+      child: Drawer(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              const Gap(10),
+              //Wallet management button
+              createPrimaryDrawerButton(
+                AppLocalizations.of(context)!.manageWallets,
+                activeWalletName,
+                ManagementPage(
+                  WalletManagementPage(),
                   AppLocalizations.of(context)!.manageWallets,
-                  activeWalletName,
-                  ManagementPage(
-                    WalletManagementPage(),
-                    AppLocalizations.of(context)!.manageWallets,
-                  ),
                 ),
-                //Account management button
+              ),
+              //Account management button
 
-                createPrimaryDrawerButton(
+              createPrimaryDrawerButton(
+                AppLocalizations.of(context)!.manageAccounts,
+                // Utils().shortenAccount(currentAccount),
+                accountName,
+                ManagementPage(
+                  AccountManagementPage(),
                   AppLocalizations.of(context)!.manageAccounts,
-                  // Utils().shortenAccount(currentAccount),
-                  accountName,
-                  ManagementPage(
-                    AccountManagementPage(),
-                    AppLocalizations.of(context)!.manageAccounts,
-                  ),
                 ),
+              ),
 
-                /// TBA NFTs
-                ///
-                // Text(
-                //   "NFTs",
-                //   style: TextStyle(
-                //     color: currentTheme.text,
-                //     fontSize: currentTheme.fontSize,
-                //   ),
-                // ),
-                const Divider(
-                  height: 15,
-                  thickness: 3,
+              /// TBA NFTs
+              ///
+              // Text(
+              //   "NFTs",
+              //   style: TextStyle(
+              //     color: currentTheme.text,
+              //     fontSize: currentTheme.fontSize,
+              //   ),
+              // ),
+              const Divider(
+                height: 15,
+                thickness: 3,
+              ),
+              Text(AppLocalizations.of(context)!.accountSettings,
+                  style: TextStyle(
+                    fontSize: currentTheme.fontSize - 4,
+                    color: currentTheme.offColor,
+                  )),
+              createRepBottomSheetButton(
+                AppLocalizations.of(context)!.representative,
+                representative,
+                //
+                account,
+              ),
+              const Divider(
+                height: 15,
+                thickness: 2,
+              ),
+
+              // ------------------------------------
+              Text(
+                AppLocalizations.of(context)!.appSettings,
+                style: TextStyle(
+                  fontSize: currentTheme.fontSize - 4,
+                  color: currentTheme.offColor,
                 ),
-                Text(AppLocalizations.of(context)!.accountSettings,
-                    style: TextStyle(
-                      fontSize: currentTheme.fontSize - 4,
-                      color: currentTheme.offColor,
-                    )),
-                createRepBottomSheetButton(
-                  AppLocalizations.of(context)!.representative,
-                  representative,
-                  //
-                  account,
-                ),
-                const Divider(
-                  height: 15,
-                  thickness: 2,
-                ),
+              ),
+              // createDialogButton("Currency", "1", ThemesDialog()),
+              // createDialogButton("Min. to receive", "1", ThemesDialog()),
 
-                // ------------------------------------
-                Text(AppLocalizations.of(context)!.appSettings,
-                    style: TextStyle(
-                      fontSize: currentTheme.fontSize - 4,
-                      color: currentTheme.offColor,
-                    )),
-                // createDialogButton("Currency", "1", ThemesDialog()),
-                // createDialogButton("Min. to receive", "1", ThemesDialog()),
+              // Already done and working.
+              // createDialogButton("PoW Source", selectedPoWName, PoWDialog()),
 
-                // Already done and working.
-                // createDialogButton("PoW Source", selectedPoWName, PoWDialog()),
+              // createDialogButton("Block Explorer", "1", ThemesDialog()),
+              // createDialogButton("Data Source", "1", ThemesDialog()),
 
-                // createDialogButton("Block Explorer", "1", ThemesDialog()),
-                // createDialogButton("Data Source", "1", ThemesDialog()),
+              createDialogButton(AppLocalizations.of(context)!.themes,
+                  activeTheme, ThemesDialog()),
+              createDialogButton(
+                  AppLocalizations.of(context)!.security, "", SecurityDialog()),
 
-                createDialogButton(AppLocalizations.of(context)!.themes,
-                    activeTheme, ThemesDialog()),
-                createDialogButton(AppLocalizations.of(context)!.security, "",
-                    SecurityDialog()),
+              createDialogButton(AppLocalizations.of(context)!.language,
+                  activeLanguage['displayedLanguage']!, LangDialog()),
+              // createDialogButton("Contacts/Bookmark", "1", ThemesDialog()),
+              // createDialogButton("Notifications", "1", ThemesDialog()),
+              // createDialogButton("switch to nano?", "1", ThemesDialog()),
 
-                createDialogButton(AppLocalizations.of(context)!.language,
-                    activeLanguage['displayedLanguage']!, LangDialog()),
-                // createDialogButton("Contacts/Bookmark", "1", ThemesDialog()),
-                // createDialogButton("Notifications", "1", ThemesDialog()),
-                // createDialogButton("switch to nano?", "1", ThemesDialog()),
-                ////////////////////////////////
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton(
-                    onPressed: () {
-                      resetFn();
-                    },
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            AppLocalizations.of(context)!.resetApp,
-                            style: TextStyle(
-                              color: currentTheme.text,
-                              fontSize: currentTheme.fontSize,
-                            ),
+              ////////////////////////////////
+
+              /// Reset App button
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  style: currentTheme.btnStyleNoBorder,
+                  onPressed: () {
+                    resetAppDialog(context, currentTheme);
+                  },
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: (!Utils().isDirectionRTL(context)
+                            ? Alignment.centerLeft
+                            : Alignment.centerRight),
+                        child: Text(
+                          AppLocalizations.of(context)!.resetApp,
+                          style: TextStyle(
+                            color: currentTheme.text,
+                            fontSize: currentTheme.fontSize,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(
-                  height: 40,
-                ),
-                /////////////////
-              ],
-            ),
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              /////////////////
+            ],
           ),
         ),
       ),
     );
   }
 
+  Future<bool?> resetAppDialog(
+      BuildContext context, BaseTheme currentTheme) async {
+    var appLocalizations = AppLocalizations.of(context);
+
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(builder:
+            (BuildContext context, void Function(void Function()) setState) {
+          return AlertDialog(
+            backgroundColor: currentTheme.secondary,
+            elevation: 2,
+            title: Center(
+              child: Text(appLocalizations!.resetAppTitle),
+            ),
+            titleTextStyle: TextStyle(
+              color: Colors.red,
+              fontSize: currentTheme.fontSize,
+            ),
+            content: Text(appLocalizations.resetAppWarning),
+            contentTextStyle: TextStyle(
+              color: currentTheme.textDisabled,
+              fontSize: currentTheme.fontSize - 3,
+            ),
+            actions: [
+              Center(
+                child: Column(
+                  children: [
+                    TextButton(
+                      style: currentTheme.btnStyleNoBorder,
+                      onPressed: () async {
+                        bool canauth = await BiometricUtil().canAuth();
+                        bool? verified = false;
+
+                        if (!canauth) {
+                          verified = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => VerifyPIN(),
+                            ),
+                          );
+                        } else {
+                          verified = await BiometricUtil()
+                              .authenticate(appLocalizations.authMsgWalletDel);
+                        }
+
+                        if (verified != null && verified) {
+                          setState(() {
+                            resetFn();
+                          });
+                        }
+                      },
+                      child: Text(
+                        appLocalizations.yes,
+                        style: currentTheme.textStyle,
+                      ),
+                    ),
+                    TextButton(
+                      style: currentTheme.btnStyleNoBorder,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(
+                        appLocalizations.cancel,
+                        style: currentTheme.textStyle,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          );
+        });
+      },
+    );
+  }
+
   resetFn() async {
-    // if (kDebugMode) {
-    //   print("1111111111111111111111111111111111111111111111111111111");
-    // }
     services<DBManager>().deleteDatabase();
     Navigator.pushAndRemoveUntil(
         context,
@@ -227,6 +305,7 @@ class _SideDrawer extends State<SideDrawer>
     return SizedBox(
       width: double.infinity,
       child: TextButton(
+        style: currentTheme.btnStyleNoBorder,
         onPressed: () {
           showDialog(
             context: context,
@@ -241,7 +320,9 @@ class _SideDrawer extends State<SideDrawer>
         child: Column(
           children: [
             Align(
-              alignment: Alignment.centerLeft,
+              alignment: (!Utils().isDirectionRTL(context)
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight),
               child: Text(
                 label,
                 style: TextStyle(
@@ -254,7 +335,9 @@ class _SideDrawer extends State<SideDrawer>
               height: 2,
             ),
             Align(
-              alignment: Alignment.centerLeft,
+              alignment: (!Utils().isDirectionRTL(context)
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight),
               child: Text(
                 peekActive,
                 style: TextStyle(
@@ -285,13 +368,19 @@ class _SideDrawer extends State<SideDrawer>
     return SizedBox(
       width: double.infinity,
       child: TextButton(
+        style: currentTheme.btnStyleNoBorder,
         onPressed: () async {
-          changeRepPage(currentTheme, account, peekActive);
+          //dont create page or open it if account is unopened
+          if (account.opened) {
+            changeRepPage(currentTheme, account, peekActive);
+          }
         },
         child: Column(
           children: [
             Align(
-              alignment: Alignment.centerLeft,
+              alignment: (!Utils().isDirectionRTL(context)
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight),
               child: Text(
                 label,
                 style: TextStyle(
@@ -300,17 +389,21 @@ class _SideDrawer extends State<SideDrawer>
                 ),
               ),
             ),
-            const Gap(2),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                representativeAliasOrAddress,
-                style: TextStyle(
-                  color: currentTheme.textDisabled,
-                  fontSize: currentTheme.fontSize - 6,
+            if (account.opened) ...[
+              const Gap(2),
+              Align(
+                alignment: (!Utils().isDirectionRTL(context)
+                    ? Alignment.centerLeft
+                    : Alignment.centerRight),
+                child: Text(
+                  representativeAliasOrAddress,
+                  style: TextStyle(
+                    color: currentTheme.textDisabled,
+                    fontSize: currentTheme.fontSize - 6,
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),
@@ -343,6 +436,7 @@ class _SideDrawer extends State<SideDrawer>
     return SizedBox(
       width: double.infinity,
       child: TextButton(
+        style: currentTheme.btnStyleNoBorder,
         onPressed: () async {
           // showDialog(
           //   context: context,

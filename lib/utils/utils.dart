@@ -1,4 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bananokeeper/api/currency_conversion.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/user_data.dart';
 import 'package:custom_platform_device_id/platform_device_id.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -151,7 +154,14 @@ class Utils {
         RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
   }
 
-  Widget formatBalance(activeAccountBalance, currentTheme) {
+  Widget formatBalance(
+      activeAccountBalance, currentTheme, String userCurrency) {
+    // String userCurrency = services<UserData>().currency;
+    Decimal convertedPrice = Decimal.parse(
+            services<CurrencyConversion>().price[userCurrency]!.toString()) *
+        amountFromRaw(activeAccountBalance);
+    String textC =
+        "${services<CurrencyConversion>().symbol[userCurrency]}${convertedPrice.toStringAsFixed(2)}";
     return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         //Center Row contents horizontally,
@@ -170,15 +180,18 @@ class Utils {
             displayNums(activeAccountBalance),
             style: TextStyle(color: currentTheme.text),
           ),
-          // GestureDetector(
-          //   onTap: () {
-          //     //change currency showing here ------------------------
-          //   },
-          //   child: Text(
-          //     " (\$5)",
-          //     style: TextStyle(color: currentTheme.offColor),
-          //   ),
-          // ),
+          GestureDetector(
+            onTap: () {
+              print("asd");
+
+              services<UserData>().switchCurrency();
+              //change currency showing here ------------------------
+            },
+            child: Text(
+              " ($textC)",
+              style: TextStyle(color: currentTheme.offColor),
+            ),
+          ),
         ]);
   }
 

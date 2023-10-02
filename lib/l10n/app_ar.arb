@@ -145,6 +145,9 @@
   "loadingWidgetChangeRepMsg": "يتم تغيير الممثل...",
   "loadingWidgetDefaultMsg": "في قيد الإنتظار...",
   "loadingWidgetSendMsg": "يتم اللإرسال...",
-  "changePINButton": "Change PIN"
+  "changePINButton": "Change PIN",
+  "resetAppTitle": "Reset App",
+  "resetAppWarning": "This will delete all of the app data including your wallets.\nMake sure you have a backup of your seed(s). \n\nClick yes to continue, this is irreversible."
+
 
 }

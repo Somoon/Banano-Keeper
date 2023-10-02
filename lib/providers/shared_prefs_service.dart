@@ -69,6 +69,26 @@ class SharedPrefsModel {
     return savedRepList;
   }
 
+  saveCurrency(String curn) {}
+
+  // not necessary?
+  // savePrices(Map<String, double> price) async {
+  //   List<String> listArr = [];
+  //   price.forEach((k, v) => listArr.add("{ $k, $v }"));
+  //   print(listArr);
+  //   sharedPref.setStringList('prices', listArr);
+  // }
+  //
+  // getPrices() async {
+  //   List<String> stringValue = sharedPref.getStringList('prices') ?? [];
+  //   print(stringValue.asMap());
+  //   Map<String, double> price = {for (var item in stringValue) '$item' : 'valueOf$item'};
+  //   {for (var e in stringValue) e: double.parse(e)};
+  //
+  //   print(price);
+  //   return price;
+  // }
+
   saveActiveWallet(String walletname) async {
     sharedPref.setString('activeWallet', walletname);
   }
