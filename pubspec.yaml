@@ -67,6 +67,8 @@ dependencies:
   qr_flutter: ^4.1.0
   queue: ^3.1.0+2
   gap: ^3.0.1
+  pointycastle: ^3.7.3
+  pinenacl: ^0.5.1
 #  cryptography: ^2.5.0
 
 

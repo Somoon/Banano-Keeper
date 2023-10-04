@@ -439,7 +439,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                   Text(
                     account.getName(),
                     style: TextStyle(
-                      color: currentTheme.textDisabled,
+                      color: currentTheme.textSecondary,
                     ),
                   ),
                   SizedBox(

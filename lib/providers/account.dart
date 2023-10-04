@@ -297,7 +297,7 @@ class Account extends ChangeNotifier {
               }
             }
 
-            notifyListeners();
+            // notifyListeners();
 
             // print("DONE EXUCTING NOTIFYLIS");
           }

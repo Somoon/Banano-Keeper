@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -63,6 +64,7 @@ class ActiveAccountState extends State<ActiveAccount>
       Account account,
       WalletService wallet,
       bool blurred) {
+    String userCurrency = watchOnly((UserData x) => x.currency);
     return Center(
       child: Card(
         color: currentTheme.secondary,
@@ -95,59 +97,57 @@ class ActiveAccountState extends State<ActiveAccount>
                             ),
                           ),
                           // const SizedBox(height: 10),
-                          Container(
-                            child: PopupMenuButton(
-                              constraints: const BoxConstraints(maxHeight: 300),
-                              tooltip: AppLocalizations.of(context)!
-                                  .selectAddressHint,
-                              // position: PopupMenuPosition.under,
-                              // offset: const Offset(0, -380),
-                              // position: ,
-                              offset: const Offset(0, 20),
-                              color: currentTheme.primary,
-                              initialValue: currentAccount,
-                              // Callback that sets the selected popup menu item.
-                              onSelected: (item) {
-                                setState(() {
-                                  int walletID =
-                                      services<WalletsService>().activeWallet;
-                                  String walletName = services<WalletsService>()
-                                      .walletsList[walletID];
-                                  if (item !=
-                                      services<WalletService>(
-                                              instanceName: walletName)
-                                          .getActiveIndex()) {
+                          PopupMenuButton(
+                            constraints: const BoxConstraints(maxHeight: 300),
+                            tooltip:
+                                AppLocalizations.of(context)!.selectAddressHint,
+                            // position: PopupMenuPosition.under,
+                            // offset: const Offset(0, -380),
+                            // position: ,
+                            offset: const Offset(0, 20),
+                            color: currentTheme.primary,
+                            initialValue: currentAccount,
+                            // Callback that sets the selected popup menu item.
+                            onSelected: (item) {
+                              setState(() {
+                                int walletID =
+                                    services<WalletsService>().activeWallet;
+                                String walletName = services<WalletsService>()
+                                    .walletsList[walletID];
+                                if (item !=
                                     services<WalletService>(
                                             instanceName: walletName)
-                                        .setActiveIndex(item);
-                                  }
-                                });
-                              },
-                              itemBuilder: (BuildContext context) =>
-                                  createDropDownMenuItems(wallet, currentTheme),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: Center(
-                                    child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        //Center Row contents horizontally,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        //Center Row contents vertically,
-                                        children: <Widget>[
-                                      AutoSizeText(
-                                        Utils().shortenAccount(currentAccount),
-                                        maxLines: 1,
-                                        style: currentTheme.textStyle
-                                            .copyWith(fontSize: 14),
-                                      ),
-                                      Icon(
-                                        Icons.arrow_drop_down,
-                                        color: currentTheme.text,
-                                      ),
-                                    ])),
-                              ),
+                                        .getActiveIndex()) {
+                                  services<WalletService>(
+                                          instanceName: walletName)
+                                      .setActiveIndex(item);
+                                }
+                              });
+                            },
+                            itemBuilder: (BuildContext context) =>
+                                createDropDownMenuItems(wallet, currentTheme),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: Center(
+                                  child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      //Center Row contents horizontally,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      //Center Row contents vertically,
+                                      children: <Widget>[
+                                    AutoSizeText(
+                                      Utils().shortenAccount(currentAccount),
+                                      maxLines: 1,
+                                      style: currentTheme.textStyle
+                                          .copyWith(fontSize: 14),
+                                    ),
+                                    Icon(
+                                      Icons.arrow_drop_down,
+                                      color: currentTheme.text,
+                                    ),
+                                  ])),
                             ),
                           ),
                           Expanded(
@@ -155,8 +155,8 @@ class ActiveAccountState extends State<ActiveAccount>
                             child: Center(
                               child: blurBalance(
                                 blurred,
-                                Utils().formatBalance(
-                                    account.getBalance(), currentTheme),
+                                Utils().formatBalance(account.getBalance(),
+                                    currentTheme, userCurrency),
                               ),
                               // displayBalance(account, currentTheme)),
                             ),

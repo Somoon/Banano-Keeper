@@ -1,10 +1,16 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bananokeeper/api/currency_conversion.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/user_data.dart';
+import 'package:bananokeeper/utils/tnacl/tnacl.dart';
 import 'package:custom_platform_device_id/platform_device_id.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nanodart/nanodart.dart';
 import 'package:decimal/decimal.dart';
+import 'package:pointycastle/digests/blake2b.dart';
+import 'package:pinenacl/tweetnacl.dart';
 
 class Utils {
   BigInt banRaw = BigInt.parse('100000000000000000000000000000');
@@ -151,7 +157,14 @@ class Utils {
         RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
   }
 
-  Widget formatBalance(activeAccountBalance, currentTheme) {
+  Widget formatBalance(
+      activeAccountBalance, currentTheme, String userCurrency) {
+    // String userCurrency = services<UserData>().currency;
+    Decimal convertedPrice = Decimal.parse(
+            services<CurrencyConversion>().price[userCurrency]!.toString()) *
+        amountFromRaw(activeAccountBalance);
+    String textC =
+        "${services<CurrencyConversion>().symbol[userCurrency]}${convertedPrice.toStringAsFixed(2)}";
     return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         //Center Row contents horizontally,
@@ -170,15 +183,18 @@ class Utils {
             displayNums(activeAccountBalance),
             style: TextStyle(color: currentTheme.text),
           ),
-          // GestureDetector(
-          //   onTap: () {
-          //     //change currency showing here ------------------------
-          //   },
-          //   child: Text(
-          //     " (\$5)",
-          //     style: TextStyle(color: currentTheme.offColor),
-          //   ),
-          // ),
+          GestureDetector(
+            onTap: () {
+              print("asd");
+
+              services<UserData>().switchCurrency();
+              //change currency showing here ------------------------
+            },
+            child: Text(
+              " ($textC)",
+              style: TextStyle(color: currentTheme.offColor),
+            ),
+          ),
         ]);
   }
 
@@ -208,5 +224,75 @@ class Utils {
 
   bool isDirectionRTL(BuildContext context) {
     return (Directionality.of(context).index == 0);
+  }
+
+  String getDummyBlockHash(String account, String representative) {
+    Uint8List statePreamble = NanoHelpers.hexToBytes(
+        "0000000000000000000000000000000000000000000000000000000000000006");
+    Uint8List accountBytes =
+        NanoHelpers.hexToBytes(NanoAccounts.extractPublicKey(account));
+    Uint8List previousBytes = NanoHelpers.hexToBytes("".padLeft(64, "0"));
+    Uint8List representativeBytes = NanoHelpers.hexToBytes(representative);
+    Uint8List balanceBytes = NanoHelpers.bigIntToBytes(BigInt.parse("0"));
+    Uint8List linkBytes = NanoHelpers.hexToBytes("".padLeft(64, "0"));
+    var a = Blake2b.digest256([
+      statePreamble,
+      accountBytes,
+      previousBytes,
+      representativeBytes,
+      balanceBytes,
+      linkBytes
+    ]);
+    return NanoHelpers.byteToHex(a).toUpperCase();
+  }
+
+  bool detachedVerify(
+      Uint8List message, Uint8List signature, Uint8List publicKey) {
+    int signatureLength = 64;
+    int publicKeyLength = 32;
+    if (signature.length != signatureLength) return false;
+    if (publicKey.length != publicKeyLength) return false;
+    Uint8List sm = Uint8List(signatureLength + message.length);
+    Uint8List m = Uint8List(signatureLength + message.length);
+    for (int i = 0; i < signatureLength; i++) sm[i] = signature[i];
+    for (int i = 0; i < message.length; i++)
+      sm[i + signatureLength] = message[i];
+
+    return (TNaCl.cryptoSignOpen(m, sm, sm.length, publicKey) >= 0);
+  }
+
+  String bananoMessagePreamble = 'bananomsg-';
+
+  String preamble =
+      '0000000000000000000000000000000000000000000000000000000000000006';
+  Uint8List DUMMY_BYTES = NanoHelpers.hexToBytes(
+      '0000000000000000000000000000000000000000000000000000000000000000');
+  Uint8List DUMMY_BALANCE =
+      NanoHelpers.hexToBytes('00000000000000000000000000000000');
+
+  getDumBlockHashBytes(Uint8List publicKeyBytes, message) {
+    Uint8List messageBytes = NanoHelpers.stringToBytesUtf8(message);
+    Uint8List bananoMessagePreambleBytes =
+        NanoHelpers.stringToBytesUtf8(bananoMessagePreamble);
+
+    Uint8List hashMessageToBytes = Uint8List(32);
+    Blake2bDigest blake2b = Blake2bDigest(digestSize: 32);
+    blake2b.update(
+        bananoMessagePreambleBytes, 0, bananoMessagePreambleBytes.length);
+    blake2b.update(messageBytes, 0, messageBytes.length);
+    blake2b.doFinal(hashMessageToBytes, 0);
+
+    //now the block
+    Uint8List hashBytes = Uint8List(32);
+    Blake2bDigest blake2bhashBytes = Blake2bDigest(digestSize: 32);
+    blake2bhashBytes.update(NanoHelpers.hexToBytes(preamble), 0,
+        NanoHelpers.hexToBytes(preamble).length);
+    blake2bhashBytes.update(publicKeyBytes, 0, publicKeyBytes.length);
+    blake2bhashBytes.update(DUMMY_BYTES, 0, DUMMY_BYTES.length);
+    blake2bhashBytes.update(hashMessageToBytes, 0, hashMessageToBytes.length);
+    blake2bhashBytes.update(DUMMY_BYTES, 0, DUMMY_BYTES.length);
+    blake2bhashBytes.update(DUMMY_BALANCE, 0, DUMMY_BALANCE.length);
+    blake2bhashBytes.doFinal(hashBytes, 0);
+    return hashBytes;
   }
 }

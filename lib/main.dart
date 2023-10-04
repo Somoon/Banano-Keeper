@@ -1,3 +1,4 @@
+import 'package:bananokeeper/api/currency_conversion.dart';
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/initial_pages/initial_page_one.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -37,6 +38,10 @@ Future<void> setupUserData() async {
   var userValues = await services<SharedPrefsModel>().getStoredValues();
 
   // services<WalletsService>().createMockWallet();
+
+  var cData = await CurrencyAPI().getData();
+  services.registerSingleton<CurrencyConversion>(CurrencyConversion());
+  services<CurrencyConversion>().updateData(cData);
 
   //new app launch - no data
 

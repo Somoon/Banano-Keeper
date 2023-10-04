@@ -72,6 +72,7 @@ class ManualRepChange {
                       child: ScaffoldMessenger(
                         key: scaffoldMessengerKey,
                         child: Scaffold(
+                          resizeToAvoidBottomInset: false,
                           backgroundColor: currentTheme.primary,
                           body: Center(
                             child: Column(
@@ -181,23 +182,7 @@ class ManualRepChange {
                 width: double.infinity,
                 height: 48,
                 child: OutlinedButton(
-                  style: ButtonStyle(
-                    overlayColor: MaterialStateColor.resolveWith(
-                        (states) => currentTheme.text.withOpacity(0.3)),
-                    // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-
-                    side: MaterialStatePropertyAll<BorderSide>(
-                      BorderSide(
-                        color: currentTheme.buttonOutline,
-                        width: 1,
-                      ),
-                    ),
-                  ),
+                  style: currentTheme.btnStyle,
                   onPressed: () async {
                     changeRep(context, account);
                   },

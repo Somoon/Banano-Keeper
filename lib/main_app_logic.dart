@@ -92,6 +92,10 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
         elevation: 0,
         leading: Builder(
           builder: (context) => IconButton(
+            style: currentTheme.btnStyleNoBorder,
+            splashRadius: 20,
+            splashColor: currentTheme.textDisabled,
+            highlightColor: currentTheme.text,
             icon: const Icon(Icons.menu), //, color: Colors.black38),
             // icon: new Icon(Icons.settings),
             onPressed: () => Scaffold.of(context).openDrawer(),

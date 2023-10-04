@@ -69,6 +69,15 @@ class SharedPrefsModel {
     return savedRepList;
   }
 
+  saveCurrency(String currency) {
+    sharedPref.setString('currency', currency);
+  }
+  String getCurrency()
+  {
+    String stringValue = sharedPref.getString('currency') ?? "USD";
+    return stringValue;
+  }
+
   saveActiveWallet(String walletname) async {
     sharedPref.setString('activeWallet', walletname);
   }
