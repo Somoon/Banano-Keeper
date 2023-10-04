@@ -8,6 +8,7 @@
 import 'dart:convert';
 
 import 'package:bananokeeper/api/account_api.dart';
+import 'package:bananokeeper/api/currency_conversion.dart';
 import 'package:bananokeeper/api/representative_json.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
@@ -27,20 +28,25 @@ class UserData extends ChangeNotifier {
   late String blockExplorer = "";
   late bool Notifs = false;
 
+  getCurrency() {
+    return currency;
+  }
+
   setCurrency(String curr) {
     currency = curr;
+    services<SharedPrefsModel>().saveCurrency(currency);
+    notifyListeners();
   }
 
   switchCurrency() {
-    var l = ['USD', 'GBP', 'XNO', 'BTC'];
-    int i = l.indexOf(currency);
-    print(i);
-    if (i == l.length - 1) {
-      setCurrency(l[0]);
+    List<String> currencies =
+        services<CurrencyConversion>().price.keys.toList();
+    int i = currencies.indexOf(currency);
+    if (i == currencies.length - 1) {
+      setCurrency(currencies[0]);
     } else {
-      setCurrency(l[i + 1]);
+      setCurrency(currencies[i + 1]);
     }
-    notifyListeners();
   }
 
   //Auth related
@@ -99,7 +105,7 @@ class UserData extends ChangeNotifier {
 
       await services<SharedPrefsModel>().saveRepresentatives(representatives!);
 
-      services<SharedPrefsModel>().getRepresentatives();
+      // services<SharedPrefsModel>().getRepresentatives();
       notifyListeners();
     }
   }

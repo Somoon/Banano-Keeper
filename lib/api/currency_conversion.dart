@@ -1,6 +1,4 @@
 import 'package:bananokeeper/providers/get_it_main.dart';
-import 'package:bananokeeper/providers/pow_source.dart';
-import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -14,7 +12,6 @@ class CurrencyAPI {
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
-
     return jsonDecode(response.body);
   }
 }
@@ -33,20 +30,8 @@ class CurrencyConversion extends ChangeNotifier {
     "BTC": "฿"
   };
 
-  Map<String, Map<String, String>> test = {
-    "USD": {
-      "price": "0.0",
-      "symbol": "\$",
-    },
-    "GBP": {
-      "price": "0.0",
-      "symbol": "\$",
-    },
-  };
 
   updateData(data) {
-    // test['USD']?['price'];
-    // currencies = Map<String, double>.from(data);
     Map<String, double> _price = {
       "USD": data['USD']!,
       "GBP": data['GBP']!,
@@ -55,8 +40,6 @@ class CurrencyConversion extends ChangeNotifier {
     };
     price = Map.from(_price);
 
-    // services<SharedPrefsModel>().savePrices(price);
-    // services<SharedPrefsModel>().getPrices();
     notifyListeners();
   }
 }

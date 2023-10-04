@@ -107,7 +107,6 @@ class WalletService extends ChangeNotifier {
     Account account =
         Account(index, nickname, address, balance, lastUpdate, representative);
     if (balance != "0") {
-      print("<<M<<<");
       account.opened = true;
     }
 

@@ -1,5 +1,6 @@
 // import 'dart:async';
 
+import 'package:bananokeeper/ui/dialogs/currency_diag.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -46,6 +47,7 @@ class _SideDrawer extends State<SideDrawer>
     var activeTheme = watchOnly((ThemeModel x) => x.activeTheme);
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     var activeLanguage = watchOnly((LocalizationModel x) => x.getLanguage());
+    String currentCurrency = watchOnly((UserData x) => x.getCurrency());
 
     //Wallet and address
 
@@ -148,7 +150,7 @@ class _SideDrawer extends State<SideDrawer>
                   color: currentTheme.offColor,
                 ),
               ),
-              // createDialogButton("Currency", "1", ThemesDialog()),
+              createDialogButton("Currency", currentCurrency, CurrencyDialog()),
               // createDialogButton("Min. to receive", "1", ThemesDialog()),
 
               // Already done and working.
