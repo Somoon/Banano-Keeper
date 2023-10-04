@@ -342,49 +342,29 @@ class MsgSignPage {
 
                     print("MSG $message");
                     print("SIGN $sign");
+                    /////////////////////////////////
+
+                    String messageToBeChecked = "Test test 123";
 
                     String givenAddr =
-                        'ban_391ebedq1y9n48ypinozf3uwx1usmefdzsbhjao653thzuu7y8q41xmn3xow';
+                        'ban_1toozhg5en6pa4ghoi5hp5ez59o86i1i54pkkp8h8o68grscdxzqwj6sx4xp';
                     String extractedKey =
                         NanoAccounts.extractPublicKey(givenAddr);
 
-                    Uint8List givenAddrBytes =
+                    Uint8List extractedKeyBytes =
                         NanoHelpers.hexToBytes(extractedKey);
-                    Uint8List signBytes = NanoHelpers.hexToBytes(sign);
 
-                    bool verify = Signature.detachedVerify(
-                        NanoHelpers.hexToBytes(calculatedHash), signBytes, givenAddrBytes);
+                    String givenSign =
+                        '48F7EB30A0D43AD23DDD04CB3F8CA1C66A4C3565ACC1A0EB63CD5B4D9A7C6C18BFBD433C0E231D0869981D9763859CF55973152BBF89944E60E3FD8195EDDF0C';
+                    Uint8List givenSignBytes =
+                        NanoHelpers.hexToBytes(givenSign);
 
+                    var blockBytes = Utils().getDumBlockHashBytes(
+                        extractedKeyBytes, messageToBeChecked);
+
+                    bool verify = Utils().detachedVerify(
+                        blockBytes, givenSignBytes, extractedKeyBytes);
                     print("verify ok? $verify");
-
-//CBFEB59C1A94ACCA0F0D202511E6BF9D4E19FA7793C46F689E6F36523938AF76165FF4B26B978FEF2C96DE481C3D45F84486C4EFE81F4983FFE789DCFEF51800
-                    /*
-                const publicKey = await getPublicKey(privateKeyOrSigner);
-                    const publicKeyBytes = hexToBytes(publicKey);
-                    const privateKeyBytes = hexToBytes(privateKeyOrSigner);
-
-                    if (typeof privateKeyOrSigner === 'object') {
-                      const block = messageDummyBlock(publicKeyBytes, message);
-                      // type is signer
-                      const hwResponse = await privateKeyOrSigner.signBlock(block);
-                      return hwResponse.signature;
-                    }
-
-                    const dummyBlockHashBytes = messageDummyBlockHashBytes(publicKeyBytes, message);
-                    const signed = nacl.sign.detached(dummyBlockHashBytes, privateKeyBytes);
-                    const signature = bytesToHex(signed);
-                    return signature;
-                  };
-
-                  const verifyMessage = (publicKey, message, signature) => {
-                    const publicKeyBytes = hexToBytes(publicKey);
-                    const signatureBytes = hexToBytes(signature);
-
-                    const dummyBlockHashBytes = messageDummyBlockHashBytes(publicKeyBytes, message);
-                    const verified = nacl.sign.detached.verify(dummyBlockHashBytes, signatureBytes, publicKeyBytes);
-
-                    return verified;
-*/
 
                     // String pubKey =
                     setState(() {

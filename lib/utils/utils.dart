@@ -2,12 +2,15 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/api/currency_conversion.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/user_data.dart';
+import 'package:bananokeeper/utils/tnacl/tnacl.dart';
 import 'package:custom_platform_device_id/platform_device_id.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nanodart/nanodart.dart';
 import 'package:decimal/decimal.dart';
+import 'package:pointycastle/digests/blake2b.dart';
+import 'package:pinenacl/tweetnacl.dart';
 
 class Utils {
   BigInt banRaw = BigInt.parse('100000000000000000000000000000');
@@ -245,8 +248,140 @@ class Utils {
       balanceBytes,
       linkBytes
     ]);
-    print("!!!!!!");
-    print (a);
     return NanoHelpers.byteToHex(a).toUpperCase();
+  }
+
+  getDummyBlockHashV(String account, String previous, Uint8List representative,
+      BigInt balance, String link) {
+    Uint8List statePreamble = NanoHelpers.hexToBytes(
+        "0000000000000000000000000000000000000000000000000000000000000006");
+    Uint8List accountBytes =
+        NanoHelpers.hexToBytes(NanoAccounts.extractPublicKey(account));
+    Uint8List previousBytes = NanoHelpers.hexToBytes(previous.padLeft(64, "0"));
+    Uint8List representativeBytes = representative;
+    Uint8List balanceBytes = NanoHelpers.bigIntToBytes(balance);
+    Uint8List linkBytes = NanoHelpers.hexToBytes(link);
+    Uint8List out = Uint8List(32);
+    Blake2bDigest blake2b = Blake2bDigest(digestSize: 32);
+    blake2b.update(accountBytes, 0, accountBytes.length);
+    blake2b.update(previousBytes, 0, previousBytes.length);
+    blake2b.update(representativeBytes, 0, representativeBytes.length);
+    blake2b.update(balanceBytes, 0, balanceBytes.length);
+    blake2b.update(linkBytes, 0, linkBytes.length);
+    blake2b.doFinal(out, 0);
+
+    return NanoHelpers.byteToHex(out).toUpperCase();
+  }
+
+  bool detachedVerify(
+      Uint8List message, Uint8List signature, Uint8List publicKey) {
+    int signatureLength = 64;
+    int publicKeyLength = 32;
+    if (signature.length != signatureLength) return false;
+    if (publicKey.length != publicKeyLength) return false;
+    print("$signatureLength + ${message.length}");
+    Uint8List sm = Uint8List(signatureLength + message.length);
+    Uint8List m = Uint8List(signatureLength + message.length);
+    for (int i = 0; i < signatureLength; i++) sm[i] = signature[i];
+    for (int i = 0; i < message.length; i++)
+      sm[i + signatureLength] = message[i];
+
+    return (TNaCl.cryptoSignOpen(m, sm, sm.length, publicKey) >= 0);
+
+    return false;
+    /*
+    const sm = new Uint8Array(crypto_sign_BYTES + msg.length);
+      const m = new Uint8Array(crypto_sign_BYTES + msg.length);
+      let i;
+      for (i = 0; i < crypto_sign_BYTES; i++) {
+        sm[i] = sig[i];
+      }
+      for (i = 0; i < msg.length; i++) {
+        sm[i + crypto_sign_BYTES] = msg[i];
+      }
+      return (crypto_sign_open(m, sm, sm.length, publicKey) >= 0);
+     */
+  }
+
+  // n = sm.length - pk publickey
+
+  // // int
+  // cryptoSignOpen(Uint8List m, Uint8List sm, int n, Uint8List pk) {
+  //   int i;
+  //   int mlen;
+  //   final t = Uint8List(32), h = Uint8List(64);
+  //   final p = List<Int32List>.generate(4, (_) => Int32List(16));
+  //
+  //   final q = List<Int32List>.generate(4, (_) => Int32List(16));
+  //
+  //   mlen = -1;
+  //   if (n < 64) {
+  //     return -1;
+  //   }
+  //
+  //   if (_unpackneg(q, pk)) {
+  //     return -1;
+  //   }
+  //   for (i = 0; i < n; i++) {
+  //     m[i] = sm[i];
+  //   }
+  //   for (i = 0; i < 32; i++) {
+  //     m[i + 32] = pk[i];
+  //   }
+  //   Blake2bDigest blake2b = Blake2bDigest(digestSize: 64);
+  //   blake2b.update(m, 0, m.length);
+  //   blake2b.doFinal(h, 0);
+  //   _reduce(h);
+  //   _scalarmult(p, q, h, 0);
+  //   _scalarbase(q, sm, 32);
+  //
+  //   _add(p, q);
+  //   _pack(t, p);
+  //   n -= 64;
+  //   if (_crypto_verify_32(sm, 0, t, 0) != 0) {
+  //     for (i = 0; i < n; i++) {
+  //       m[i] = 0;
+  //     }
+  //     return -1;
+  //   }
+  //   for (i = 0; i < n; i++) {
+  //     m[i] = sm[i + 64];
+  //   }
+  //   mlen = n;
+  //   return mlen;
+  // }
+
+  String bananoMessagePreamble = 'bananomsg-';
+
+  String preamble =
+      '0000000000000000000000000000000000000000000000000000000000000006';
+  Uint8List DUMMY_BYTES = NanoHelpers.hexToBytes(
+      '0000000000000000000000000000000000000000000000000000000000000000');
+  Uint8List DUMMY_BALANCE =
+      NanoHelpers.hexToBytes('00000000000000000000000000000000');
+  getDumBlockHashBytes(Uint8List publicKeyBytes, message) {
+    Uint8List messageBytes = NanoHelpers.stringToBytesUtf8(message);
+    Uint8List bananoMessagePreambleBytes =
+        NanoHelpers.stringToBytesUtf8(bananoMessagePreamble);
+
+    Uint8List hashMessageToBytes = Uint8List(32);
+    Blake2bDigest blake2b = Blake2bDigest(digestSize: 32);
+    blake2b.update(
+        bananoMessagePreambleBytes, 0, bananoMessagePreambleBytes.length);
+    blake2b.update(messageBytes, 0, messageBytes.length);
+    blake2b.doFinal(hashMessageToBytes, 0);
+
+    //now the block
+    Uint8List hashBytes = Uint8List(32);
+    Blake2bDigest blake2bhashBytes = Blake2bDigest(digestSize: 32);
+    blake2bhashBytes.update(NanoHelpers.hexToBytes(preamble), 0,
+        NanoHelpers.hexToBytes(preamble).length);
+    blake2bhashBytes.update(publicKeyBytes, 0, publicKeyBytes.length);
+    blake2bhashBytes.update(DUMMY_BYTES, 0, DUMMY_BYTES.length);
+    blake2bhashBytes.update(hashMessageToBytes, 0, hashMessageToBytes.length);
+    blake2bhashBytes.update(DUMMY_BYTES, 0, DUMMY_BYTES.length);
+    blake2bhashBytes.update(DUMMY_BALANCE, 0, DUMMY_BALANCE.length);
+    blake2bhashBytes.doFinal(hashBytes, 0);
+    return hashBytes;
   }
 }
