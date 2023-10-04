@@ -1,13 +1,12 @@
+import 'dart:async';
+
 import 'package:bananokeeper/providers/get_it_main.dart';
-import 'package:bananokeeper/providers/wallet_service.dart';
-import 'package:bananokeeper/providers/wallets_service.dart';
+
 import 'package:bananokeeper/themes.dart';
 import 'package:bananokeeper/ui/dialogs/info_dialog.dart';
-import 'package:bananokeeper/ui/representative_pages/manual_rep_change.dart';
 import 'package:flutter/material.dart';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -24,7 +23,8 @@ class MsgSignVerifyPage {
   late BuildContext _context;
   bool isDisplayed = false;
   int selectedIndex = -1;
-  bool showSign = false;
+  bool showResult = false;
+  bool signValid = false;
 
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
@@ -66,156 +66,184 @@ class MsgSignVerifyPage {
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                     color: currentTheme.primary,
                   ),
-                  child: SizedBox(
-                    height: height / 1.25,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0),
-                      child: ScaffoldMessenger(
-                        key: scaffoldMessengerKey,
-                        child: Scaffold(
-                          resizeToAvoidBottomInset: false,
-                          backgroundColor: currentTheme.primary,
-                          body: Center(
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(top: 10),
-                                  height: 5,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.15,
-                                  decoration: BoxDecoration(
-                                    color: currentTheme.secondary,
-                                    borderRadius: BorderRadius.circular(100.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: SizedBox(
+                      height: height / 1.25,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20.0),
+                        child: ScaffoldMessenger(
+                          key: scaffoldMessengerKey,
+                          child: Scaffold(
+                            resizeToAvoidBottomInset: false,
+                            backgroundColor: currentTheme.primary,
+                            body: Center(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 10),
+                                    height: 5,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.15,
+                                    decoration: BoxDecoration(
+                                      color: currentTheme.secondary,
+                                      borderRadius:
+                                          BorderRadius.circular(100.0),
+                                    ),
                                   ),
-                                ),
-                                Row(
-                                  //was end
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 10,
-                                      ),
-                                      child: SizedBox(
-                                        child: TextButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              InfoDialog().show(
-                                                  context,
-                                                  AppLocalizations.of(context)!
-                                                      .messageVerifyInfoDialogTitle,
-                                                  AppLocalizations.of(context)!
-                                                      .messageVerifyInfoDialogExplanation,
-                                                  currentTheme);
-                                            });
-                                          },
-                                          style: ButtonStyle(
-                                            foregroundColor:
-                                                MaterialStatePropertyAll<Color>(
-                                                    currentTheme.textDisabled),
-                                            // backgroundColor:
-                                            //     MaterialStatePropertyAll<
-                                            //         Color>(primary),
-                                          ),
-                                          child: const Icon(
-                                              Icons.info_outline_rounded),
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 10,
-                                      ),
-                                      child: SizedBox(
-                                        child: TextButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              // addressController.clear();
-                                              Navigator.of(context).pop(false);
-                                            });
-                                          },
-                                          style: ButtonStyle(
-                                            foregroundColor:
-                                                MaterialStatePropertyAll<Color>(
-                                                    currentTheme.textDisabled),
-                                            // backgroundColor:
-                                            //     MaterialStatePropertyAll<
-                                            //         Color>(primary),
-                                          ),
-                                          child: const Icon(Icons.close),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 15, right: 15),
-                                  child: Column(
+                                  Row(
+                                    //was end
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      AutoSizeText(
-                                        AppLocalizations.of(context)!
-                                            .messageVerifyTitle,
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                          fontSize: 28,
-                                          fontWeight: FontWeight.bold,
-                                          color: currentTheme.text,
-                                        ),
-                                      ),
-                                      const Gap(30),
                                       Padding(
                                         padding: const EdgeInsets.only(
-                                          left: 25.0,
-                                          right: 25.0,
+                                          left: 10,
                                         ),
-                                        child: Column(
-                                          children: [
-                                            createTextFieldTitle(
-                                                context,
-                                                AppLocalizations.of(context)!
-                                                    .enterAddressLabel,
-                                                currentTheme),
-                                            addressTextField(currentTheme,
-                                                context, setState),
-                                            const Gap(30),
-                                            createTextFieldTitle(
-                                                context,
-                                                AppLocalizations.of(context)!
-                                                    .enterMessageLabel,
-                                                currentTheme),
-                                            messageTextField(currentTheme,
-                                                context, setState),
-                                            const Gap(30),
-                                            createTextFieldTitle(
-                                                context,
-                                                AppLocalizations.of(context)!
-                                                    .enterSignLabel,
-                                                currentTheme),
-                                            signTextField(currentTheme, context,
-                                                setState),
-                                          ],
+                                        child: SizedBox(
+                                          child: TextButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                InfoDialog().show(
+                                                    context,
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .messageVerifyInfoDialogTitle,
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .messageVerifyInfoDialogExplanation,
+                                                    currentTheme);
+                                              });
+                                            },
+                                            style: ButtonStyle(
+                                              foregroundColor:
+                                                  MaterialStatePropertyAll<
+                                                          Color>(
+                                                      currentTheme
+                                                          .textDisabled),
+                                              // backgroundColor:
+                                              //     MaterialStatePropertyAll<
+                                              //         Color>(primary),
+                                            ),
+                                            child: const Icon(
+                                                Icons.info_outline_rounded),
+                                          ),
                                         ),
                                       ),
-                                      if (errMsg != '') ...[
-                                        const Gap(20),
-                                        AutoSizeText(
-                                          errMsg,
-                                          style: const TextStyle(
-                                            color: Colors.red,
-                                          ),
-                                          maxLines: 1,
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          right: 10,
                                         ),
-                                      ]
+                                        child: SizedBox(
+                                          child: TextButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                // addressController.clear();
+                                                Navigator.of(context)
+                                                    .pop(false);
+                                              });
+                                            },
+                                            style: ButtonStyle(
+                                              foregroundColor:
+                                                  MaterialStatePropertyAll<
+                                                          Color>(
+                                                      currentTheme
+                                                          .textDisabled),
+                                              // backgroundColor:
+                                              //     MaterialStatePropertyAll<
+                                              //         Color>(primary),
+                                            ),
+                                            child: const Icon(Icons.close),
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 15, right: 15),
+                                    child: Column(
+                                      children: [
+                                        AutoSizeText(
+                                          AppLocalizations.of(context)!
+                                              .messageVerifyTitle,
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.bold,
+                                            color: currentTheme.text,
+                                          ),
+                                        ),
+                                        const Gap(30),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 25.0,
+                                            right: 25.0,
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              createTextFieldTitle(
+                                                  context,
+                                                  AppLocalizations.of(context)!
+                                                      .enterAddressLabel,
+                                                  currentTheme),
+                                              addressTextField(currentTheme,
+                                                  context, setState),
+                                              const Gap(30),
+                                              createTextFieldTitle(
+                                                  context,
+                                                  AppLocalizations.of(context)!
+                                                      .enterMessageLabel,
+                                                  currentTheme),
+                                              messageTextField(currentTheme,
+                                                  context, setState),
+                                              const Gap(30),
+                                              createTextFieldTitle(
+                                                  context,
+                                                  AppLocalizations.of(context)!
+                                                      .enterSignLabel,
+                                                  currentTheme),
+                                              signTextField(currentTheme,
+                                                  context, setState),
+                                            ],
+                                          ),
+                                        ),
+                                        const Gap(30),
+                                        if (showResult) ...[
+                                          AutoSizeText(
+                                            (signValid
+                                                ? AppLocalizations.of(context)!
+                                                    .signValidMessage
+                                                : AppLocalizations.of(context)!
+                                                    .signInvalidMessage),
+                                            style: TextStyle(
+                                              fontSize: currentTheme.fontSize,
+                                              fontWeight: FontWeight.bold,
+                                              color: (signValid
+                                                  ? Colors.green
+                                                  : Colors.red),
+                                            ),
+                                          )
+                                        ],
+                                        if (errMsg != '') ...[
+                                          const Gap(20),
+                                          AutoSizeText(
+                                            errMsg,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                            ),
+                                            maxLines: 1,
+                                          ),
+                                        ]
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
+                            bottomNavigationBar: displayButtons(
+                                context, setState, currentTheme, height),
                           ),
-                          bottomNavigationBar: displayButtons(
-                              context, setState, currentTheme, height),
                         ),
                       ),
                     ),
@@ -350,33 +378,48 @@ class MsgSignVerifyPage {
   }
 
   String errMsg = '';
+  // Timer t = Timer(const Duration(seconds: 1), () {});
+
   verifyMessage(BuildContext context, StateSetter setState) {
-    showSign = true;
-    /////////////////////////////////
+    try {
+      String messageToBeChecked = messageController.text;
+      String givenAddr = addressController.text;
+      // 'ban_1fcyrps8j5uokeah34ud531nuu9wkqrb9xkkadk8qinefx11c6oxeia5utbk';
+      String extractedKey = NanoAccounts.extractPublicKey(givenAddr);
 
-    String messageToBeChecked = messageController.text;
-    String givenAddr = addressController.text;
-    // 'ban_1fcyrps8j5uokeah34ud531nuu9wkqrb9xkkadk8qinefx11c6oxeia5utbk';
-    String extractedKey = NanoAccounts.extractPublicKey(givenAddr);
+      Uint8List extractedKeyBytes = NanoHelpers.hexToBytes(extractedKey);
 
-    Uint8List extractedKeyBytes = NanoHelpers.hexToBytes(extractedKey);
+      String givenSign = signController.text;
+      Uint8List givenSignBytes = NanoHelpers.hexToBytes(givenSign);
 
-    String givenSign = signController.text;
-    Uint8List givenSignBytes = NanoHelpers.hexToBytes(givenSign);
+      var blockBytes =
+          Utils().getDumBlockHashBytes(extractedKeyBytes, messageToBeChecked);
 
-    var blockBytes =
-        Utils().getDumBlockHashBytes(extractedKeyBytes, messageToBeChecked);
+      bool verify =
+          Utils().detachedVerify(blockBytes, givenSignBytes, extractedKeyBytes);
 
-    bool verify =
-        Utils().detachedVerify(blockBytes, givenSignBytes, extractedKeyBytes);
-    print("verify ok? $verify");
+      setState(() {
+        signValid = verify;
 
-    // String pubKey =
-    setState(() {
-      // if (result != null && result) {
-      //   Navigator.of(context).pop(true);
+        showResult = true;
+      });
+      // if (t.isActive) {
+      //   t.cancel();
       // }
-    });
+      // t = Timer(const Duration(seconds: 5000), () {
+      //   setState(() {
+      //     showResult = false;
+      //   });
+      // });
+      // Future.delayed(const Duration(milliseconds: 5000), () {
+      //   setState(() {
+      //     showResult = false;
+      //   });
+      // });
+    } catch (e) {
+      print("verify message err");
+      print(e);
+    }
   }
 
   final messageController = TextEditingController();
@@ -703,7 +746,7 @@ class MsgSignVerifyPage {
   }
 
   clear() {
-    showSign = false;
+    showResult = false;
     selectedIndex = -1;
     messageController.clear();
     addressController.clear();
