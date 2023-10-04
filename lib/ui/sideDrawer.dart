@@ -1,6 +1,7 @@
 // import 'dart:async';
 
 import 'package:bananokeeper/ui/dialogs/currency_diag.dart';
+import 'package:bananokeeper/ui/message_signing/bottomSheetSign.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -130,13 +131,25 @@ class _SideDrawer extends State<SideDrawer>
                   style: TextStyle(
                     fontSize: currentTheme.fontSize - 4,
                     color: currentTheme.offColor,
-                  )),
+                  ),
+              ),
               createRepBottomSheetButton(
                 AppLocalizations.of(context)!.representative,
                 representative,
                 //
                 account,
               ),
+
+              /// Message Signing button
+              ///
+
+              createSigningBottomSheetButton("Message Signing",),
+
+                // AppLocalizations.of(context)!.representative,
+                // representative,
+              //   account,
+              // ),
+
               const Divider(
                 height: 15,
                 thickness: 2,
@@ -208,6 +221,54 @@ class _SideDrawer extends State<SideDrawer>
       ),
     );
   }
+
+  /// creates a button that display a bottomsheet to choose an item and peek at the active item
+  ///
+  /// @param label        - button label
+  /// @param peekActive   - active item
+  /// @param account      - account
+  ///
+  /// returns a widget button
+  Widget createSigningBottomSheetButton(
+      String label) {
+    BaseTheme currentTheme = watchOnly((ThemeModel x) => x.curTheme);
+
+    return SizedBox(
+      width: double.infinity,
+      child: TextButton(
+        style: currentTheme.btnStyleNoBorder,
+        onPressed: () async {
+          var result = await MsgSignPage().show(context, currentTheme);
+          // MessageSigningPage(currentTheme);
+        },
+        child: Column(
+          children: [
+            Align(
+              alignment: (!Utils().isDirectionRTL(context)
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight),
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: currentTheme.text,
+                  fontSize: currentTheme.fontSize,
+                ),
+              ),
+            ),
+
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<bool?> MessageSigningPage(
+      BaseTheme currentTheme) async {
+
+    var result = await MsgSignPage().show(context, currentTheme);
+    return result;
+  }
+
 
   Future<bool?> resetAppDialog(
       BuildContext context, BaseTheme currentTheme) async {

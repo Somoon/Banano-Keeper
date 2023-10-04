@@ -92,7 +92,7 @@ class WalletService extends ChangeNotifier {
         print("private key: $privateKey");
       }
       // Getting public key from this private key
-      String pubKey = NanoKeys.createPublicKey(privateKey);
+      String pubKey = getPublicKey(privateKey);
       // Getting address (nano_, ban_) from this pubkey
       address = NanoAccounts.createAccount(NanoAccountType.BANANO, pubKey);
       if (kDebugMode) {
@@ -227,6 +227,10 @@ class WalletService extends ChangeNotifier {
 
   String getPrivateKey(index) {
     return NanoKeys.seedToPrivate(seed, index);
+  }
+
+  String getPublicKey(String privateKey) {
+    return NanoKeys.createPublicKey(privateKey);
   }
 
   Map<String, dynamic> toMap() {
