@@ -148,7 +148,21 @@
   "changePINButton": "Change PIN",
   "resetAppTitle": "Reset App",
   "resetAppWarning": "This will delete all of the app data including your wallets.\nMake sure you have a backup of your seed(s). \n\nClick yes to continue, this is irreversible.",
-  "currency": "Currency"
+  "currency": "Currency",
+  "messageSigningTitle": "Message Signing",
+  "messageSingingInfoDialogExplanation": "1 2 3 ",
+  "messageSingingInfoDialogTitle": "What is Message Signing",
+  "enterMessageHint": "Enter Message",
+  "signButtonText": "Sign message",
+  "verifyButtonText": "Verify signature",
+  "signPageErrorMessage": "Please Enter a message.",
+  "messageVerifyTitle": "Message Verification",
+  "messageVerifyInfoDialogExplanation": "1 2 3 ",
+  "messageVerifyInfoDialogTitle": "Message Verification",
+  "enterSignHint": "Enter Signature",
+  "enterAddressLabel": "Signer Address",
+  "enterMessageLabel": "Message",
+  "enterSignLabel": "Signature"
 
 
 }

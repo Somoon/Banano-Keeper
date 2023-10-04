@@ -127,11 +127,12 @@ class _SideDrawer extends State<SideDrawer>
                 height: 15,
                 thickness: 3,
               ),
-              Text(AppLocalizations.of(context)!.accountSettings,
-                  style: TextStyle(
-                    fontSize: currentTheme.fontSize - 4,
-                    color: currentTheme.offColor,
-                  ),
+              Text(
+                AppLocalizations.of(context)!.accountSettings,
+                style: TextStyle(
+                  fontSize: currentTheme.fontSize - 4,
+                  color: currentTheme.offColor,
+                ),
               ),
               createRepBottomSheetButton(
                 AppLocalizations.of(context)!.representative,
@@ -143,10 +144,12 @@ class _SideDrawer extends State<SideDrawer>
               /// Message Signing button
               ///
 
-              createSigningBottomSheetButton("Message Signing",),
+              createSigningBottomSheetButton(
+                "Message Signing",
+              ),
 
-                // AppLocalizations.of(context)!.representative,
-                // representative,
+              // AppLocalizations.of(context)!.representative,
+              // representative,
               //   account,
               // ),
 
@@ -222,15 +225,12 @@ class _SideDrawer extends State<SideDrawer>
     );
   }
 
-  /// creates a button that display a bottomsheet to choose an item and peek at the active item
+  /// creates a button that display a bottomsheet to choose an item
   ///
   /// @param label        - button label
-  /// @param peekActive   - active item
-  /// @param account      - account
   ///
   /// returns a widget button
-  Widget createSigningBottomSheetButton(
-      String label) {
+  Widget createSigningBottomSheetButton(String label) {
     BaseTheme currentTheme = watchOnly((ThemeModel x) => x.curTheme);
 
     return SizedBox(
@@ -239,6 +239,7 @@ class _SideDrawer extends State<SideDrawer>
         style: currentTheme.btnStyleNoBorder,
         onPressed: () async {
           var result = await MsgSignPage().show(context, currentTheme);
+          MsgSignPage().clear();
           // MessageSigningPage(currentTheme);
         },
         child: Column(
@@ -255,20 +256,16 @@ class _SideDrawer extends State<SideDrawer>
                 ),
               ),
             ),
-
           ],
         ),
       ),
     );
   }
 
-  Future<bool?> MessageSigningPage(
-      BaseTheme currentTheme) async {
-
+  Future<bool?> MessageSigningPage(BaseTheme currentTheme) async {
     var result = await MsgSignPage().show(context, currentTheme);
     return result;
   }
-
 
   Future<bool?> resetAppDialog(
       BuildContext context, BaseTheme currentTheme) async {
