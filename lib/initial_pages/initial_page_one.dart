@@ -42,6 +42,7 @@ class InitialPageOneState extends State<InitialPageOne> with GetItStateMixin {
 
     // register services
     initServices();
+    services<WalletsService>().activeWallet=0;
 
     await services.allReady();
     await _initSharedPref();

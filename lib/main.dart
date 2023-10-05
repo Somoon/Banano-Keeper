@@ -103,7 +103,7 @@ Future<void> loadWalletsFromDB(
     }
 
     if (kDebugMode) {
-      // print("done loading wallet ${walletData['name']}");
+      print("done loading wallet ${walletData['name']}");
     }
 
     //load the wallet data from its table $original_name
@@ -111,7 +111,7 @@ Future<void> loadWalletsFromDB(
     var walletIndices =
         await services<DBManager>().getWalletData(original_name);
     for (var row in walletIndices) {
-      // print(row);
+      print(row);
 
       services<WalletService>(instanceName: original_name).importAccount(
         row['index_id'],

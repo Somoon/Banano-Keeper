@@ -191,11 +191,11 @@ class Account extends ChangeNotifier {
 
       overviewResp = jsonDecode(overview.body);
 
-      if (kDebugMode) {
-        print(
-            '----------------------getOverview $forceUpdate--------------------------------------');
-        print("getOverview: $overviewResp");
-      }
+      // if (kDebugMode) {
+      //   print(
+      //       '----------------------getOverview $forceUpdate--------------------------------------');
+      //   print("getOverview: $overviewResp");
+      // }
     }
     if (!doneovR) {
       handleOverviewResponse(true);

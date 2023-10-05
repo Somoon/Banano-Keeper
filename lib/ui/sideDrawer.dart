@@ -345,11 +345,14 @@ class _SideDrawer extends State<SideDrawer>
   }
 
   resetFn() async {
-    services<DBManager>().deleteDatabase();
-    Navigator.pushAndRemoveUntil(
+    await Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => InitialPageOne()),
-        ModalRoute.withName("/initialpageone"));
+        ModalRoute.withName("/initialpageone"),
+    );
+    services<DBManager>().deleteDatabase();
+    services<WalletsService>().resetService();
+
   }
 
   /// creates a button that display a dialog to choose an item and peek at the active item

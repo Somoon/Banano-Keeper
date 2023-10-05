@@ -324,11 +324,13 @@ class InitialPageInformationState extends State<InitialPageInformation>
                             "LATEST ID ${services<WalletsService>().latestWalletID}");
                       }
                       setState(() {
+                        //await
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => SetupPin("initial"),
                           ),
                         );
+                        //after successful return create wallet
                       });
                     }
                   },
