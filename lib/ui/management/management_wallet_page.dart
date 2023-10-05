@@ -62,7 +62,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     // var statusBarHeight = MediaQuery.of(context).viewPadding.top;
-
+    List<String> walletList = watchOnly((WalletsService x) => x.walletsList);
     var activeWallet = get<WalletsService>().activeWallet;
 
     return ScaffoldMessenger(
@@ -94,7 +94,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
               // Divider(
               //   thickness: 3,
               // ),
-              addressList(activeWallet),
+              addressList(activeWallet, walletList),
             ],
           ),
         ),
@@ -102,10 +102,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
     );
   }
 
-  Widget addressList(activeWallet) {
+  Widget addressList(activeWallet, walletsList) {
     // List<WalletService> wallets = get<WalletsService>().wallets;
-
-    List<String> walletsList = services<WalletsService>().walletsList;
+//services<WalletsService>().walletsList;
 
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     double width = MediaQuery.of(context).size.width;

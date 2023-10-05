@@ -382,7 +382,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
     Account account = services<Account>(instanceName: accOrgName);
 
     bool isActiveAccount =
-        (currentWallet.currentAccount.value == account.getAddress());
+        (currentWallet.getCurrentAccount() == account.getAddress());
     // if (!account.doneovR) {
     //   services<QueueService>().add(account.getOverview());
     // }

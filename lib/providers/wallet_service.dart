@@ -147,7 +147,7 @@ class WalletService extends ChangeNotifier {
     addAccount(index, nickname, address, balance, lastUpdate, representative,
         newAccount);
 
-    notifyListeners();
+    // notifyListeners();
   }
 
   void importAccount(int index,
@@ -158,7 +158,7 @@ class WalletService extends ChangeNotifier {
       representative = ""]) {
     // print("IMPORTING INDEX $index");
     addAccount(index, nickname, address, balance, lastUpdate, representative);
-    notifyListeners();
+    // notifyListeners();
   }
 
   String getCurrentAccount() {

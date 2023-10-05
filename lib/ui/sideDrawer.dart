@@ -314,6 +314,7 @@ class _SideDrawer extends State<SideDrawer>
 
                         if (verified != null && verified) {
                           setState(() {
+                            Navigator.of(context).pop();
                             resetFn();
                           });
                         }
