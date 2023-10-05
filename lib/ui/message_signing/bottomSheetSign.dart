@@ -25,6 +25,7 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 
+// @RoutePage()
 class MsgSignPage {
   static final MsgSignPage _singleton = MsgSignPage._internal();
   late BuildContext _context;
@@ -461,13 +462,7 @@ class MsgSignPage {
                       context,
                       currentTheme,
                     );
-                    MsgSignVerifyPage().clear();
                     setState(() {
-                      // if (result != null && result) {
-                      //   Navigator.of(context).pop(true);
-                      // }
-                      // properly make sure field is cleared
-                      ManualRepChange().addressController.clear();
                     });
                   },
                   child: Text(

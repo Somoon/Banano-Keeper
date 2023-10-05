@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:auto_route/annotations.dart';
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/initial_pages/initial_page_import.dart';
 import 'package:bananokeeper/initial_pages/initial_page_new_information.dart';
@@ -20,6 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:bananokeeper/providers/account.dart';
 
+// @RoutePage()
 class InitialPageOne extends StatefulWidget with GetItStatefulWidgetMixin {
   InitialPageOne({super.key});
 
@@ -59,7 +61,7 @@ class InitialPageOneState extends State<InitialPageOne> with GetItStateMixin {
     await services<DBManager>().init();
 
     var userValues = await services<SharedPrefsModel>().getStoredValues();
-
+    services<UserData>().updateRepresentatives();
     // services<WalletsService>().createMockWallet();
 
     //new app launch - no data

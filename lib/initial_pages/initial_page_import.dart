@@ -255,6 +255,7 @@ class InitialPageImportState extends State<InitialPageImport>
             setState(() {
               if (isCorrectHex) {
                 importSeedTextController.text = copiedtext;
+                isCheckedNewWallet = true;
               }
             });
           },
@@ -319,7 +320,7 @@ class InitialPageImportState extends State<InitialPageImport>
             if (!isCorrectHex) {
               return AppLocalizations.of(context)!.invalidSeed;
             }
-
+            isCheckedNewWallet = true;
             return value.length > 64
                 ? AppLocalizations.of(context)!.invalidSeedLength
                 : null;
@@ -566,6 +567,7 @@ class InitialPageImportState extends State<InitialPageImport>
       onChanged: (text) {
         setState(() {
           mnemonicIsValid = true;
+          isCheckedNewWallet = true;
           wordsErr.clear();
         });
         //   if (text.length == 64) {

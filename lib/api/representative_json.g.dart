@@ -11,9 +11,7 @@ Representative _$RepresentativeFromJson(Map<String, dynamic> json) =>
       json['address'] as String,
       json['alias'] as String?,
       json['daysAge'] as num,
-      (json['monitorStats'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k, e),
-      ),
+      json['monitorStats'] as Map<String, dynamic>?,
       json['online'] as bool,
       json['principal'] as bool,
       json['score'] as num,

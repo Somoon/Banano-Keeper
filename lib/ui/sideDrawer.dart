@@ -33,6 +33,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gap/gap.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
+import 'message_signing/message_sign_verification.dart';
+
 class SideDrawer extends StatefulWidget with GetItStatefulWidgetMixin {
   SideDrawer({super.key});
 
@@ -240,6 +242,8 @@ class _SideDrawer extends State<SideDrawer>
         onPressed: () async {
           var result = await MsgSignPage().show(context, currentTheme);
           MsgSignPage().clear();
+          MsgSignVerifyPage().clear();
+
           // MessageSigningPage(currentTheme);
         },
         child: Column(

@@ -1,3 +1,4 @@
+import 'package:auto_route/annotations.dart';
 import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/themes.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+// @RoutePage()
 class MainAppLogic extends StatefulWidget with GetItStatefulWidgetMixin {
   MainAppLogic({super.key});
   // final bool isNewUser;
