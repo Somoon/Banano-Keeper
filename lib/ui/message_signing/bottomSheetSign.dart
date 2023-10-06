@@ -1,6 +1,8 @@
 import 'dart:ffi';
 
+import 'package:auto_route/annotations.dart';
 import 'package:bananokeeper/api/representative_json.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
@@ -25,7 +27,7 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 
-// @RoutePage()
+// @RoutePage<bool>(name: "MsgSignRoute")
 class MsgSignPage {
   static final MsgSignPage _singleton = MsgSignPage._internal();
   late BuildContext _context;
@@ -161,7 +163,8 @@ class MsgSignPage {
                                           onPressed: () {
                                             setState(() {
                                               // addressController.clear();
-                                              Navigator.of(context).pop(false);
+                                              Navigator.of(context)
+                                                  .pop<bool>(false);
                                             });
                                           },
                                           style: ButtonStyle(
@@ -462,8 +465,7 @@ class MsgSignPage {
                       context,
                       currentTheme,
                     );
-                    setState(() {
-                    });
+                    setState(() {});
                   },
                   child: Text(
                     appLocalizations.verifyButtonText,
@@ -617,7 +619,7 @@ class MsgSignPage {
                               if (result is String) {
                                 messageController.text = result.text;
 
-                                Navigator.of(context).pop();
+                                services<AppRouter>().pop();
                               }
                             },
                           ),
@@ -720,7 +722,7 @@ class MsgSignPage {
 
   dismiss() {
     if (isDisplayed) {
-      Navigator.of(_context).pop();
+      services<AppRouter>().pop();
       isDisplayed = false;
     }
   }

@@ -1,8 +1,12 @@
+import 'package:auto_route/annotations.dart';
+import 'package:bananokeeper/app_router.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bananokeeper/themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 
+@RoutePage<bool>(name: "management")
 class ManagementPage extends StatefulWidget with GetItStatefulWidgetMixin {
   // ManagementPage({super.key});
 
@@ -48,7 +52,7 @@ class ManagementPageState extends State<ManagementPage> with GetItStateMixin {
           leading: InkWell(
             onTap: () {
               setState(() {
-                Navigator.of(context).pop();
+                services<AppRouter>().pop();
               });
             },
             child: Icon(

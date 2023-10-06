@@ -1,6 +1,7 @@
 // import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -197,7 +198,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                                         setState(() {
                                           amountController.clear();
                                           addressController.clear();
-                                          Navigator.of(context).pop(context);
+                                          Navigator.of(context).pop();
                                         });
                                       },
                                       style: ButtonStyle(
@@ -373,7 +374,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                                 onPressed: () {
                                   amountController.clear();
                                   addressController.clear();
-                                  Navigator.of(context).pop(context);
+                                  Navigator.of(context).pop();
                                 },
                                 style: ButtonStyle(
                                   foregroundColor:
@@ -528,21 +529,17 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
             Decimal maxAmount = Utils().amountFromRaw(account.getBalance());
             if ((amount > Decimal.parse("0") && amount <= maxAmount)) {
               bool canauth = await BiometricUtil().canAuth();
-              bool verified = false;
+              bool? verified = false;
 
               if (!canauth) {
-                verified = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => VerifyPIN(),
-                      ),
-                    ) ??
-                    false;
+                verified =
+                    await services<AppRouter>().push<bool>(VerifyPINRoute());
               } else {
                 verified = await BiometricUtil()
                     .authenticate(appLocalizations.authMsgWalletDel);
               }
 
-              if (verified) {
+              if (verified != null && verified) {
                 LoadingIndicatorDialog().show(context,
                     text: AppLocalizations.of(context)!.loadingWidgetSendMsg);
 

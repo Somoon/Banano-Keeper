@@ -2,6 +2,8 @@
 import 'dart:ui';
 import 'dart:io';
 
+import 'package:auto_route/annotations.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -22,6 +24,7 @@ import 'package:nanodart/nanodart.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 
+@RoutePage(name: "InitialPageImportRoute")
 class InitialPageImport extends StatefulWidget with GetItStatefulWidgetMixin {
   InitialPageImport({super.key});
 
@@ -201,11 +204,12 @@ class InitialPageImportState extends State<InitialPageImport>
             services<WalletService>(instanceName: walletName).setActiveIndex(0);
             services<SharedPrefsModel>().initliazeValues();
             setState(() {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => SetupPin("initial"),
-                ),
-              );
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => SetupPin("initial"),
+              //   ),
+              // );
+              services<AppRouter>().push(SetupPinRoute(nextPage: 'initial'));
             });
           }
         },
@@ -416,11 +420,8 @@ class InitialPageImportState extends State<InitialPageImport>
                     .setActiveIndex(0);
                 services<SharedPrefsModel>().initliazeValues();
                 setState(() {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => SetupPin("initial"),
-                    ),
-                  );
+                  services<AppRouter>()
+                      .push(SetupPinRoute(nextPage: 'initial'));
                 });
               }
             }

@@ -2,6 +2,8 @@
 
 import 'dart:ui';
 import 'dart:io';
+import 'package:auto_route/annotations.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +19,7 @@ import 'package:nanodart/nanodart.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 
+@RoutePage<bool>(name: "ImportWalletRoute")
 class ImportWalletPage extends StatefulWidget with GetItStatefulWidgetMixin {
   // ManagementPage({super.key});
 
@@ -105,7 +108,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
               leading: InkWell(
                 onTap: () {
                   setState(() {
-                    Navigator.of(context).pop();
+                    services<AppRouter>().pop();
                   });
                 },
                 child: Icon(
@@ -192,7 +195,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
     await services<WalletsService>().createNewWallet(seed);
     setState(() {});
     if (context.mounted) {
-      Navigator.of(context).pop(true);
+      services<AppRouter>().pop(true);
     }
   }
 
@@ -251,7 +254,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
                             onCapture: (Result result) {
                               // print(result.text);
                               importSeedTextController.text = result.text;
-                              Navigator.of(context).pop();
+                              services<AppRouter>().pop();
                             },
                           ),
                           QRScannerOverlay(
@@ -474,7 +477,7 @@ class ImportWalletPageState extends State<ImportWalletPage>
                             onCapture: (Result result) {
                               // print(result.text);
                               importMnemonicTextController.text = result.text;
-                              Navigator.of(context).pop();
+                              services<AppRouter>().pop();
                             },
                           ),
                           QRScannerOverlay(

@@ -2,6 +2,8 @@
 
 import 'dart:ui';
 
+import 'package:auto_route/annotations.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/main_app_logic.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
@@ -14,6 +16,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:pinput/pinput.dart';
 
+@RoutePage(name: "SetupPinRoute")
 class SetupPin extends StatefulWidget with GetItStatefulWidgetMixin {
   // SetupPin({super.key});
 
@@ -147,15 +150,18 @@ class SetupPinState extends State<SetupPin> with GetItStateMixin {
                                         pinController.clear();
 
                                         if (widget.nextPage == "homepage") {
-                                          Navigator.of(context).pop();
+                                          services<AppRouter>().pop();
+                                          // Navigator.of(context).pop();
                                         } else if (widget.nextPage ==
                                             "initial") {
-                                          Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      MainAppLogic()),
-                                              ModalRoute.withName("/homepage"));
+                                          // Navigator.pushAndRemoveUntil(
+                                          //     context,
+                                          //     MaterialPageRoute(
+                                          //         builder: (context) =>
+                                          //             MainAppLogic()),
+                                          //     ModalRoute.withName("/homepage"));
+                                          services<AppRouter>()
+                                              .replaceAll([Home()]);
                                         }
                                       });
                                     })

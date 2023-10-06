@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/pow_source.dart';
 import 'package:flutter/material.dart';
 
@@ -53,7 +54,7 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                services<AppRouter>().pop(context);
               },
               child: Text(
                 'Close',

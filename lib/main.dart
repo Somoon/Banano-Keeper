@@ -1,4 +1,6 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:bananokeeper/api/currency_conversion.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/initial_pages/initial_page_one.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -140,6 +142,7 @@ void main() async {
 
   // register services
   initServices();
+  services.registerSingleton<AppRouter>(AppRouter());
   await setupUserData();
 
   //remove splash ready to start
@@ -181,25 +184,27 @@ class MyApp extends StatelessWidget {
     var supportedLocales = services<LocalizationModel>().supportedLocales;
 
     // print("MAIN.DART: is new user? $isNewUser");
-    return MaterialApp(
+    final appRouter = services<AppRouter>();
+    return MaterialApp.router(
+      routerConfig: appRouter.config(
+        deepLinkBuilder: (deepLink) {
+          if (deepLink.path.startsWith('/products')) {
+            // continute with the platfrom link
+            return deepLink;
+          } else {
+            // return DeepLink.defaultPath;
+            // or DeepLink.path('/')
+            print('we here');
+            return DeepLink([Home()]);
+          }
+        },
+      ),
+      // routeInformationParser: appRouter.defaultRouteParser(),
+      // routerDelegate: appRouter.delegate(),
+
+      // return MaterialApp(
       debugShowCheckedModeBanner: false,
-      // theme: ThemeData(
-      //   // Define the default brightness and colors.
-      //   brightness: Brightness.dark,
-      //   primaryColor: Colors.lightBlue[800],
-      //
-      //   // Define the default font family.
-      //   fontFamily: 'Georgia',
-      //
-      //   // Define the default `TextTheme`. Use this to specify the default
-      //   // text styling for headlines, titles, bodies of text, and more.
-      //   textTheme: const TextTheme(
-      //     displayLarge: TextStyle(fontSize: 72, fontWeight: FontWeight.bold),
-      //     titleLarge: TextStyle(fontSize: 36, fontStyle: FontStyle.italic),
-      //     bodyMedium: TextStyle(fontSize: 14, fontFamily: 'Hind'),
-      //   ),
-      // ),
-      // -----------------------
+
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -209,7 +214,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: supportedLocales,
       locale: currentLocale,
       // ---------------------------
-      home: (isNewUser ? InitialPageOne() : MainAppLogic()),
+      //////////// home: (isNewUser ? InitialPageOne() : MainAppLogic()),
       // initialRoute: '/initialpageone', //(isNewUser ? '/initialpageone' : '/'),
 
       // routes: {

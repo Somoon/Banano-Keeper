@@ -1,3 +1,4 @@
+import 'package:bananokeeper/app_router.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bananokeeper/providers/localization_service.dart';
@@ -46,14 +47,14 @@ class LangDialogState extends State<LangDialog> with GetItStateMixin {
               // createLangButton("English", AppLocalizations.of(context)),
               // createLangButton("Spanish"),
             ),
-            const Gap( 15),
+            const Gap(15),
             const Divider(
               thickness: 1,
             ),
             TextButton(
               style: currentTheme.btnStyleNoBorder,
               onPressed: () {
-                Navigator.pop(context);
+                services<AppRouter>().pop();
               },
               child: Text(
                 AppLocalizations.of(context)!.close,

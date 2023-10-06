@@ -1,6 +1,9 @@
 // import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/ui/dialogs/currency_diag.dart';
+import 'package:bananokeeper/ui/message_signing/MessageSignPage.dart';
 import 'package:bananokeeper/ui/message_signing/bottomSheetSign.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -95,13 +98,18 @@ class _SideDrawer extends State<SideDrawer>
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               const Gap(10),
+
               //Wallet management button
               createPrimaryDrawerButton(
                 AppLocalizations.of(context)!.manageWallets,
                 activeWalletName,
-                ManagementPage(
-                  WalletManagementPage(),
-                  AppLocalizations.of(context)!.manageWallets,
+                // ManagementPage(
+                //   WalletManagementPage(),
+                //   AppLocalizations.of(context)!.manageWallets,
+                // ),
+                Management(
+                  pageContent: WalletManagementPage(),
+                  pageTitle: AppLocalizations.of(context)!.manageWallets,
                 ),
               ),
               //Account management button
@@ -110,9 +118,9 @@ class _SideDrawer extends State<SideDrawer>
                 AppLocalizations.of(context)!.manageAccounts,
                 // Utils().shortenAccount(currentAccount),
                 accountName,
-                ManagementPage(
-                  AccountManagementPage(),
-                  AppLocalizations.of(context)!.manageAccounts,
+                Management(
+                  pageContent: AccountManagementPage(),
+                  pageTitle: AppLocalizations.of(context)!.manageWallets,
                 ),
               ),
 
@@ -266,11 +274,6 @@ class _SideDrawer extends State<SideDrawer>
     );
   }
 
-  Future<bool?> MessageSigningPage(BaseTheme currentTheme) async {
-    var result = await MsgSignPage().show(context, currentTheme);
-    return result;
-  }
-
   Future<bool?> resetAppDialog(
       BuildContext context, BaseTheme currentTheme) async {
     var appLocalizations = AppLocalizations.of(context);
@@ -306,11 +309,9 @@ class _SideDrawer extends State<SideDrawer>
                         bool? verified = false;
 
                         if (!canauth) {
-                          verified = await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => VerifyPIN(),
-                            ),
-                          );
+                          verified = await services<AppRouter>()
+                                  .push(VerifyPINRoute()) ??
+                              false;
                         } else {
                           verified = await BiometricUtil()
                               .authenticate(appLocalizations.authMsgWalletDel);
@@ -349,14 +350,9 @@ class _SideDrawer extends State<SideDrawer>
   }
 
   resetFn() async {
-    await Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => InitialPageOne()),
-        ModalRoute.withName("/initialpageone"),
-    );
+    services<AppRouter>().replaceAll([InitialPage()]);
     services<DBManager>().deleteDatabase();
     services<WalletsService>().resetService();
-
   }
 
   /// creates a button that display a dialog to choose an item and peek at the active item
@@ -497,8 +493,7 @@ class _SideDrawer extends State<SideDrawer>
     return result;
   }
 
-  Widget createPrimaryDrawerButton(
-      String label, String peekActive, Widget pageRoute) {
+  createPrimaryDrawerButton(String label, String peekActive, pageRoute) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
 
     return SizedBox(
@@ -506,24 +501,16 @@ class _SideDrawer extends State<SideDrawer>
       child: TextButton(
         style: currentTheme.btnStyleNoBorder,
         onPressed: () async {
-          // showDialog(
-          //   context: context,
-          //   builder: (BuildContext context) => Dialog(
-          //     shape: const RoundedRectangleBorder(
-          //         borderRadius: BorderRadius.all(Radius.circular(25))),
-          //     backgroundColor: currentTheme.primary,
-          //     child: dialogWidget, // -- CHANGE LATER
-          //   ),
-          // );
+          // await Navigator.of(context)
+          //     .push(
+          //       MaterialPageRoute(
+          //         builder: (context) => pageRoute,
+          //       ),
+          //     )
+          //     .then((value) => setState(() {}));
+          // setState(() {});
 
-          await Navigator.of(context)
-              .push(
-                MaterialPageRoute(
-                  builder: (context) => pageRoute,
-                ),
-              )
-              .then((value) => setState(() {}));
-          setState(() {});
+          await services<AppRouter>().push(pageRoute);
         },
         child: Column(
           children: [

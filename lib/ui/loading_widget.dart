@@ -1,3 +1,5 @@
+import 'package:bananokeeper/app_router.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 

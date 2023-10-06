@@ -1,3 +1,4 @@
+import 'package:bananokeeper/app_router.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -45,7 +46,7 @@ class ThemesDialogState extends State<ThemesDialog> with GetItStateMixin {
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                services<AppRouter>().pop();
               },
               child: Text(
                 'Close',
