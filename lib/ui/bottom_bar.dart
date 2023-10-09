@@ -580,8 +580,9 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                 StateBlock sendBlock = StateBlock(account.address, previous,
                     account.representative, newRaw, destAddress, sign);
 
-                var sendHash = await AccountAPI()
-                    .processRequest(sendBlock.toJson(), "send");
+                var sendHash =
+                    await AccountAPI().processRequest(sendBlock, "send");
+                // .processRequest(sendBlock.toJson(), "send");
 
                 // Close the dialog programmatically
                 // We use "mounted" variable to get rid of the "Do not use BuildContexts across async gaps" warning

@@ -11,6 +11,7 @@ class StateBlock {
   final String balance;
   final String link;
   String signature;
+  String? work;
 
   StateBlock(
     this.account,

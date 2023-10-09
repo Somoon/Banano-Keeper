@@ -1,5 +1,10 @@
+import 'dart:ffi';
+import 'dart:isolate';
+
+import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
-import 'package:bananokeeper/providers/pow_source.dart';
+import 'package:bananokeeper/providers/pow/local_pow.dart';
+import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -57,17 +62,45 @@ class AccountAPI {
     return response;
   }
 
-  processRequest(block, subtype) async {
+  processRequest(StateBlock block, subtype) async {
+    String powType = services<PoWSource>().getAPIName();
     String apiURL = services<PoWSource>().getAPIURL();
-    if (kDebugMode) {
-      print("processRequest $apiURL");
+
+    Map<String, dynamic> request;
+
+    if (powType == 'Local PoW') {
+      if (block.work == null || block.work == '') {
+        services<LocalPoW>().blockToSend = block;
+        services<LocalPoW>().subType = subtype;
+        print('init genwork');
+        // services<LocalPoW>().generateWork(hash: block.signature, threads: 2);
+      } else {
+        // await services<LocalPoW>().completer.future;
+        print('outside while got work ${services<LocalPoW>().work.value}');
+
+        request = {
+          "action": "process",
+          "block": json.encode(block.toJson()),
+          "subtype": subtype
+        };
+
+        return restOfProcess(request, apiURL);
+      }
+    } else {
+      if (kDebugMode) {
+        print("processRequest $apiURL");
+      }
+      request = {
+        "action": "process",
+        "block": json.encode(block.toJson()),
+        "do_work": true,
+        "subtype": subtype
+      };
+      return restOfProcess(request, apiURL);
     }
-    Map<String, dynamic> request = {
-      "action": "process",
-      "block": json.encode(block),
-      "do_work": true,
-      "subtype": subtype
-    };
+  }
+
+  restOfProcess(Map<String, dynamic> request, String apiURL) async {
     if (kDebugMode) {
       print(request);
     }

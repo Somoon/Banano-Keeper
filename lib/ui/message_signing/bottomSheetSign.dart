@@ -163,8 +163,7 @@ class MsgSignPage {
                                           onPressed: () {
                                             setState(() {
                                               // addressController.clear();
-                                              Navigator.of(context)
-                                                  .pop<bool>(false);
+                                              Navigator.of(context).pop(false);
                                             });
                                           },
                                           style: ButtonStyle(
@@ -619,7 +618,7 @@ class MsgSignPage {
                               if (result is String) {
                                 messageController.text = result.text;
 
-                                services<AppRouter>().pop();
+                                Navigator.of(context).pop();
                               }
                             },
                           ),
@@ -722,7 +721,7 @@ class MsgSignPage {
 
   dismiss() {
     if (isDisplayed) {
-      services<AppRouter>().pop();
+      Navigator.of(_context).pop();
       isDisplayed = false;
     }
   }

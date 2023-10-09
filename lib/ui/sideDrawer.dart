@@ -2,8 +2,8 @@
 
 import 'package:auto_route/auto_route.dart';
 import 'package:bananokeeper/app_router.dart';
+import 'package:bananokeeper/db/dbtest.dart';
 import 'package:bananokeeper/ui/dialogs/currency_diag.dart';
-import 'package:bananokeeper/ui/message_signing/MessageSignPage.dart';
 import 'package:bananokeeper/ui/message_signing/bottomSheetSign.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +14,7 @@ import 'package:bananokeeper/initial_pages/initial_page_one.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
-import 'package:bananokeeper/providers/pow_source.dart';
+import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/localization_service.dart';
@@ -98,6 +98,38 @@ class _SideDrawer extends State<SideDrawer>
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               const Gap(10),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  style: currentTheme.btnStyleNoBorder,
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => DBTest(),
+                      ),
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: (!Utils().isDirectionRTL(context)
+                            ? Alignment.centerLeft
+                            : Alignment.centerRight),
+                        child: Text(
+                          "aaa",
+                          style: TextStyle(
+                            color: currentTheme.text,
+                            fontSize: currentTheme.fontSize,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 2,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
 
               //Wallet management button
               createPrimaryDrawerButton(
@@ -180,7 +212,7 @@ class _SideDrawer extends State<SideDrawer>
               // createDialogButton("Min. to receive", "1", ThemesDialog()),
 
               // Already done and working.
-              // createDialogButton("PoW Source", selectedPoWName, PoWDialog()),
+              createDialogButton("PoW Source", selectedPoWName, PoWDialog()),
 
               // createDialogButton("Block Explorer", "1", ThemesDialog()),
               // createDialogButton("Data Source", "1", ThemesDialog()),

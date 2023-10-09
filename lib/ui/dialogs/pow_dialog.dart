@@ -1,12 +1,13 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/app_router.dart';
-import 'package:bananokeeper/providers/pow_source.dart';
+import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:flutter/material.dart';
 
-import '../../providers/get_it_main.dart';
-import '../../providers/shared_prefs_service.dart';
-import '../../themes.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/shared_prefs_service.dart';
+import 'package:bananokeeper/themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PoWDialog extends StatefulWidget with GetItStatefulWidgetMixin {
   PoWDialog({super.key});
@@ -19,6 +20,22 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
   @override
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
+    List<String> sources = get<PoWSource>().listOfAPIS.keys.toList();
+
+    List<Widget> powWidgets = [];
+    powWidgets.add(
+      Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: AutoSizeText(
+          "Select the source which will be used when doing a transaction.",
+          style: currentTheme.textStyle,
+          maxFontSize: 12,
+        ),
+      ),
+    );
+    for (String item in sources) {
+      powWidgets.add(createLangButton(item, AppLocalizations.of(context)));
+    }
 
     return Container(
       constraints: const BoxConstraints(
@@ -35,18 +52,7 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: AutoSizeText(
-                    "Select the source which will be used when doing a transaction.",
-                    style: currentTheme.textStyle,
-                    maxFontSize: 12,
-                  ),
-                ),
-                createButton("Kalium"),
-                // createButton("Booster"),
-              ],
+              children: powWidgets,
             ),
             const SizedBox(height: 15),
             const Divider(
@@ -67,33 +73,28 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
     );
   }
 
-  Widget createButton(label) {
+  Widget createLangButton(String label, appLocalizations) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-
+    var currentSource = watchOnly((PoWSource x) => x.getAPIName());
     return SizedBox(
       width: double.infinity,
       child: TextButton(
+        style: currentTheme.btnStyleNoBorder,
         onPressed: () {
           _setSource(label);
           setState(() {});
           // Navigator.pop(context);
         },
         child: Text(
+          // appLocalizations!.
           label,
           style: TextStyle(
-              color: (getTextColor(label)
+              color: (currentSource != label
                   ? currentTheme.text
                   : currentTheme.textDisabled)),
         ),
       ),
     );
-  }
-
-  getTextColor(PoWName) {
-    String selectedPoWName = watchOnly((PoWSource x) => x.getAPIName());
-
-    if (selectedPoWName == PoWName) return false;
-    return true;
   }
 
   void _setSource(String PoWName) {

@@ -142,7 +142,7 @@ class MsgSignVerifyPage {
                                             onPressed: () {
                                               setState(() {
                                                 // addressController.clear();
-                                                services<AppRouter>()
+                                                Navigator.of(context)
                                                     .pop(false);
                                               });
                                             },

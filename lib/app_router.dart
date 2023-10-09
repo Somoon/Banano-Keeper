@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/initial_pages/initial_page_import.dart';
 import 'package:bananokeeper/initial_pages/initial_page_new_information.dart';
 import 'package:bananokeeper/initial_pages/initial_page_one.dart';

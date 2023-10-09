@@ -70,6 +70,8 @@ dependencies:
   pointycastle: ^3.7.3
   pinenacl: ^0.5.1
   auto_route: ^7.8.3
+  webview_flutter: ^4.4.1
+  permission_handler: ^11.0.1
 #  cryptography: ^2.5.0
 
 
@@ -103,6 +105,11 @@ flutter:
     - images/nano.png
     - images/greymonkey.png
     - images/icon.png
+    - pow/multiThread.html
+    - pow/pow.js
+    - pow/pow.wasm
+    - pow/startThreads.js
+    - pow/thread.js
 
   generate: true
 
