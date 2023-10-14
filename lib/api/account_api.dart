@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ffi';
 import 'dart:isolate';
 
@@ -62,30 +63,32 @@ class AccountAPI {
     return response;
   }
 
-  processRequest(StateBlock block, subtype) async {
+  processRequest(StateBlock block, subtype, [String publicKey = '']) async {
     String powType = services<PoWSource>().getAPIName();
     String apiURL = services<PoWSource>().getAPIURL();
 
-    Map<String, dynamic> request;
-
+    Map<String, dynamic> request = {};
+    print("POW TYPE: !!!!!!!!! ${powType} !!!!!!!!!!!!!!");
     if (powType == 'Local PoW') {
-      if (block.work == null || block.work == '') {
-        services<LocalPoW>().blockToSend = block;
-        services<LocalPoW>().subType = subtype;
-        print('init genwork');
-        // services<LocalPoW>().generateWork(hash: block.signature, threads: 2);
-      } else {
-        // await services<LocalPoW>().completer.future;
-        print('outside while got work ${services<LocalPoW>().work.value}');
+      // if (block.work == null || block.work == '') {
+      LocalPoW lPow = LocalPoW();
 
-        request = {
-          "action": "process",
-          "block": json.encode(block.toJson()),
-          "subtype": subtype
-        };
+      lPow.completer = Completer<String>();
+      String hashForWork = (subtype == 'open' ? publicKey : block.previous);
+      lPow.generateWork(
+        hash: hashForWork,
+      );
+      String fetchedWork = await lPow.completer.future;
+      print(fetchedWork);
+      block.work = fetchedWork;
+      // services<LocalPoW>().generateWork(hash: block.signature, threads: 2);
 
-        return restOfProcess(request, apiURL);
-      }
+      request = {
+        "action": "process",
+        "block": json.encode(block.toJson()),
+        "subtype": subtype
+      };
+      // }
     } else {
       if (kDebugMode) {
         print("processRequest $apiURL");
@@ -96,14 +99,8 @@ class AccountAPI {
         "do_work": true,
         "subtype": subtype
       };
-      return restOfProcess(request, apiURL);
     }
-  }
 
-  restOfProcess(Map<String, dynamic> request, String apiURL) async {
-    if (kDebugMode) {
-      print(request);
-    }
     http.Response response = await http.post(
       Uri.parse(apiURL),
       headers: <String, String>{

@@ -24,7 +24,7 @@ void initServices() {
   services.registerSingleton<UserData>(UserData());
   services.registerSingleton<DBManager>(DBManager());
   services.registerSingleton<PoWSource>(PoWSource());
-  services.registerSingleton<LocalPoW>(LocalPoW());
+  // services.registerSingleton<LocalPoW>(LocalPoW());
 
   services.registerSingleton<QueueService>(QueueService());
 
@@ -48,7 +48,7 @@ void resetServices() {
   if (services.isRegistered<UserData>()) services.unregister<UserData>();
   if (services.isRegistered<DBManager>()) services.unregister<DBManager>();
   if (services.isRegistered<PoWSource>()) services.unregister<PoWSource>();
-  if (services.isRegistered<LocalPoW>()) services.unregister<LocalPoW>();
+  // if (services.isRegistered<LocalPoW>()) services.unregister<LocalPoW>();
   if (services.isRegistered<QueueService>())
     services.unregister<QueueService>();
   if (services.isRegistered<WalletService>())

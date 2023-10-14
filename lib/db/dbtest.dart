@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ffi';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -19,6 +20,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:isolate';
 import 'package:permission_handler/permission_handler.dart';
 
+Completer<String> completer = Completer<String>();
+
 class DBTest extends StatefulWidget with GetItStatefulWidgetMixin {
   DBTest({super.key});
 
@@ -35,10 +38,35 @@ class DBTestState extends State<DBTest> with GetItStateMixin {
     super.initState();
   }
 
+  genWork({required String hash, int threads = 3}) {
+    print("AAAA $hash");
+    WebViewController controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..addJavaScriptChannel(
+        "Print",
+        onMessageReceived: (JavaScriptMessage jsChannel) {
+          setState(() {
+            print(jsChannel.message);
+            setWork(jsChannel.message);
+            // controller.runJavaScript('window.stop();');
+          });
+        },
+      )
+      ..loadRequest(Uri.parse(
+          'https://moonano.net/assets/data/pow/multiThread.html?hash=$hash&threads=${threads.toString()}'));
+  }
+
+  setWork(String workk) {
+    print("RECEIVED!");
+    // work = workk;
+    completer.complete(workk);
+  }
+
+  String bananas = '';
   @override
   Widget build(BuildContext context) {
     LocalPoW pow = LocalPoW();
-    String work = watchX((LocalPoW x) => x.work);
+    // String work = watchX((LocalPoW x) => x.work);
     int walletIndex = watchOnly((WalletsService x) => x.activeWallet);
 
     String orgWalletName =
@@ -74,6 +102,47 @@ class DBTestState extends State<DBTest> with GetItStateMixin {
                       Navigator.of(context).pop();
                     },
                     child: Text("X CLOSE X")),
+                // TextButton(
+                //   onPressed: () async {
+                //     if (!await Permission.bluetoothConnect.isGranted) {
+                //       Permission.bluetoothConnect.request();
+                //     }
+
+                // services<LocalPoW>().generateWork(
+                //     hash:
+                //         "BD9F737DDECB0A34DFBA0EDF7017ACB0EF0AA04A6F7A73A406191EF80BB290AD");
+                // services<LocalPoW>().generateWork(
+                //     hash:
+                //         "BD9F737DDECB0A34DFBA0EDF7017ACB0EF0AA04A6F7A73A406191EF80BB290AD",
+                //     threads: 2);
+
+                // aa(pow);
+
+                // StateBlock block = await account.iniChangeRep(
+                //     "ban_14xjizffqiwjamztn4edhmbinnaxuy4fzk7c7d6gywxigydrrxftp4qgzabh");
+                // await Isolate.run(
+                // services<LocalPoW>().generateWork(
+                //   hash: block.signature,
+                //   // ) //;
+                //   // ,
+                // );
+                //     LocalPoW lPow = LocalPoW();
+                //
+                //     lPow.completer = Completer<String>();
+                //     lPow.generateWork(
+                //       hash: block.previous,
+                //     );
+                //     bananas = await lPow.completer.future;
+                //     setState(() {
+                //       print(bananas);
+                //     });
+                //     block.work = bananas;
+                //     await AccountAPI().processRequest(block, "change");
+                //     setState(() {});
+                //     print('found it ${bananas}');
+                //   },
+                //   child: Text("get new work"),
+                // ),
                 TextButton(
                   onPressed: () async {
                     if (!await Permission.bluetoothConnect.isGranted) {
@@ -90,22 +159,28 @@ class DBTestState extends State<DBTest> with GetItStateMixin {
 
                     // aa(pow);
 
-                    StateBlock block = await account.iniChangeRep(
-                        "ban_14xjizffqiwjamztn4edhmbinnaxuy4fzk7c7d6gywxigydrrxftp4qgzabh");
-                    // await Isolate.run(
-                      services<LocalPoW>().generateWork(
-                        hash: block.signature,
-                      // ) //;
-                      // ,
-                    );
-                    block.work = services<LocalPoW>().work.value;
-                    await AccountAPI().processRequest(block, "change");
+                    await account.changeRepresentative(
+                        "ban_1moonanoj76om1e9gnji5mdfsopnr5ddyi6k3qtcbs8nogyjaa6p8j87sgid");
+//ban_14xjizffqiwjamztn4edhmbinnaxuy4fzk7c7d6gywxigydrrxftp4qgzabh
+//ban_1moonanoj76om1e9gnji5mdfsopnr5ddyi6k3qtcbs8nogyjaa6p8j87sgid
+                    // LocalPoW lPow = LocalPoW();
+                    //
+                    // lPow.completer = Completer<String>();
+                    // lPow.generateWork(
+                    //   hash: block.previous,
+                    // );
+                    // bananas = await lPow.completer.future;
+                    // setState(() {
+                    //   print(bananas);
+                    // });
+                    // block.work = bananas;
+                    // await AccountAPI().processRequest(block, "change");
                     setState(() {});
-                    print('found it ${pow.work.value}');
+                    // print('found it ${bananas}');
                   },
-                  child: Text("get new work"),
+                  child: Text("def change rep"),
                 ),
-                Text(work),
+                Text("work"),
               ],
             ),
           ),

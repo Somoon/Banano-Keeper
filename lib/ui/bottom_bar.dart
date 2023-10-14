@@ -540,8 +540,8 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
               }
 
               if (verified != null && verified) {
-                LoadingIndicatorDialog().show(context,
-                    text: AppLocalizations.of(context)!.loadingWidgetSendMsg);
+                // LoadingIndicatorDialog().show(context,
+                //     text: AppLocalizations.of(context)!.loadingWidgetSendMsg);
 
                 await services<QueueService>().add(account.getOverview(true));
                 await services<QueueService>()
@@ -586,7 +586,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
 
                 // Close the dialog programmatically
                 // We use "mounted" variable to get rid of the "Do not use BuildContexts across async gaps" warning
-                LoadingIndicatorDialog().dismiss();
+                // LoadingIndicatorDialog().dismiss();
 
                 //if
                 //{"error":"Invalid block balance for given subtype"}

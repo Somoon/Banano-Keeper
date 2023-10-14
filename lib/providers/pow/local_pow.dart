@@ -14,62 +14,53 @@ import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 class LocalPoW extends ChangeNotifier {
+  Completer<String> completer = Completer<String>();
   ValueNotifier<String> work = ValueNotifier<String>('');
   late WebViewController controller = WebViewController()
     ..setJavaScriptMode(JavaScriptMode.unrestricted)
-    ..setOnConsoleMessage(onConsoleMessage)
     ..addJavaScriptChannel(
       "Print",
       onMessageReceived: (JavaScriptMessage jsChannel) {
+        print(jsChannel.message);
         setWork(jsChannel.message);
+        // controller.runJavaScript('window.stop();');
       },
     );
   //maybe have multi/different hosts in case one is down (gh?)
   String powScriptURL = 'https://moonano.net/assets/data/pow/multiThread.html';
-  Completer completer = Completer();
-  late final PlatformWebViewControllerCreationParams params;
 
-  LocalPoW() {
-    // controller
-    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
-      params = WebKitWebViewControllerCreationParams(
-        allowsInlineMediaPlayback: true,
-        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
-      );
-    } else {
-      params = const PlatformWebViewControllerCreationParams();
-    }
-
-    final WebViewController controller =
-        WebViewController.fromPlatformCreationParams(params);
-// ···
-    if (controller.platform is AndroidWebViewController) {
-      AndroidWebViewController.enableDebugging(true);
-      (controller.platform as AndroidWebViewController)
-          .setMediaPlaybackRequiresUserGesture(false);
-    }
-  }
-  setWork(String foundWork) {
-    work.value = foundWork;
-    print('DONE!!!! $foundWork');
-    //force stop the work
-    controller.loadRequest(Uri.parse('about:blank'));
-    // callBackFn(work.value);
-    completer.complete();
-    // blockToSend.work = foundWork;
-    // AccountAPI().processRequest(blockToSend, subType);
-    notifyListeners();
+//   setWork(String foundWork) {
+//     work.value = foundWork;
+//     print('DONE!!!! $foundWork');
+//     //force stop the work
+//     controller.loadRequest(Uri.parse('about:blank'));
+//     // callBackFn(work.value);
+//     completer.complete();
+//     // blockToSend.work = foundWork;
+//     // AccountAPI().processRequest(blockToSend, subType);
+//     notifyListeners();
+//   }
+  setWork(String workk) {
+    // work = workk;
+    completer.complete(workk);
   }
 
 //, required Function callBack
   generateWork({required String hash, int threads = 3}) async {
-    controller.clearLocalStorage;
-    controller.clearCache;
-    print(hash);
-    work.value = '';
     String completeURL =
         '$powScriptURL?hash=$hash&threads=${threads.toString()}';
-    controller.loadRequest(Uri.parse(completeURL));
+    WebViewController controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..addJavaScriptChannel(
+        "Print",
+        onMessageReceived: (JavaScriptMessage jsChannel) {
+          // print(jsChannel.message);
+          setWork(jsChannel.message);
+          // controller.runJavaScript('window.stop();');
+        },
+      )
+      ..loadRequest(Uri.parse(completeURL));
+    // controller.loadRequest(Uri.parse(completeURL));
     // await completer.future;
     // callBackFn = callBack;
   }
@@ -81,9 +72,4 @@ class LocalPoW extends ChangeNotifier {
   onConsoleMessage(data) {
     print("onconsolemessage ${data.message}");
   }
-
-  late StateBlock blockToSend;
-  String subType = '';
-
-  // late Function callBackFn;
 }

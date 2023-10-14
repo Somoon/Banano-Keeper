@@ -333,6 +333,8 @@ class Account extends ChangeNotifier {
 
     String privateKey =
         services<WalletService>(instanceName: walletName).getPrivateKey(index);
+    String publicKey = services<WalletService>(instanceName: walletName)
+        .getPublicKey(privateKey);
 
     if (kDebugMode) {
       print("private key $privateKey");
@@ -348,7 +350,8 @@ class Account extends ChangeNotifier {
     StateBlock openBlock =
         StateBlock(address, previous, representative, amountRaw, hash, sign);
 
-    String hashResponse = await AccountAPI().processRequest(openBlock, "open");
+    String hashResponse =
+        await AccountAPI().processRequest(openBlock, "open", publicKey);
     // await AccountAPI().processRequest(openBlock.toJson(), "open");
 
     if (jsonDecode(hashResponse)['hash'] != null &&
@@ -366,28 +369,28 @@ class Account extends ChangeNotifier {
     opened = true;
   }
 
-  iniChangeRep(String newRep) async {
-    await services<QueueService>().add(getOverview(true));
-    await services<QueueService>().add(handleOverviewResponse(true));
-
-    var hist = await AccountAPI().getHistory(address, 1);
-    var historyData = jsonDecode(hist.body);
-    String previous = historyData[0]['hash'];
-
-    int accountType = NanoAccountType.BANANO;
-    String calculatedHash = NanoBlocks.computeStateHash(accountType, address,
-        previous, newRep, BigInt.parse(balance), '0'.padLeft(64, '0'));
-
-    int activeWallet = services<WalletsService>().activeWallet;
-    String walletName = services<WalletsService>().walletsList[activeWallet];
-
-    String privateKey =
-        services<WalletService>(instanceName: walletName).getPrivateKey(index);
-    String sign = NanoSignatures.signBlock(calculatedHash, privateKey);
-    StateBlock sendBlock = StateBlock(
-        address, previous, newRep, balance, "".padLeft(64, "0"), sign);
-    return sendBlock;
-  }
+  // iniChangeRep(String newRep) async {
+  //   await services<QueueService>().add(getOverview(true));
+  //   await services<QueueService>().add(handleOverviewResponse(true));
+  //
+  //   var hist = await AccountAPI().getHistory(address, 1);
+  //   var historyData = jsonDecode(hist.body);
+  //   String previous = historyData[0]['hash'];
+  //
+  //   int accountType = NanoAccountType.BANANO;
+  //   String calculatedHash = NanoBlocks.computeStateHash(accountType, address,
+  //       previous, newRep, BigInt.parse(balance), '0'.padLeft(64, '0'));
+  //
+  //   int activeWallet = services<WalletsService>().activeWallet;
+  //   String walletName = services<WalletsService>().walletsList[activeWallet];
+  //
+  //   String privateKey =
+  //       services<WalletService>(instanceName: walletName).getPrivateKey(index);
+  //   String sign = NanoSignatures.signBlock(calculatedHash, privateKey);
+  //   StateBlock sendBlock = StateBlock(
+  //       address, previous, newRep, balance, "".padLeft(64, "0"), sign);
+  //   return sendBlock;
+  // }
 
   changeRepresentative(String newRep) async {
     await services<QueueService>().add(getOverview(true));
@@ -415,17 +418,17 @@ class Account extends ChangeNotifier {
     var sendHash = await AccountAPI().processRequest(sendBlock, "change");
     // await AccountAPI().processRequest(sendBlock.toJson(), "change");
 
-    // if (jsonDecode(sendHash)['hash'] != null &&
-    //     NanoHelpers.isHexString(jsonDecode(sendHash)['hash'])) {
-    //   setRep(newRep);
-    //   services<QueueService>().add(onRefreshUpdateHistory());
-    //   return true;
-    // } else {
-    //   if (kDebugMode) {
-    //     print(sendHash);
-    //   }
-    //   return false;
-    // }
+    if (jsonDecode(sendHash)['hash'] != null &&
+        NanoHelpers.isHexString(jsonDecode(sendHash)['hash'])) {
+      setRep(newRep);
+      services<QueueService>().add(onRefreshUpdateHistory());
+      return true;
+    } else {
+      if (kDebugMode) {
+        print(sendHash);
+      }
+      return false;
+    }
   }
 
   toMap() {
