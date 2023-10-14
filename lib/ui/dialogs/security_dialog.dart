@@ -1,3 +1,5 @@
+import 'package:bananokeeper/app_router.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:flutter/material.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/ui/pin/setup_pin.dart';
@@ -47,7 +49,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                services<AppRouter>().pop();
               },
               child: Text(
                 AppLocalizations.of(context)!.close,
@@ -69,11 +71,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
           bool? verified = false;
 
           if (!canauth) {
-            verified = await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => VerifyPIN(),
-              ),
-            );
+            verified = await services<AppRouter>().push<bool>(VerifyPINRoute());
           } else {
             verified = await BiometricUtil()
                 .authenticate(AppLocalizations.of(context)!.authMsgChangePIN);
@@ -81,11 +79,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
 
           if (verified != null && verified) {
             setState(() {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => SetupPin("homepage"),
-                ),
-              );
+              services<AppRouter>().push(SetupPinRoute(nextPage: 'homepage'));
             });
           }
           setState(() {});

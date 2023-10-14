@@ -67,7 +67,6 @@ class WalletService extends ChangeNotifier {
   }
 
   String getAccountName(int index) {
-    //accounts[index].getName();
     String accOrgName = accountsList[activeIndex];
     return services<Account>(instanceName: accOrgName).getName();
   }
@@ -85,19 +84,18 @@ class WalletService extends ChangeNotifier {
       index++;
     }
 
-    //use less resource if it was created before and saved
     if (address == "") {
       String privateKey = getPrivateKey(index);
-      if (kDebugMode) {
-        print("private key: $privateKey");
-      }
-      // Getting public key from this private key
+      // if (kDebugMode) {
+      //   print("getting private key for indeex $index");
+      //
+      //   print("private key: $privateKey");
+      // }
       String pubKey = getPublicKey(privateKey);
-      // Getting address (nano_, ban_) from this pubkey
       address = NanoAccounts.createAccount(NanoAccountType.BANANO, pubKey);
-      if (kDebugMode) {
-        print("address: $address");
-      }
+      // if (kDebugMode) {
+      //   print("address: $address");
+      // }
     }
     // currentAccount.value = address;
 
@@ -124,7 +122,7 @@ class WalletService extends ChangeNotifier {
       services<DBManager>().insertWalletDataRow(original_name, {
         "index_id": index,
         "index_name": nickname,
-        "address": currentAccount.value,
+        "address": address,
         "balance": balance,
         "last_update": lastUpdate,
         "representative": representative
@@ -147,7 +145,7 @@ class WalletService extends ChangeNotifier {
     addAccount(index, nickname, address, balance, lastUpdate, representative,
         newAccount);
 
-    notifyListeners();
+    // notifyListeners();
   }
 
   void importAccount(int index,
@@ -156,9 +154,9 @@ class WalletService extends ChangeNotifier {
       balance = "0",
       lastUpdate = 0,
       representative = ""]) {
-    // print("IMPORTING INDEX $index");
+    // print("IMPORTING INDEX $index $address");
     addAccount(index, nickname, address, balance, lastUpdate, representative);
-    notifyListeners();
+    // notifyListeners();
   }
 
   String getCurrentAccount() {

@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:auto_route/annotations.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/initial_pages/initial_page_import.dart';
 import 'package:bananokeeper/initial_pages/initial_page_new_information.dart';
-import 'package:bananokeeper/providers/pow_source.dart';
+import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
@@ -20,6 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:bananokeeper/providers/account.dart';
 
+@RoutePage(name: "InitialPage")
 class InitialPageOne extends StatefulWidget with GetItStatefulWidgetMixin {
   InitialPageOne({super.key});
 
@@ -42,6 +45,7 @@ class InitialPageOneState extends State<InitialPageOne> with GetItStateMixin {
 
     // register services
     initServices();
+    services<WalletsService>().activeWallet = 0;
 
     await services.allReady();
     await _initSharedPref();
@@ -58,7 +62,7 @@ class InitialPageOneState extends State<InitialPageOne> with GetItStateMixin {
     await services<DBManager>().init();
 
     var userValues = await services<SharedPrefsModel>().getStoredValues();
-
+    services<UserData>().updateRepresentatives();
     // services<WalletsService>().createMockWallet();
 
     //new app launch - no data
@@ -160,12 +164,8 @@ class InitialPageOneState extends State<InitialPageOne> with GetItStateMixin {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              InitialPageInformation()),
-                                    );
+                                    services<AppRouter>()
+                                        .push(InitialPageInformationRoute());
 
                                     /*
                                     services<WalletsService>()
@@ -221,12 +221,8 @@ class InitialPageOneState extends State<InitialPageOne> with GetItStateMixin {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              InitialPageImport()),
-                                    );
+                                    services<AppRouter>()
+                                        .push(InitialPageImportRoute());
                                   });
                                 },
                                 child: AutoSizeText(

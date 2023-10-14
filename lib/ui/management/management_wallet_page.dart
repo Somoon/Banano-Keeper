@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:ui';
+import 'package:bananokeeper/app_router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -62,7 +63,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     // var statusBarHeight = MediaQuery.of(context).viewPadding.top;
-
+    List<String> walletList = watchOnly((WalletsService x) => x.walletsList);
     var activeWallet = get<WalletsService>().activeWallet;
 
     return ScaffoldMessenger(
@@ -94,7 +95,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
               // Divider(
               //   thickness: 3,
               // ),
-              addressList(activeWallet),
+              addressList(activeWallet, walletList),
             ],
           ),
         ),
@@ -102,10 +103,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
     );
   }
 
-  Widget addressList(activeWallet) {
+  Widget addressList(activeWallet, walletsList) {
     // List<WalletService> wallets = get<WalletsService>().wallets;
-
-    List<String> walletsList = services<WalletsService>().walletsList;
+//services<WalletsService>().walletsList;
 
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     double width = MediaQuery.of(context).size.width;
@@ -316,7 +316,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                               TextButton(
                                 onPressed: () {
                                   renameController.clear();
-                                  Navigator.pop(context);
+                                  services<AppRouter>().pop();
                                 },
                                 child: Text(
                                   AppLocalizations.of(context)!.close,
@@ -421,11 +421,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
                     bool? verified = false;
 
                     if (!canauth) {
-                      verified = await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => VerifyPIN(),
-                        ),
-                      );
+                      verified =
+                          await services<AppRouter>().push(VerifyPINRoute()) ??
+                              false;
                     } else {
                       verified = await BiometricUtil()
                           .authenticate(appLocalizations.authMsgWalletDel);
@@ -438,7 +436,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                     }
                   }
                   setState(() {
-                    Navigator.of(context).pop(true);
+                    services<AppRouter>().pop<bool>(true);
                   });
                 },
                 child: Text(
@@ -449,7 +447,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  services<AppRouter>().pop();
                 },
                 child: Text(
                   appLocalizations.no,
@@ -466,20 +464,16 @@ class WalletManagementPageState extends State<WalletManagementPage>
   void backupWallet(
       context, index, List<String> walletsList, currentTheme) async {
     bool canauth = await BiometricUtil().canAuth();
-    bool verified = false;
+    bool? verified = false;
     var appLocalizations = AppLocalizations.of(context);
     if (!canauth) {
-      verified = await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => VerifyPIN(),
-        ),
-      );
+      verified = await services<AppRouter>().push<bool>(VerifyPINRoute());
     } else {
       verified = await BiometricUtil()
           .authenticate(appLocalizations!.authMsgWalletBackup);
     }
 
-    if (verified) {
+    if (verified != null && verified) {
       bool createStateNewWallet = true;
       String walletName = services<WalletsService>().walletsList[index];
       String seed = services<WalletService>(instanceName: walletName).seed;
@@ -665,7 +659,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                           (states) => currentTheme.text.withOpacity(0.3)),
                     ),
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      services<AppRouter>().pop();
                     },
                     child: Text(
                       // 'Yes',
@@ -969,7 +963,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                         (states) => currentTheme.text.withOpacity(0.3)),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop(false);
+                    services<AppRouter>().pop<bool>(false);
                   },
                   child: Text(
                     // 'Yes',
@@ -987,7 +981,7 @@ class WalletManagementPageState extends State<WalletManagementPage>
                   ),
                   onPressed: () {
                     if (isCheckedNewWallet) {
-                      Navigator.of(context).pop(true);
+                      services<AppRouter>().pop<bool>(true);
                     }
                   },
                   child: Text(
@@ -1041,13 +1035,8 @@ class WalletManagementPageState extends State<WalletManagementPage>
         ),
         onPressed: () async {
           //open seed/Mnemonic importing page
-          await Navigator.of(context)
-              .push(
-                MaterialPageRoute(
-                  builder: (context) => ImportWalletPage(),
-                ),
-              )
-              .then((value) => setState(() {}));
+          await services<AppRouter>().push(ImportWalletRoute());
+
           setState(() {});
         },
         child: Text(

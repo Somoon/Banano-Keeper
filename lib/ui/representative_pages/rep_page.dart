@@ -1,3 +1,4 @@
+import 'package:auto_route/annotations.dart';
 import 'package:bananokeeper/api/representative_json.dart';
 import 'package:bananokeeper/themes.dart';
 import 'package:bananokeeper/ui/dialogs/info_dialog.dart';
@@ -11,6 +12,7 @@ import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gap/gap.dart';
 
+// @RoutePage()
 class RepPage {
   static final RepPage _singleton = RepPage._internal();
   late BuildContext _context;

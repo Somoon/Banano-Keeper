@@ -1,4 +1,5 @@
 import 'package:bananokeeper/api/currency_conversion.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/material.dart';
 
@@ -19,11 +20,10 @@ class CurrencyDialogState extends State<CurrencyDialog> with GetItStateMixin {
   @override
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-   List<String> currencies =
-        get<CurrencyConversion>().price.keys.toList();
+    List<String> currencies = get<CurrencyConversion>().price.keys.toList();
 
     List<Widget> currgWidgets = [];
-    for ( String item in currencies) {
+    for (String item in currencies) {
       currgWidgets.add(createLangButton(item, AppLocalizations.of(context)));
     }
     return Container(
@@ -42,16 +42,15 @@ class CurrencyDialogState extends State<CurrencyDialog> with GetItStateMixin {
           children: <Widget>[
             Column(
               children: currgWidgets,
-
             ),
-            const Gap( 15),
+            const Gap(15),
             const Divider(
               thickness: 1,
             ),
             TextButton(
               style: currentTheme.btnStyleNoBorder,
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.of(context).pop();
               },
               child: Text(
                 AppLocalizations.of(context)!.close,

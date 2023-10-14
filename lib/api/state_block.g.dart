@@ -13,7 +13,9 @@ StateBlock _$StateBlockFromJson(Map<String, dynamic> json) => StateBlock(
       json['balance'] as String,
       json['link'] as String,
       json['signature'] as String,
-    )..type = json['type'] as String;
+    )
+      ..type = json['type'] as String
+      ..work = json['work'] as String?;
 
 Map<String, dynamic> _$StateBlockToJson(StateBlock instance) =>
     <String, dynamic>{
@@ -24,4 +26,5 @@ Map<String, dynamic> _$StateBlockToJson(StateBlock instance) =>
       'balance': instance.balance,
       'link': instance.link,
       'signature': instance.signature,
+      'work': instance.work,
     };

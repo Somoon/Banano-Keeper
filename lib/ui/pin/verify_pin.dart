@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:auto_route/annotations.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -10,6 +12,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:pinput/pinput.dart';
 
+@RoutePage<bool>(name: "VerifyPINRoute")
 class VerifyPIN extends StatefulWidget with GetItStatefulWidgetMixin {
   VerifyPIN({super.key});
 
@@ -107,7 +110,7 @@ class VerifyPINState extends State<VerifyPIN> with GetItStateMixin {
                                     const Duration(milliseconds: 2000), () {
                                   setState(() {
                                     if (incorrectAttempt >= 3) {
-                                      Navigator.of(context).pop(false);
+                                      services<AppRouter>().pop<bool>(false);
                                     }
                                     pinController.clear();
                                     topMsg = "";
@@ -120,7 +123,7 @@ class VerifyPINState extends State<VerifyPIN> with GetItStateMixin {
                                     const Duration(milliseconds: 200), () {
                                   setState(() {
                                     pinController.clear();
-                                    Navigator.of(context).pop(true);
+                                    services<AppRouter>().pop<bool>(true);
                                   });
                                 })
                               }

@@ -1,5 +1,8 @@
 // import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
+import 'package:bananokeeper/app_router.dart';
+import 'package:bananokeeper/db/dbtest.dart';
 import 'package:bananokeeper/ui/dialogs/currency_diag.dart';
 import 'package:bananokeeper/ui/message_signing/bottomSheetSign.dart';
 import 'package:flutter/foundation.dart';
@@ -11,7 +14,7 @@ import 'package:bananokeeper/initial_pages/initial_page_one.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
-import 'package:bananokeeper/providers/pow_source.dart';
+import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/localization_service.dart';
@@ -32,6 +35,8 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gap/gap.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+
+import 'message_signing/message_sign_verification.dart';
 
 class SideDrawer extends StatefulWidget with GetItStatefulWidgetMixin {
   SideDrawer({super.key});
@@ -93,13 +98,50 @@ class _SideDrawer extends State<SideDrawer>
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               const Gap(10),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  style: currentTheme.btnStyleNoBorder,
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => DBTest(),
+                      ),
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: (!Utils().isDirectionRTL(context)
+                            ? Alignment.centerLeft
+                            : Alignment.centerRight),
+                        child: Text(
+                          "aaa",
+                          style: TextStyle(
+                            color: currentTheme.text,
+                            fontSize: currentTheme.fontSize,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 2,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
               //Wallet management button
               createPrimaryDrawerButton(
                 AppLocalizations.of(context)!.manageWallets,
                 activeWalletName,
-                ManagementPage(
-                  WalletManagementPage(),
-                  AppLocalizations.of(context)!.manageWallets,
+                // ManagementPage(
+                //   WalletManagementPage(),
+                //   AppLocalizations.of(context)!.manageWallets,
+                // ),
+                Management(
+                  pageContent: WalletManagementPage(),
+                  pageTitle: AppLocalizations.of(context)!.manageWallets,
                 ),
               ),
               //Account management button
@@ -108,9 +150,9 @@ class _SideDrawer extends State<SideDrawer>
                 AppLocalizations.of(context)!.manageAccounts,
                 // Utils().shortenAccount(currentAccount),
                 accountName,
-                ManagementPage(
-                  AccountManagementPage(),
-                  AppLocalizations.of(context)!.manageAccounts,
+                Management(
+                  pageContent: AccountManagementPage(),
+                  pageTitle: AppLocalizations.of(context)!.manageWallets,
                 ),
               ),
 
@@ -170,7 +212,7 @@ class _SideDrawer extends State<SideDrawer>
               // createDialogButton("Min. to receive", "1", ThemesDialog()),
 
               // Already done and working.
-              // createDialogButton("PoW Source", selectedPoWName, PoWDialog()),
+              createDialogButton("PoW Source", selectedPoWName, PoWDialog()),
 
               // createDialogButton("Block Explorer", "1", ThemesDialog()),
               // createDialogButton("Data Source", "1", ThemesDialog()),
@@ -240,6 +282,8 @@ class _SideDrawer extends State<SideDrawer>
         onPressed: () async {
           var result = await MsgSignPage().show(context, currentTheme);
           MsgSignPage().clear();
+          MsgSignVerifyPage().clear();
+
           // MessageSigningPage(currentTheme);
         },
         child: Column(
@@ -260,11 +304,6 @@ class _SideDrawer extends State<SideDrawer>
         ),
       ),
     );
-  }
-
-  Future<bool?> MessageSigningPage(BaseTheme currentTheme) async {
-    var result = await MsgSignPage().show(context, currentTheme);
-    return result;
   }
 
   Future<bool?> resetAppDialog(
@@ -302,11 +341,9 @@ class _SideDrawer extends State<SideDrawer>
                         bool? verified = false;
 
                         if (!canauth) {
-                          verified = await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => VerifyPIN(),
-                            ),
-                          );
+                          verified = await services<AppRouter>()
+                                  .push(VerifyPINRoute()) ??
+                              false;
                         } else {
                           verified = await BiometricUtil()
                               .authenticate(appLocalizations.authMsgWalletDel);
@@ -314,6 +351,7 @@ class _SideDrawer extends State<SideDrawer>
 
                         if (verified != null && verified) {
                           setState(() {
+                            Navigator.of(context).pop();
                             resetFn();
                           });
                         }
@@ -344,11 +382,9 @@ class _SideDrawer extends State<SideDrawer>
   }
 
   resetFn() async {
+    services<AppRouter>().replaceAll([InitialPage()]);
     services<DBManager>().deleteDatabase();
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => InitialPageOne()),
-        ModalRoute.withName("/initialpageone"));
+    services<WalletsService>().resetService();
   }
 
   /// creates a button that display a dialog to choose an item and peek at the active item
@@ -489,8 +525,7 @@ class _SideDrawer extends State<SideDrawer>
     return result;
   }
 
-  Widget createPrimaryDrawerButton(
-      String label, String peekActive, Widget pageRoute) {
+  createPrimaryDrawerButton(String label, String peekActive, pageRoute) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
 
     return SizedBox(
@@ -498,24 +533,16 @@ class _SideDrawer extends State<SideDrawer>
       child: TextButton(
         style: currentTheme.btnStyleNoBorder,
         onPressed: () async {
-          // showDialog(
-          //   context: context,
-          //   builder: (BuildContext context) => Dialog(
-          //     shape: const RoundedRectangleBorder(
-          //         borderRadius: BorderRadius.all(Radius.circular(25))),
-          //     backgroundColor: currentTheme.primary,
-          //     child: dialogWidget, // -- CHANGE LATER
-          //   ),
-          // );
+          // await Navigator.of(context)
+          //     .push(
+          //       MaterialPageRoute(
+          //         builder: (context) => pageRoute,
+          //       ),
+          //     )
+          //     .then((value) => setState(() {}));
+          // setState(() {});
 
-          await Navigator.of(context)
-              .push(
-                MaterialPageRoute(
-                  builder: (context) => pageRoute,
-                ),
-              )
-              .then((value) => setState(() {}));
-          setState(() {});
+          await services<AppRouter>().push(pageRoute);
         },
         child: Column(
           children: [

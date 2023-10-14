@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:auto_route/annotations.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 
 import 'package:bananokeeper/themes.dart';
@@ -18,6 +20,7 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 
+// @RoutePage<bool>(name: "MsgSignVerifyRoute")
 class MsgSignVerifyPage {
   static final MsgSignVerifyPage _singleton = MsgSignVerifyPage._internal();
   late BuildContext _context;

@@ -1,4 +1,6 @@
 // ignore_for_file: prefer_const_constructors
+import 'package:auto_route/annotations.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +19,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:nanodart/nanodart.dart';
 
+@RoutePage(name: "InitialPageInformationRoute")
 class InitialPageInformation extends StatefulWidget
     with GetItStatefulWidgetMixin {
   InitialPageInformation({super.key});
@@ -323,12 +326,12 @@ class InitialPageInformationState extends State<InitialPageInformation>
                         print(
                             "LATEST ID ${services<WalletsService>().latestWalletID}");
                       }
-                      setState(() {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => SetupPin("initial"),
-                          ),
-                        );
+                      setState(() async {
+                        //await
+                        services<AppRouter>()
+                            .push(SetupPinRoute(nextPage: 'initial'));
+
+                        //after successful return create wallet
                       });
                     }
                   },

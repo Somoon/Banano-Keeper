@@ -10,11 +10,15 @@ class PoWSource extends ChangeNotifier {
   Map<String, String> listOfAPIS = {
     "Kalium": "https://kaliumapi.appditto.com/api",
     "Booster": "https://booster.dev-ptera.com/banano-rpc",
+    "Local PoW": "https://kaliumapi.appditto.com/api", //for now like this
   };
 
   String apiName = 'Kalium';
   void setAPI(api) {
     switch (api) {
+      case "Local PoW":
+        // services<UserData>().setPoWSource(boosterAPI);
+        apiName = "Local PoW";
       case "Booster":
         // services<UserData>().setPoWSource(boosterAPI);
         apiName = "Booster";

@@ -1,6 +1,8 @@
 import 'dart:ffi';
 
+import 'package:auto_route/annotations.dart';
 import 'package:bananokeeper/api/representative_json.dart';
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
@@ -25,6 +27,7 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 
+// @RoutePage<bool>(name: "MsgSignRoute")
 class MsgSignPage {
   static final MsgSignPage _singleton = MsgSignPage._internal();
   late BuildContext _context;
@@ -461,14 +464,7 @@ class MsgSignPage {
                       context,
                       currentTheme,
                     );
-                    MsgSignVerifyPage().clear();
-                    setState(() {
-                      // if (result != null && result) {
-                      //   Navigator.of(context).pop(true);
-                      // }
-                      // properly make sure field is cleared
-                      ManualRepChange().addressController.clear();
-                    });
+                    setState(() {});
                   },
                   child: Text(
                     appLocalizations.verifyButtonText,

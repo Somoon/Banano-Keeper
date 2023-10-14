@@ -1,5 +1,11 @@
+import 'dart:async';
+import 'dart:ffi';
+import 'dart:isolate';
+
+import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
-import 'package:bananokeeper/providers/pow_source.dart';
+import 'package:bananokeeper/providers/pow/local_pow.dart';
+import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -57,20 +63,44 @@ class AccountAPI {
     return response;
   }
 
-  processRequest(block, subtype) async {
+  processRequest(StateBlock block, subtype, [String publicKey = '']) async {
+    String powType = services<PoWSource>().getAPIName();
     String apiURL = services<PoWSource>().getAPIURL();
-    if (kDebugMode) {
-      print("processRequest $apiURL");
+
+    Map<String, dynamic> request = {};
+    print("POW TYPE: !!!!!!!!! ${powType} !!!!!!!!!!!!!!");
+    if (powType == 'Local PoW') {
+      // if (block.work == null || block.work == '') {
+      LocalPoW lPow = LocalPoW();
+
+      lPow.completer = Completer<String>();
+      String hashForWork = (subtype == 'open' ? publicKey : block.previous);
+      lPow.generateWork(
+        hash: hashForWork,
+      );
+      String fetchedWork = await lPow.completer.future;
+      print(fetchedWork);
+      block.work = fetchedWork;
+      // services<LocalPoW>().generateWork(hash: block.signature, threads: 2);
+
+      request = {
+        "action": "process",
+        "block": json.encode(block.toJson()),
+        "subtype": subtype
+      };
+      // }
+    } else {
+      if (kDebugMode) {
+        print("processRequest $apiURL");
+      }
+      request = {
+        "action": "process",
+        "block": json.encode(block.toJson()),
+        "do_work": true,
+        "subtype": subtype
+      };
     }
-    Map<String, dynamic> request = {
-      "action": "process",
-      "block": json.encode(block),
-      "do_work": true,
-      "subtype": subtype
-    };
-    if (kDebugMode) {
-      print(request);
-    }
+
     http.Response response = await http.post(
       Uri.parse(apiURL),
       headers: <String, String>{

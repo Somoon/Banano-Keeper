@@ -2,6 +2,7 @@
 
 import 'dart:ui';
 
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
@@ -348,7 +349,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                     TextButton(
                       onPressed: () {
                         renameController.clear();
-                        Navigator.pop(context);
+                        services<AppRouter>().pop();
                       },
                       child: Text(
                         appLocalizations.close,
@@ -382,7 +383,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
     Account account = services<Account>(instanceName: accOrgName);
 
     bool isActiveAccount =
-        (currentWallet.currentAccount.value == account.getAddress());
+        (currentWallet.getCurrentAccount() == account.getAddress());
     // if (!account.doneovR) {
     //   services<QueueService>().add(account.getOverview());
     // }
@@ -561,7 +562,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                     currentWallet.removeIndex(index);
                   });
                 }
-                Navigator.of(context).pop();
+                services<AppRouter>().pop();
               },
               child: Text(
                 // 'Yes',
@@ -571,7 +572,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                services<AppRouter>().pop();
               },
               child: Text(
                 appLocalizations.no,
