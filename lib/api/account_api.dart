@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:isolate';
 
 import 'package:bananokeeper/api/state_block.dart';
@@ -68,7 +67,7 @@ class AccountAPI {
     String apiURL = services<PoWSource>().getAPIURL();
 
     Map<String, dynamic> request = {};
-    print("POW TYPE: !!!!!!!!! ${powType} !!!!!!!!!!!!!!");
+    // print("POW TYPE: !!!!!!!!! ${powType} !!!!!!!!!!!!!!");
     if (powType == 'Local PoW') {
       // if (block.work == null || block.work == '') {
       LocalPoW lPow = LocalPoW();
