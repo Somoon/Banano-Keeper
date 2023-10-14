@@ -327,7 +327,6 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
         elevation: 5,
       ),
       onPressed: () async {
-        final LocalAuthentication auth = LocalAuthentication();
         var appLocalizations = AppLocalizations.of(context);
 
         showModalBottomSheet<void>(
@@ -339,138 +338,206 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
           ),
           backgroundColor: currentTheme.primary,
           builder: (BuildContext context) {
-            return Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: currentTheme.primary,
-                ),
-                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                color: currentTheme.primary,
-              ),
-              // color: currentTheme.primary,
-              child: SizedBox(
-                height: height / 1.55,
-                child: Center(
-                  child: Column(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(top: 10),
-                        height: 5,
-                        width: MediaQuery.of(context).size.width * 0.15,
-                        decoration: BoxDecoration(
-                          color: currentTheme.secondary,
-                          borderRadius: BorderRadius.circular(100.0),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+            bool qrBoxOption = false;
+
+            return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: currentTheme.primary,
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    color: currentTheme.primary,
+                  ),
+                  // color: currentTheme.primary,
+                  child: SizedBox(
+                    height: height / 1.55,
+                    child: Center(
+                      child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              right: 10,
+                          Container(
+                            margin: const EdgeInsets.only(top: 10),
+                            height: 5,
+                            width: MediaQuery.of(context).size.width * 0.15,
+                            decoration: BoxDecoration(
+                              color: currentTheme.secondary,
+                              borderRadius: BorderRadius.circular(100.0),
                             ),
-                            child: SizedBox(
-                              child: TextButton(
-                                onPressed: () {
-                                  amountController.clear();
-                                  addressController.clear();
-                                  Navigator.of(context).pop();
-                                },
-                                style: ButtonStyle(
-                                  foregroundColor:
-                                      MaterialStatePropertyAll<Color>(
-                                          currentTheme.textDisabled),
-                                  // backgroundColor:
-                                  //     MaterialStatePropertyAll<
-                                  //         Color>(primary),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  right: 10,
                                 ),
-                                child: const Icon(Icons.close),
-                              ),
+                                child: SizedBox(
+                                  child: TextButton(
+                                    onPressed: () {
+                                      amountController.clear();
+                                      addressController.clear();
+                                      Navigator.of(context).pop();
+                                    },
+                                    style: ButtonStyle(
+                                      foregroundColor:
+                                          MaterialStatePropertyAll<Color>(
+                                              currentTheme.textDisabled),
+                                      // backgroundColor:
+                                      //     MaterialStatePropertyAll<
+                                      //         Color>(primary),
+                                    ),
+                                    child: const Icon(Icons.close),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15, right: 15),
+                            child: Column(
+                              children: [
+                                AutoSizeText(
+                                  account.name,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: currentTheme.text,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20, right: 20),
+                                  child: Utils()
+                                      .colorffix(account.address, currentTheme),
+                                ),
+                                const SizedBox(
+                                  height: 40,
+                                ),
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Container(
+                                      height: 200.0,
+                                      width: 200.0,
+                                      color: Colors.white,
+                                    ),
+                                    if (qrBoxOption) ...[
+                                      const Image(
+                                        image: AssetImage('images/banano.png'),
+                                        height: 200,
+                                        width: 200,
+                                      ),
+                                    ] else ...[
+                                      FadeInImage.assetNetwork(
+                                        image:
+                                            'https://imgproxy.moonano.net/${account.address}',
+                                        placeholder: 'images/greymonkey.png',
+                                        width: 200,
+                                        fit: BoxFit.fill,
+                                        imageErrorBuilder:
+                                            (BuildContext context,
+                                                Object exception,
+                                                StackTrace? stackTrace) {
+                                          return const Image(
+                                            image:
+                                                AssetImage('images/banano.png'),
+                                            width: 200,
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                    QrImageView(
+                                      data: account.address,
+                                      version: QrVersions.auto,
+                                      size: 200.0,
+                                      backgroundColor: Colors
+                                          .transparent, //currentTheme.textDisabled,
+                                      // eyeStyle: const QrEyeStyle(
+                                      //     eyeShape: QrEyeShape.circle,
+                                      //     color: Colors.yellow),
+                                      // embeddedImage:
+                                      //     Image.asset('images/banano.png').image,
+                                      // embeddedImageStyle: const QrEmbeddedImageStyle(
+                                      //   size: Size(41.0, 41.0),
+                                      //   color: Colors.blue,
+                                      // ),
+                                    ),
+                                  ],
+                                ),
+                                Switch(
+                                  // This bool value toggles the switch.
+                                  value: qrBoxOption,
+                                  activeColor: currentTheme.text,
+                                  activeTrackColor: Colors.black38,
+                                  inactiveThumbColor: currentTheme.text,
+
+                                  onChanged: (bool value) {
+                                    // This is called when the user toggles the switch.
+                                    setState(() {
+                                      qrBoxOption = !qrBoxOption;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(
+                                  height: 40,
+                                ),
+                                SizedBox(
+                                  height: 48,
+                                  width: width - 40,
+                                  child: OutlinedButton(
+                                    style: ButtonStyle(
+                                      overlayColor:
+                                          MaterialStateColor.resolveWith(
+                                              (states) => currentTheme.text
+                                                  .withOpacity(0.3)),
+                                      // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
+                                      shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                      ),
+
+                                      side:
+                                          MaterialStatePropertyAll<BorderSide>(
+                                        BorderSide(
+                                          color: currentTheme.buttonOutline,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      Clipboard.setData(
+                                        ClipboardData(text: account.address),
+                                      );
+                                      setState(() {});
+                                    },
+                                    child: AutoSizeText(
+                                      appLocalizations!.copyAddress,
+                                      style: TextStyle(
+                                        color: currentTheme.text,
+                                        fontSize: currentTheme.fontSize,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                              ],
                             ),
-                          )
+                          ),
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, right: 15),
-                        child: Column(
-                          children: [
-                            AutoSizeText(
-                              account.name,
-                              maxLines: 1,
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: currentTheme.text,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 20, right: 20),
-                              child: Utils()
-                                  .colorffix(account.address, currentTheme),
-                            ),
-                            const SizedBox(
-                              height: 40,
-                            ),
-                            QrImageView(
-                              data: account.address,
-                              version: QrVersions.auto,
-                              size: 200.0,
-                              backgroundColor: currentTheme.textDisabled,
-                            ),
-                            const SizedBox(
-                              height: 40,
-                            ),
-                            SizedBox(
-                              height: 48,
-                              width: width - 40,
-                              child: OutlinedButton(
-                                style: ButtonStyle(
-                                  overlayColor: MaterialStateColor.resolveWith(
-                                      (states) =>
-                                          currentTheme.text.withOpacity(0.3)),
-                                  // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
-                                  shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                  ),
-
-                                  side: MaterialStatePropertyAll<BorderSide>(
-                                    BorderSide(
-                                      color: currentTheme.buttonOutline,
-                                      width: 1,
-                                    ),
-                                  ),
-                                ),
-                                onPressed: () async {
-                                  Clipboard.setData(
-                                    ClipboardData(text: account.address),
-                                  );
-                                  setState(() {});
-                                },
-                                child: AutoSizeText(
-                                  appLocalizations!.copyAddress,
-                                  style: TextStyle(
-                                    color: currentTheme.text,
-                                    fontSize: currentTheme.fontSize,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         );
