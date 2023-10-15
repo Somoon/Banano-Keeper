@@ -406,14 +406,19 @@ class _SideDrawer extends State<SideDrawer>
         style: currentTheme.btnStyleNoBorder,
         onPressed: () {
           showDialog(
-            context: context,
-            builder: (BuildContext context) => Dialog(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(25))),
-              backgroundColor: currentTheme.primary,
-              child: dialogWidget, // -- CHANGE LATER
-            ),
-          );
+              context: context,
+              builder: (BuildContext context) {
+                return StatefulBuilder(
+                  builder: (context, setState) {
+                    return Dialog(
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(25))),
+                      backgroundColor: currentTheme.primary,
+                      child: dialogWidget, // -- CHANGE LATER
+                    );
+                  },
+                );
+              });
         },
         child: Column(
           children: [

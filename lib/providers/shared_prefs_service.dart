@@ -132,6 +132,15 @@ class SharedPrefsModel {
     sharedPref.setString('pin', pin);
   }
 
+  getAuthOnBoot() async {
+    bool status = sharedPref.getBool('authOnBoot') ?? false;
+    return status;
+  }
+
+  void saveAuthOnBoot(bool newStatus) async {
+    sharedPref.setBool('authOnBoot', newStatus);
+  }
+
   Future<List> getStoredValues() async {
     var isInit = sharedPref.containsKey('isInitialized');
     var lang = "English";
@@ -144,6 +153,7 @@ class SharedPrefsModel {
     String pin = "0";
     List<Representative> repList = [];
     int repUpdate = 0;
+    bool authOnBoot = false;
     if (isInit) {
       lang = await getLang();
       theme = await getTheme();
@@ -155,6 +165,7 @@ class SharedPrefsModel {
       powThreadCount = await getThreadCount();
       repList = await getRepresentatives();
       repUpdate = await getRepUpdateTime();
+      authOnBoot = await getAuthOnBoot();
     }
 
     return [
@@ -168,7 +179,8 @@ class SharedPrefsModel {
       powSource, //7
       repList, //8
       repUpdate, //9
-      powThreadCount, 10
+      powThreadCount, //10
+      authOnBoot, //11
     ];
   }
 
@@ -209,5 +221,8 @@ class SharedPrefsModel {
       sharedPref.remove("representatives");
     }
     if (sharedPref.containsKey("repUpdate")) sharedPref.remove("repUpdate");
+    if (sharedPref.containsKey("PoWThreadCount"))
+      sharedPref.remove("PoWThreadCount");
+    if (sharedPref.containsKey("authOnBoot")) sharedPref.remove("authOnBoot");
   }
 }

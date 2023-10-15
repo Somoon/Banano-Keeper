@@ -1,5 +1,8 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/shared_prefs_service.dart';
+import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/ui/pin/setup_pin.dart';
@@ -20,6 +23,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
   @override
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
+    bool authOnBootStatus = watchOnly((UserData x) => x.getAuthOnBoot());
 
     return Container(
       constraints: const BoxConstraints(
@@ -38,6 +42,32 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
             Column(
               children: [
                 createChangePINButton(currentTheme),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      AutoSizeText(
+                        "Auth on startup: ",
+                        style: TextStyle(
+                          color: currentTheme.text,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Switch(
+                        // This bool value toggles the switch.
+                        value: authOnBootStatus,
+                        activeColor: currentTheme.text,
+                        activeTrackColor: Colors.black38,
+                        inactiveThumbColor: currentTheme.textDisabled,
+
+                        onChanged: (bool value) {
+                          changeAuthValue(value);
+                        },
+                      ),
+                    ],
+                  ),
+                )
                 // createStartupBehaviourButton(),
 
                 // createThemeButton("Login Auth"),
@@ -60,6 +90,13 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
         ),
       ),
     );
+  }
+
+  changeAuthValue(bool value) {
+    setState(() {
+      services<UserData>().setAuthOnBoot(value);
+      services<SharedPrefsModel>().saveAuthOnBoot(value);
+    });
   }
 
   Widget createChangePINButton(currentTheme) {

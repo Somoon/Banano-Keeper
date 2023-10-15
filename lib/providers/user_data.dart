@@ -22,6 +22,7 @@ class UserData extends ChangeNotifier {
   late String lockType = "pin";
   String pin = "";
   late int lockoutTime = 0;
+  late bool authOnBoot = false;
   late String currency = "USD";
   late double minToReceive = 0.01;
   late String powSource = "Kalium";
@@ -60,6 +61,15 @@ class UserData extends ChangeNotifier {
 
   String getPin() {
     return pin;
+  }
+
+  setAuthOnBoot(bool newStatus) {
+    authOnBoot = newStatus;
+    notifyListeners();
+  }
+
+  bool getAuthOnBoot() {
+    return authOnBoot;
   }
 
   setLockType(String type) {

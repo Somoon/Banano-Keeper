@@ -80,7 +80,7 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
                   inactiveColor: Colors.purple.shade100,
                   thumbColor: Colors.pink,
                   min: 1.0,
-                  max: 10.0,
+                  max: 8.0,
                   value: threadCount.toDouble(),
                   onChanged: (value) {
                     threadCount = value.toInt();

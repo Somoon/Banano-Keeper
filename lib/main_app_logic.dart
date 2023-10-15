@@ -11,7 +11,7 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-@RoutePage(name: "home")
+@RoutePage(name: "HomeRoute")
 class MainAppLogic extends StatefulWidget with GetItStatefulWidgetMixin {
   MainAppLogic({super.key});
   // final bool isNewUser;
