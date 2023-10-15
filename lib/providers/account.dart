@@ -92,7 +92,7 @@ class Account extends ChangeNotifier {
         .updateAccountTime(originalName, index, time.toString());
     lastUpdate = time;
 
-    notifyListeners();
+    // notifyListeners();
   }
 
   int getLastUpdate() {

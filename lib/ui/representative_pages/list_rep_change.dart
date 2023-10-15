@@ -263,6 +263,7 @@ class ListRepChange {
         //     text: AppLocalizations.of(context)!.loadingWidgetChangeRepMsg);
 
         bool result = await account.changeRepresentative(repAddress);
+
         // LoadingIndicatorDialog().dismiss();
         if (result) {
           Navigator.of(context).pop(true);

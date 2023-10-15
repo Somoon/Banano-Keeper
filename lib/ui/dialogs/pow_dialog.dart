@@ -8,6 +8,7 @@ import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PoWDialog extends StatefulWidget with GetItStatefulWidgetMixin {
   PoWDialog({super.key});
@@ -80,8 +81,14 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
       width: double.infinity,
       child: TextButton(
         style: currentTheme.btnStyleNoBorder,
-        onPressed: () {
+        onPressed: () async {
           _setSource(label);
+          print(label);
+          if (label == 'Local PoW') {
+            if (!await Permission.bluetoothConnect.isGranted) {
+              Permission.bluetoothConnect.request();
+            }
+          }
           setState(() {});
           // Navigator.pop(context);
         },
