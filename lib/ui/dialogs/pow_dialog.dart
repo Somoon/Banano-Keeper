@@ -1,11 +1,13 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/pow/pow_source.dart';
+import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/themes.dart';
+import 'package:gap/gap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -18,9 +20,12 @@ class PoWDialog extends StatefulWidget with GetItStatefulWidgetMixin {
 }
 
 class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
+  int threadCount = services<UserData>().getThreadCount();
+
   @override
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
+    var currentSource = watchOnly((PoWSource x) => x.getAPIName());
     List<String> sources = get<PoWSource>().listOfAPIS.keys.toList();
 
     List<Widget> powWidgets = [];
@@ -55,7 +60,38 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
             Column(
               children: powWidgets,
             ),
-            const SizedBox(height: 15),
+            if (currentSource == 'Local PoW') ...[
+              const Gap(15),
+              const Divider(
+                thickness: 1,
+              ),
+              AutoSizeText(
+                "Threads: $threadCount",
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: currentTheme.text,
+                ),
+              ),
+              Container(
+                width: 250,
+                child: Slider(
+                  activeColor: Colors.purple,
+                  inactiveColor: Colors.purple.shade100,
+                  thumbColor: Colors.pink,
+                  min: 1.0,
+                  max: 10.0,
+                  value: threadCount.toDouble(),
+                  onChanged: (value) {
+                    threadCount = value.toInt();
+                    services<UserData>().setThreadCount(threadCount);
+                    services<SharedPrefsModel>().saveThreadCount(threadCount);
+                    setState(() {});
+                  },
+                ),
+              ),
+            ],
+            const Gap(15),
             const Divider(
               thickness: 1,
             ),
@@ -64,7 +100,7 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
                 services<AppRouter>().pop(context);
               },
               child: Text(
-                'Close',
+                AppLocalizations.of(context)!.close,
                 style: TextStyle(color: currentTheme.text),
               ),
             ),

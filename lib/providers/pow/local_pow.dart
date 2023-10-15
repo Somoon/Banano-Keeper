@@ -5,6 +5,8 @@ import 'dart:async';
 import 'package:bananokeeper/api/account_api.dart';
 import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/db/dbtest.dart';
+import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -46,7 +48,8 @@ class LocalPoW extends ChangeNotifier {
   }
 
 //, required Function callBack
-  generateWork({required String hash, int threads = 3}) async {
+  generateWork({required String hash}) async {
+    int threads = services<UserData>().getThreadCount();
     String completeURL =
         '$powScriptURL?hash=$hash&threads=${threads.toString()}';
     WebViewController controller = WebViewController()

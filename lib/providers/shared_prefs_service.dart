@@ -72,8 +72,8 @@ class SharedPrefsModel {
   saveCurrency(String currency) {
     sharedPref.setString('currency', currency);
   }
-  String getCurrency()
-  {
+
+  String getCurrency() {
     String stringValue = sharedPref.getString('currency') ?? "USD";
     return stringValue;
   }
@@ -114,6 +114,15 @@ class SharedPrefsModel {
     sharedPref.setString('PoWSource', powSource);
   }
 
+  getThreadCount() async {
+    int poWThreadCount = sharedPref.getInt('PoWThreadCount') ?? 3;
+    return poWThreadCount;
+  }
+
+  void saveThreadCount(int threadCount) async {
+    sharedPref.setInt('PoWThreadCount', threadCount);
+  }
+
   getPin() async {
     String pin = sharedPref.getString('pin') ?? "0";
     return pin;
@@ -131,6 +140,7 @@ class SharedPrefsModel {
     var activeAccount = 0;
     var latestWalletID = 0;
     String powSource = "Kalium";
+    int powThreadCount = 3;
     String pin = "0";
     List<Representative> repList = [];
     int repUpdate = 0;
@@ -142,6 +152,7 @@ class SharedPrefsModel {
       latestWalletID = await getLatestWalletID();
       pin = await getPin();
       powSource = await getPoWSource();
+      powThreadCount = await getThreadCount();
       repList = await getRepresentatives();
       repUpdate = await getRepUpdateTime();
     }
@@ -157,6 +168,7 @@ class SharedPrefsModel {
       powSource, //7
       repList, //8
       repUpdate, //9
+      powThreadCount, 10
     ];
   }
 
