@@ -19,6 +19,7 @@ import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/ui/loading_widget.dart';
 import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:bananokeeper/utils/utils.dart';
+import 'package:gap/gap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -338,7 +339,38 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
           ),
           backgroundColor: currentTheme.primary,
           builder: (BuildContext context) {
-            bool qrBoxOption = false;
+            // bool qrBoxOption = false;
+            int qrOptionInt = 0;
+            List<Widget> qrImages = [
+              // ConstrainedBox(
+              //   constraints: const BoxConstraints(
+              //       // maxHeight: 380.0,
+              //       ),
+              //   child: const Image(
+              //     image: AssetImage('images/qrOptionFace.png'),
+              //     // width: 600,
+              //   ),
+              // ),
+              const Image(
+                image: AssetImage('images/banano.png'),
+                height: 200,
+                width: 200,
+              ),
+              FadeInImage.assetNetwork(
+                image: 'https://imgproxy.moonano.net/${account.address}',
+                placeholder: 'images/greymonkey.png',
+                width: 200,
+                fit: BoxFit.fill,
+                imageErrorBuilder: (BuildContext context, Object exception,
+                    StackTrace? stackTrace) {
+                  return const Image(
+                    image: AssetImage('images/banano.png'),
+                    height: 200,
+                    width: 200,
+                  );
+                },
+              ),
+            ];
 
             return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
@@ -352,7 +384,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                   ),
                   // color: currentTheme.primary,
                   child: SizedBox(
-                    height: height / 1.55,
+                    height: height / 1.35,
                     child: Center(
                       child: Column(
                         children: [
@@ -405,18 +437,14 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                                     color: currentTheme.text,
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
+                                const Gap(20),
                                 Padding(
                                   padding: const EdgeInsets.only(
-                                      left: 20, right: 20),
+                                      left: 25, right: 25),
                                   child: Utils()
                                       .colorffix(account.address, currentTheme),
                                 ),
-                                const SizedBox(
-                                  height: 40,
-                                ),
+                                const Gap(40),
                                 Stack(
                                   alignment: Alignment.center,
                                   children: [
@@ -425,6 +453,8 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                                       width: 200.0,
                                       color: Colors.white,
                                     ),
+                                    qrImages[qrOptionInt],
+                                    /*
                                     if (qrBoxOption) ...[
                                       const Image(
                                         image: AssetImage('images/banano.png'),
@@ -450,6 +480,8 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                                         },
                                       ),
                                     ],
+
+                                     */
                                     QrImageView(
                                       data: account.address,
                                       version: QrVersions.auto,
@@ -468,6 +500,25 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                                     ),
                                   ],
                                 ),
+                                const Gap(10),
+                                TextButton(
+                                  style: currentTheme.btnStyleNoBorder,
+                                  onPressed: () {
+                                    int currentInt = qrOptionInt;
+                                    setState(() {
+                                      if (currentInt == qrImages.length - 1) {
+                                        qrOptionInt = 0;
+                                      } else {
+                                        qrOptionInt++;
+                                      }
+                                    });
+                                  },
+                                  child: Text(
+                                    '>',
+                                    style: currentTheme.textStyle,
+                                  ),
+                                ),
+                                /*
                                 Switch(
                                   // This bool value toggles the switch.
                                   value: qrBoxOption,
@@ -482,9 +533,9 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                                     });
                                   },
                                 ),
-                                const SizedBox(
-                                  height: 40,
-                                ),
+
+                                 */
+                                const Gap(40),
                                 SizedBox(
                                   height: 48,
                                   width: width - 40,

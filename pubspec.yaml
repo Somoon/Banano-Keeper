@@ -104,6 +104,7 @@ flutter:
     - images/banano.png
     - images/nano.png
     - images/greymonkey.png
+    - images/qrOptionFace.png
     - images/icon.png
     - pow/multiThread.html
     - pow/pow.js
