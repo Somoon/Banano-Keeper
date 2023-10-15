@@ -429,9 +429,7 @@ class _SideDrawer extends State<SideDrawer>
                 ),
               ),
             ),
-            const SizedBox(
-              height: 2,
-            ),
+            const Gap(2),
             Align(
               alignment: (!Utils().isDirectionRTL(context)
                   ? Alignment.centerLeft
@@ -444,6 +442,7 @@ class _SideDrawer extends State<SideDrawer>
                 ),
               ),
             ),
+            const Gap(5),
           ],
         ),
       ),
