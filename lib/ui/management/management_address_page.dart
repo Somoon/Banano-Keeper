@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/themes.dart';
+import 'package:gap/gap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -106,9 +107,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                SizedBox(
-                  height: 20,
-                ),
+                const Gap(20),
 
                 // top buttons
                 Row(
@@ -118,9 +117,7 @@ class AccountManagementPageState extends State<AccountManagementPage>
                     addButtonWithTextInput(),
                   ],
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+                const Gap(10),
                 Divider(
                   thickness: 3,
                 ),
@@ -167,7 +164,8 @@ class AccountManagementPageState extends State<AccountManagementPage>
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        currentWallet.setActiveIndex(index);
+                        services<WalletService>(instanceName: walletName)
+                            .setActiveIndex(index);
                       });
                     },
                     child: Slidable(

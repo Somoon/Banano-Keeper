@@ -185,7 +185,7 @@ class WalletService extends ChangeNotifier {
 
     services<SharedPrefsModel>().saveActiveAccount(index);
     try {
-      // notifyListeners();
+      notifyListeners();
     } catch (e) {
       if (kDebugMode) {
         print("setActiveIndex error");
