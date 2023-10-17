@@ -5,7 +5,7 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-	<string>Banano Keeper</string>
+	    <string>Banano Keeper</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -13,9 +13,26 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-	<string>Banano Keeper</string>
+	    <string>Banano Keeper</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
+		<key>CFBundleURLTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleTypeRole</key>
+                    <string>Editor</string>
+             	<key>CFBundleURLName</key>
+                    <string>com.banano.kaliumwallet</string>
+             	<key>CFBundleURLSchemes</key>
+                    <array>
+                        <string>banano</string>
+                        <string>ban</string>
+                        <string>bansign</string>
+                        <string>banverify</string>
+                        <string>banrep</string>
+                    </array>
+            </dict>
+        </array>
 		<key>CFBundleShortVersionString</key>
 		<string>$(FLUTTER_BUILD_NAME)</string>
 		<key>CFBundleSignature</key>
@@ -25,11 +42,11 @@
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>NSFaceIDUsageDescription</key>
-		<string>Why is my app authenticating using face id?</string>
+		<string>FaceID is used for Authentication</string>
 		<key>NSCameraUsageDescription</key>
-		<string>Can I use the camera please?</string>
+		<string>Camera will be used to scan QR code</string>
 		<key>NSMicrophoneUsageDescription</key>
-		<string>Can I use the mic please?</string>
+		<string>Camera will be used to scan QR code</string>
 		<key>UILaunchStoryboardName</key>
 		<string>LaunchScreen</string>
 		<key>UIMainStoryboardFile</key>

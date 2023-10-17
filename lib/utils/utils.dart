@@ -11,6 +11,7 @@ import 'package:nanodart/nanodart.dart';
 import 'package:decimal/decimal.dart';
 import 'package:pointycastle/digests/blake2b.dart';
 import 'package:pinenacl/tweetnacl.dart';
+import 'dart:io';
 
 class Utils {
   BigInt banRaw = BigInt.parse('100000000000000000000000000000');

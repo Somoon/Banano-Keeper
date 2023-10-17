@@ -282,7 +282,7 @@ class _SideDrawer extends State<SideDrawer>
       child: TextButton(
         style: currentTheme.btnStyleNoBorder,
         onPressed: () async {
-          var result = await MsgSignPage().show(context, currentTheme);
+          await MsgSignPage().show(context, currentTheme);
           MsgSignPage().clear();
           MsgSignVerifyPage().clear();
 
@@ -526,8 +526,16 @@ class _SideDrawer extends State<SideDrawer>
             .repScore(rep?.score.toString() ?? "0.00")
         : "");
 
-    var result = await RepPage().show(context, currentTheme, repName, score,
-        activeRep, repList, account, rep);
+    var result = await RepPage().show(
+      context,
+      currentTheme,
+      repName,
+      score,
+      activeRep,
+      repList,
+      account,
+      rep,
+    );
     return result;
   }
 
