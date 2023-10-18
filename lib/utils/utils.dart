@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/api/currency_conversion.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -186,7 +188,7 @@ class Utils {
           ),
           GestureDetector(
             onTap: () {
-              print("asd");
+              // print("asd");
 
               services<UserData>().switchCurrency();
               //change currency showing here ------------------------
@@ -217,6 +219,67 @@ class Utils {
       }
     }
     return qRData;
+  }
+
+  dissectDeepLink(String? value) {
+    Map<String, String?> deepLinkData = {};
+    if (value != null) {
+      value = value.toLowerCase();
+      Uri? uri = Uri.tryParse(value);
+      if (uri != null) {
+        switch (uri.scheme) {
+          case 'ban':
+          case 'banano':
+            deepLinkData = getQRCodeData(value);
+            break;
+          case 'banrep':
+            deepLinkData['representative'] =
+                NanoAccounts.findAccountInString(NanoAccountType.BANANO, value);
+            break;
+          case 'bansign':
+            deepLinkData['message'] = Uri.decodeFull(uri.path);
+            break;
+          case 'banverify':
+            print(value);
+
+            var a = getUrlParameter(value, 'message');
+            print("return getParam $a");
+            deepLinkData['message'] = uri.queryParameters['message'];
+            deepLinkData['sign'] = uri.queryParameters['sign'];
+            deepLinkData['address'] =
+                NanoAccounts.findAccountInString(NanoAccountType.BANANO, value);
+            break;
+        }
+      }
+    }
+
+    // var split = value.split('?amount=');
+    // if (split.length > 1) {
+    //   if (uri != null && uri.queryParameters['amount'] != null) {
+    //     deepLinkData['amountRaw'] = uri.queryParameters['amount']!;
+    //   }
+    // }
+    return deepLinkData;
+  }
+
+  getUrlParameter(String url, String sParam) {
+    print(url);
+    var sPageURL = url;
+    List<String> sURLVariables = sPageURL.split('&');
+    print('vars = $sURLVariables');
+    List<String> sParameterName = [];
+
+    for (int i = 0; i < sURLVariables.length; i++) {
+      String temp = sURLVariables[i];
+      print('current car = $temp');
+
+      sParameterName = temp.split('=');
+
+      if (sParameterName[0] == sParam) {
+        return Uri.decodeFull(sParameterName[1]);
+      }
+    }
+    return false;
   }
 
   generateSeed() {

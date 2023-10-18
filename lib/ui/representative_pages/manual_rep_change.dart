@@ -26,22 +26,23 @@ class ManualRepChange {
   String score = "";
   String weight = "";
   Representative? rep;
-  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
-      GlobalKey<ScaffoldMessengerState>();
+  late GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
   factory ManualRepChange() {
     return _singleton;
   }
 
   ManualRepChange._internal();
 
-  Future<bool?> show(BuildContext context, currentTheme, double height,
+  Future<bool?> show(BuildContext context, currentTheme, double? height,
       appLocalizations, Account account) async {
     if (isDisplayed) {
       return false;
     }
     _context = context;
     isValidAddress = false;
-
+    height ??= MediaQuery.of(context).size.height;
+    isDisplayed = true;
+    scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
     return showModalBottomSheet<bool>(
         enableDrag: true,
         isScrollControlled: true,
@@ -66,7 +67,7 @@ class ManualRepChange {
                     color: currentTheme.primary,
                   ),
                   child: SizedBox(
-                    height: height / 1.25,
+                    height: height! / 1.25,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20.0),
                       child: ScaffoldMessenger(
@@ -496,8 +497,8 @@ class ManualRepChange {
 
   dismiss() {
     if (isDisplayed) {
-      addressController.dispose();
-      addressControllerFocusNode.dispose();
+      addressController.clear();
+      // addressControllerFocusNode.dispose();
       Navigator.of(_context).pop();
       isDisplayed = false;
     }

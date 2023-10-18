@@ -35,8 +35,7 @@ class MsgSignPage {
   int selectedIndex = -1;
   bool showSign = false;
 
-  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
-      GlobalKey<ScaffoldMessengerState>();
+  late GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
   factory MsgSignPage() {
     return _singleton;
   }
@@ -50,6 +49,10 @@ class MsgSignPage {
     if (isDisplayed) {
       return false;
     }
+    _context = context;
+
+    scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+    isDisplayed = true;
     double height = MediaQuery.of(context).size.height;
 
     //Wallet and address
