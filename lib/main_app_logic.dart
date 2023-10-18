@@ -215,7 +215,8 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
       locale: currentLocale,
       // ---------------------------
 
-      home: (width < 600 ? smallScreenLogic() : bigScreenLogic()),
+      home: smallScreenLogic(),
+      //width < 600 ? smallScreenLogic() : bigScreenLogic()),
     );
   }
 

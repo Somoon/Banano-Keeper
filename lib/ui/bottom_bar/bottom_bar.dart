@@ -129,7 +129,11 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
       onPressed: () async {
         var appLocalizations = AppLocalizations.of(context);
 
-        SendBottomSheet().show(context, services<ThemeModel>().curTheme,
+        final sendPage = SendBottomSheet();
+        if (sendPage.isDisplayed) {
+          sendPage.clear();
+        }
+        sendPage.show(context, services<ThemeModel>().curTheme,
             appLocalizations, account);
       },
       child: SizedBox(
