@@ -62,6 +62,8 @@ Future<void> setupUserData() async {
     services<PoWSource>().setAPI(userValues[7]);
     services<UserData>().setRepresentativesList(userValues[8]);
     services<UserData>().setRepUpdateTime(userValues[9]);
+    services<UserData>().setThreadCount(userValues[10]);
+    services<UserData>().setAuthOnBoot(userValues[11]);
 
     //get active wallet and index
 
@@ -195,7 +197,7 @@ class MyApp extends StatelessWidget {
             // return DeepLink.defaultPath;
             // or DeepLink.path('/')
             print('we here');
-            return DeepLink([Home()]);
+            return DeepLink([HomeRoute()]);
           }
         },
       ),

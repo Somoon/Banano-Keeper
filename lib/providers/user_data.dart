@@ -22,9 +22,11 @@ class UserData extends ChangeNotifier {
   late String lockType = "pin";
   String pin = "";
   late int lockoutTime = 0;
+  late bool authOnBoot = false;
   late String currency = "USD";
   late double minToReceive = 0.01;
   late String powSource = "Kalium";
+  late int threadCount = 3;
   late String blockExplorer = "";
   late bool Notifs = false;
 
@@ -61,6 +63,15 @@ class UserData extends ChangeNotifier {
     return pin;
   }
 
+  setAuthOnBoot(bool newStatus) {
+    authOnBoot = newStatus;
+    notifyListeners();
+  }
+
+  bool getAuthOnBoot() {
+    return authOnBoot;
+  }
+
   setLockType(String type) {
     lockType = type;
   }
@@ -77,6 +88,15 @@ class UserData extends ChangeNotifier {
 
   void setPoWSource(source) {
     powSource = source;
+    notifyListeners();
+  }
+
+  int getThreadCount() {
+    return threadCount;
+  }
+
+  void setThreadCount(int newThreadCount) {
+    threadCount = newThreadCount;
     notifyListeners();
   }
 

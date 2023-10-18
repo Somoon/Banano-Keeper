@@ -72,8 +72,8 @@ class SharedPrefsModel {
   saveCurrency(String currency) {
     sharedPref.setString('currency', currency);
   }
-  String getCurrency()
-  {
+
+  String getCurrency() {
     String stringValue = sharedPref.getString('currency') ?? "USD";
     return stringValue;
   }
@@ -114,6 +114,15 @@ class SharedPrefsModel {
     sharedPref.setString('PoWSource', powSource);
   }
 
+  getThreadCount() async {
+    int poWThreadCount = sharedPref.getInt('PoWThreadCount') ?? 3;
+    return poWThreadCount;
+  }
+
+  void saveThreadCount(int threadCount) async {
+    sharedPref.setInt('PoWThreadCount', threadCount);
+  }
+
   getPin() async {
     String pin = sharedPref.getString('pin') ?? "0";
     return pin;
@@ -121,6 +130,15 @@ class SharedPrefsModel {
 
   void savePin(pin) async {
     sharedPref.setString('pin', pin);
+  }
+
+  getAuthOnBoot() async {
+    bool status = sharedPref.getBool('authOnBoot') ?? false;
+    return status;
+  }
+
+  void saveAuthOnBoot(bool newStatus) async {
+    sharedPref.setBool('authOnBoot', newStatus);
   }
 
   Future<List> getStoredValues() async {
@@ -131,9 +149,11 @@ class SharedPrefsModel {
     var activeAccount = 0;
     var latestWalletID = 0;
     String powSource = "Kalium";
+    int powThreadCount = 3;
     String pin = "0";
     List<Representative> repList = [];
     int repUpdate = 0;
+    bool authOnBoot = false;
     if (isInit) {
       lang = await getLang();
       theme = await getTheme();
@@ -142,8 +162,10 @@ class SharedPrefsModel {
       latestWalletID = await getLatestWalletID();
       pin = await getPin();
       powSource = await getPoWSource();
+      powThreadCount = await getThreadCount();
       repList = await getRepresentatives();
       repUpdate = await getRepUpdateTime();
+      authOnBoot = await getAuthOnBoot();
     }
 
     return [
@@ -157,6 +179,8 @@ class SharedPrefsModel {
       powSource, //7
       repList, //8
       repUpdate, //9
+      powThreadCount, //10
+      authOnBoot, //11
     ];
   }
 
@@ -197,5 +221,8 @@ class SharedPrefsModel {
       sharedPref.remove("representatives");
     }
     if (sharedPref.containsKey("repUpdate")) sharedPref.remove("repUpdate");
+    if (sharedPref.containsKey("PoWThreadCount"))
+      sharedPref.remove("PoWThreadCount");
+    if (sharedPref.containsKey("authOnBoot")) sharedPref.remove("authOnBoot");
   }
 }

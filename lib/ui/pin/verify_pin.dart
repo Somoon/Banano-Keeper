@@ -107,10 +107,11 @@ class VerifyPINState extends State<VerifyPIN> with GetItStateMixin {
                                   topMsg = "PIN incorrect.";
                                 }),
                                 Future.delayed(
-                                    const Duration(milliseconds: 2000), () {
+                                    const Duration(milliseconds: 1500), () {
                                   setState(() {
                                     if (incorrectAttempt >= 3) {
                                       services<AppRouter>().pop<bool>(false);
+                                      Navigator.of(context).pop(false);
                                     }
                                     pinController.clear();
                                     topMsg = "";
@@ -124,6 +125,7 @@ class VerifyPINState extends State<VerifyPIN> with GetItStateMixin {
                                   setState(() {
                                     pinController.clear();
                                     services<AppRouter>().pop<bool>(true);
+                                    Navigator.of(context).pop(true);
                                   });
                                 })
                               }

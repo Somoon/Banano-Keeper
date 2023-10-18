@@ -29,8 +29,7 @@ class MsgSignVerifyPage {
   bool showResult = false;
   bool signValid = false;
 
-  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
-      GlobalKey<ScaffoldMessengerState>();
+  late GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
   factory MsgSignVerifyPage() {
     return _singleton;
   }
@@ -44,6 +43,9 @@ class MsgSignVerifyPage {
     if (isDisplayed) {
       return false;
     }
+    _context = context;
+    scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+    isDisplayed = true;
     double height = MediaQuery.of(context).size.height;
 
     return showModalBottomSheet<bool>(

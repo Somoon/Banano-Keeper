@@ -161,7 +161,7 @@ class SetupPinState extends State<SetupPin> with GetItStateMixin {
                                           //             MainAppLogic()),
                                           //     ModalRoute.withName("/homepage"));
                                           services<AppRouter>()
-                                              .replaceAll([Home()]);
+                                              .replaceAll([HomeRoute()]);
                                         }
                                       });
                                     })

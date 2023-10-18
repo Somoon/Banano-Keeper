@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/api/currency_conversion.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -11,6 +13,7 @@ import 'package:nanodart/nanodart.dart';
 import 'package:decimal/decimal.dart';
 import 'package:pointycastle/digests/blake2b.dart';
 import 'package:pinenacl/tweetnacl.dart';
+import 'dart:io';
 
 class Utils {
   BigInt banRaw = BigInt.parse('100000000000000000000000000000');
@@ -185,7 +188,7 @@ class Utils {
           ),
           GestureDetector(
             onTap: () {
-              print("asd");
+              // print("asd");
 
               services<UserData>().switchCurrency();
               //change currency showing here ------------------------
@@ -216,6 +219,37 @@ class Utils {
       }
     }
     return qRData;
+  }
+
+  dissectDeepLink(String? value) {
+    Map<String, String?> deepLinkData = {};
+    if (value != null) {
+      value = value.toLowerCase();
+      Uri? uri = Uri.tryParse(value);
+      if (uri != null) {
+        switch (uri.scheme) {
+          case 'ban':
+          case 'banano':
+            deepLinkData = getQRCodeData(value);
+            break;
+          case 'banrep':
+            deepLinkData['representative'] =
+                NanoAccounts.findAccountInString(NanoAccountType.BANANO, value);
+            break;
+          case 'bansign':
+            deepLinkData['message'] = Uri.decodeFull(uri.path);
+            break;
+          case 'banverify':
+            deepLinkData['message'] = uri.queryParameters['message'];
+            deepLinkData['sign'] = uri.queryParameters['sign'];
+            deepLinkData['address'] =
+                NanoAccounts.findAccountInString(NanoAccountType.BANANO, value);
+            break;
+        }
+      }
+    }
+
+    return deepLinkData;
   }
 
   generateSeed() {

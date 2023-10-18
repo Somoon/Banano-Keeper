@@ -282,7 +282,7 @@ class _SideDrawer extends State<SideDrawer>
       child: TextButton(
         style: currentTheme.btnStyleNoBorder,
         onPressed: () async {
-          var result = await MsgSignPage().show(context, currentTheme);
+          await MsgSignPage().show(context, currentTheme);
           MsgSignPage().clear();
           MsgSignVerifyPage().clear();
 
@@ -385,8 +385,8 @@ class _SideDrawer extends State<SideDrawer>
 
   resetFn() async {
     services<AppRouter>().replaceAll([InitialPage()]);
-    services<DBManager>().deleteDatabase();
     services<WalletsService>().resetService();
+    services<DBManager>().deleteDatabase();
   }
 
   /// creates a button that display a dialog to choose an item and peek at the active item
@@ -406,14 +406,19 @@ class _SideDrawer extends State<SideDrawer>
         style: currentTheme.btnStyleNoBorder,
         onPressed: () {
           showDialog(
-            context: context,
-            builder: (BuildContext context) => Dialog(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(25))),
-              backgroundColor: currentTheme.primary,
-              child: dialogWidget, // -- CHANGE LATER
-            ),
-          );
+              context: context,
+              builder: (BuildContext context) {
+                return StatefulBuilder(
+                  builder: (context, setState) {
+                    return Dialog(
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(25))),
+                      backgroundColor: currentTheme.primary,
+                      child: dialogWidget, // -- CHANGE LATER
+                    );
+                  },
+                );
+              });
         },
         child: Column(
           children: [
@@ -429,9 +434,7 @@ class _SideDrawer extends State<SideDrawer>
                 ),
               ),
             ),
-            const SizedBox(
-              height: 2,
-            ),
+            const Gap(2),
             Align(
               alignment: (!Utils().isDirectionRTL(context)
                   ? Alignment.centerLeft
@@ -444,6 +447,7 @@ class _SideDrawer extends State<SideDrawer>
                 ),
               ),
             ),
+            const Gap(5),
           ],
         ),
       ),
@@ -522,8 +526,16 @@ class _SideDrawer extends State<SideDrawer>
             .repScore(rep?.score.toString() ?? "0.00")
         : "");
 
-    var result = await RepPage().show(context, currentTheme, repName, score,
-        activeRep, repList, account, rep);
+    var result = await RepPage().show(
+      context,
+      currentTheme,
+      repName,
+      score,
+      activeRep,
+      repList,
+      account,
+      rep,
+    );
     return result;
   }
 

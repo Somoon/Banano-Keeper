@@ -47,8 +47,17 @@ abstract class _$AppRouter extends RootStackRouter {
         child: InitialPageOne(key: args.key),
       );
     },
-    Home.name: (routeData) {
-      final args = routeData.argsAs<HomeArgs>(orElse: () => const HomeArgs());
+    LockedBootupRoute.name: (routeData) {
+      final args = routeData.argsAs<LockedBootupRouteArgs>(
+          orElse: () => const LockedBootupRouteArgs());
+      return AutoRoutePage<bool>(
+        routeData: routeData,
+        child: LockedBootup(key: args.key),
+      );
+    },
+    HomeRoute.name: (routeData) {
+      final args =
+          routeData.argsAs<HomeRouteArgs>(orElse: () => const HomeRouteArgs());
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: MainAppLogic(key: args.key),
@@ -203,30 +212,59 @@ class InitialPageArgs {
 }
 
 /// generated route for
-/// [MainAppLogic]
-class Home extends PageRouteInfo<HomeArgs> {
-  Home({
+/// [LockedBootup]
+class LockedBootupRoute extends PageRouteInfo<LockedBootupRouteArgs> {
+  LockedBootupRoute({
     Key? key,
     List<PageRouteInfo>? children,
   }) : super(
-          Home.name,
-          args: HomeArgs(key: key),
+          LockedBootupRoute.name,
+          args: LockedBootupRouteArgs(key: key),
           initialChildren: children,
         );
 
-  static const String name = 'Home';
+  static const String name = 'LockedBootupRoute';
 
-  static const PageInfo<HomeArgs> page = PageInfo<HomeArgs>(name);
+  static const PageInfo<LockedBootupRouteArgs> page =
+      PageInfo<LockedBootupRouteArgs>(name);
 }
 
-class HomeArgs {
-  const HomeArgs({this.key});
+class LockedBootupRouteArgs {
+  const LockedBootupRouteArgs({this.key});
 
   final Key? key;
 
   @override
   String toString() {
-    return 'HomeArgs{key: $key}';
+    return 'LockedBootupRouteArgs{key: $key}';
+  }
+}
+
+/// generated route for
+/// [MainAppLogic]
+class HomeRoute extends PageRouteInfo<HomeRouteArgs> {
+  HomeRoute({
+    Key? key,
+    List<PageRouteInfo>? children,
+  }) : super(
+          HomeRoute.name,
+          args: HomeRouteArgs(key: key),
+          initialChildren: children,
+        );
+
+  static const String name = 'HomeRoute';
+
+  static const PageInfo<HomeRouteArgs> page = PageInfo<HomeRouteArgs>(name);
+}
+
+class HomeRouteArgs {
+  const HomeRouteArgs({this.key});
+
+  final Key? key;
+
+  @override
+  String toString() {
+    return 'HomeRouteArgs{key: $key}';
   }
 }
 

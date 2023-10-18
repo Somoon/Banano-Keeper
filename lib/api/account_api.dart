@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
 
 import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -67,9 +66,7 @@ class AccountAPI {
     String apiURL = services<PoWSource>().getAPIURL();
 
     Map<String, dynamic> request = {};
-    // print("POW TYPE: !!!!!!!!! ${powType} !!!!!!!!!!!!!!");
     if (powType == 'Local PoW') {
-      // if (block.work == null || block.work == '') {
       LocalPoW lPow = LocalPoW();
 
       lPow.completer = Completer<String>();
@@ -78,9 +75,8 @@ class AccountAPI {
         hash: hashForWork,
       );
       String fetchedWork = await lPow.completer.future;
-      print(fetchedWork);
+      // print(fetchedWork);
       block.work = fetchedWork;
-      // services<LocalPoW>().generateWork(hash: block.signature, threads: 2);
 
       request = {
         "action": "process",
@@ -120,9 +116,9 @@ class AccountAPI {
     }
 
     // print(response.statusCode);
-    if (kDebugMode) {
-      print(response.body);
-    }
+    // if (kDebugMode) {
+    //   print(response.body);
+    // }
     return response.body;
   }
 
