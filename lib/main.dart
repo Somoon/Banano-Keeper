@@ -19,6 +19,7 @@ import 'package:flutter/services.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uni_links_desktop/uni_links_desktop.dart';
 import 'main_app_logic.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
@@ -146,6 +147,13 @@ void main() async {
   initServices();
   services.registerSingleton<AppRouter>(AppRouter());
   await setupUserData();
+  if (!kIsWeb && Platform.isWindows) {
+    registerProtocol('ban');
+    registerProtocol('banano');
+    registerProtocol('banrep');
+    registerProtocol('bansign');
+    registerProtocol('banverify');
+  }
 
   //remove splash ready to start
   FlutterNativeSplash.remove();

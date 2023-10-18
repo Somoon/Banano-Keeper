@@ -757,6 +757,7 @@ class MsgSignVerifyPage {
     addressController.clear();
     signController.clear();
     errMsg = '';
+    isDisplayed = false;
   }
 
   dismiss() {

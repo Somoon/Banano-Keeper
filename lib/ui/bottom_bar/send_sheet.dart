@@ -656,6 +656,7 @@ class SendBottomSheet {
     // addressControllerFocusNode.clear();
     amountController.clear();
     // amountControllerFocusNode.dispose();
+    isDisplayed = false;
   }
 
   dismiss() {

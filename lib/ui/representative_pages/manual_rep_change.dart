@@ -495,12 +495,16 @@ class ManualRepChange {
     }
   }
 
+  clear() {
+    addressController.clear();
+    isDisplayed = false;
+  }
+
   dismiss() {
     if (isDisplayed) {
-      addressController.clear();
       // addressControllerFocusNode.dispose();
-      Navigator.of(_context).pop();
       isDisplayed = false;
+      Navigator.of(_context).pop();
     }
   }
 }

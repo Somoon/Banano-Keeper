@@ -99,8 +99,8 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
         if (!mounted) {
           return;
         }
-        print('-----------------------------------------------------');
-        print('Received URI: $newURI');
+        // print('-----------------------------------------------------');
+        // print('Received URI: $newURI');
         Uri? uri = Uri.tryParse(newURI!);
         String? scheme = uri?.scheme;
         Map<String, String?> deepLinkData = Utils().dissectDeepLink(newURI);
@@ -144,11 +144,9 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
     switch (scheme) {
       case 'ban':
       case 'banano':
-        print(deepLinkData);
         final sendPage = SendBottomSheet();
         if (sendPage.isDisplayed) {
           sendPage.clear();
-          sendPage.dismiss();
         }
         sendPage.show(context, services<ThemeModel>().curTheme,
             AppLocalizations.of(context), account);
@@ -159,7 +157,7 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
         break;
       case 'banrep':
         final repPage = ManualRepChange();
-        if (repPage.isDisplayed) repPage.dismiss();
+        if (repPage.isDisplayed) repPage.clear();
         repPage.show(context, services<ThemeModel>().curTheme, null,
             AppLocalizations.of(context), account);
         repPage.addressController.text = deepLinkData['representative'] ?? "";
@@ -168,7 +166,6 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
         final msgSignPage = MsgSignPage();
         if (msgSignPage.isDisplayed) {
           msgSignPage.clear();
-          msgSignPage.dismiss();
         }
         msgSignPage.show(context, services<ThemeModel>().curTheme);
         msgSignPage.messageController.text = deepLinkData['message'] ?? "";
@@ -177,7 +174,6 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
         final msgSignVerifyPage = MsgSignVerifyPage();
         if (msgSignVerifyPage.isDisplayed) {
           msgSignVerifyPage.clear();
-          msgSignVerifyPage.dismiss();
         }
         msgSignVerifyPage.show(context, services<ThemeModel>().curTheme);
         // print(deepLinkData);
