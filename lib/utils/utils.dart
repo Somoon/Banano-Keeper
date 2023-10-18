@@ -240,10 +240,6 @@ class Utils {
             deepLinkData['message'] = Uri.decodeFull(uri.path);
             break;
           case 'banverify':
-            print(value);
-
-            var a = getUrlParameter(value, 'message');
-            print("return getParam $a");
             deepLinkData['message'] = uri.queryParameters['message'];
             deepLinkData['sign'] = uri.queryParameters['sign'];
             deepLinkData['address'] =
@@ -253,33 +249,7 @@ class Utils {
       }
     }
 
-    // var split = value.split('?amount=');
-    // if (split.length > 1) {
-    //   if (uri != null && uri.queryParameters['amount'] != null) {
-    //     deepLinkData['amountRaw'] = uri.queryParameters['amount']!;
-    //   }
-    // }
     return deepLinkData;
-  }
-
-  getUrlParameter(String url, String sParam) {
-    print(url);
-    var sPageURL = url;
-    List<String> sURLVariables = sPageURL.split('&');
-    print('vars = $sURLVariables');
-    List<String> sParameterName = [];
-
-    for (int i = 0; i < sURLVariables.length; i++) {
-      String temp = sURLVariables[i];
-      print('current car = $temp');
-
-      sParameterName = temp.split('=');
-
-      if (sParameterName[0] == sParam) {
-        return Uri.decodeFull(sParameterName[1]);
-      }
-    }
-    return false;
   }
 
   generateSeed() {

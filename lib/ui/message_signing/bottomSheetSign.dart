@@ -9,8 +9,6 @@ import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/themes.dart';
 import 'package:bananokeeper/ui/dialogs/info_dialog.dart';
 import 'package:bananokeeper/ui/message_signing/message_sign_verification.dart';
-import 'package:bananokeeper/ui/representative_pages/list_rep_change.dart';
-import 'package:bananokeeper/ui/representative_pages/manual_rep_change.dart';
 import 'package:flutter/material.dart';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -23,7 +21,6 @@ import 'package:nanodart/nanodart.dart';
 // import 'package:nanodart/src/crypto/tweetnacl_blake2b.dart';
 import 'package:pointycastle/digests/blake2b.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
-import 'dart:typed_data';
 import 'dart:io';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 
@@ -227,7 +224,7 @@ class MsgSignPage {
                                         const Gap(20),
                                         AutoSizeText(
                                           errMsg,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             color: Colors.red,
                                           ),
                                           maxLines: 1,

@@ -7,6 +7,7 @@ import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/themes.dart';
+import 'package:bananokeeper/ui/bottom_bar/send_sheet.dart';
 import 'package:bananokeeper/ui/message_signing/bottomSheetSign.dart';
 import 'package:bananokeeper/ui/message_signing/message_sign_verification.dart';
 import 'package:bananokeeper/ui/representative_pages/manual_rep_change.dart';
@@ -16,7 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:bananokeeper/ui/wallet_picker.dart';
 import 'package:bananokeeper/ui/sideDrawer.dart';
 import 'package:bananokeeper/ui/home_body.dart';
-import 'package:bananokeeper/ui/bottom_bar.dart';
+import 'package:bananokeeper/ui/bottom_bar/bottom_bar.dart';
 import 'package:flutter/services.dart';
 
 import 'package:get_it_mixin/get_it_mixin.dart';
@@ -29,8 +30,6 @@ bool _initialURILinkHandled = false;
 @RoutePage(name: "HomeRoute")
 class MainAppLogic extends StatefulWidget with GetItStatefulWidgetMixin {
   MainAppLogic({super.key});
-  // final bool isNewUser;
-  // MainAppLogic(this.isNewUser, {super.key});
   @override
   // ignore: library_private_types_in_public_api
   _MainAppLogic createState() => _MainAppLogic();
@@ -97,8 +96,6 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
       // It will handle app links while the app is already started - be it in
       // the foreground or in the background.
       _streamSubscription = linkStream.listen((String? newURI) async {
-        print('Receiaaaaaaaved URI: $newURI');
-
         if (!mounted) {
           return;
         }
@@ -147,6 +144,18 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
     switch (scheme) {
       case 'ban':
       case 'banano':
+        print(deepLinkData);
+        final sendPage = SendBottomSheet();
+        if (sendPage.isDisplayed) {
+          sendPage.clear();
+          sendPage.dismiss();
+        }
+        sendPage.show(context, services<ThemeModel>().curTheme,
+            AppLocalizations.of(context), account);
+        sendPage.addressController.text = deepLinkData['address'] ?? "";
+        String amount =
+            Utils().amountFromRaw(deepLinkData['amountRaw'] ?? "0").toString();
+        sendPage.amountController.text = amount;
         break;
       case 'banrep':
         final repPage = ManualRepChange();
@@ -171,7 +180,7 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
           msgSignVerifyPage.dismiss();
         }
         msgSignVerifyPage.show(context, services<ThemeModel>().curTheme);
-        print(deepLinkData);
+        // print(deepLinkData);
         msgSignVerifyPage.addressController.text =
             deepLinkData['address'] ?? "";
         msgSignVerifyPage.messageController.text =
