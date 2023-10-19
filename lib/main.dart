@@ -156,7 +156,6 @@ void main() async {
   }
 
   //remove splash ready to start
-  FlutterNativeSplash.remove();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(
@@ -166,6 +165,7 @@ void main() async {
 
     // setup window size for PC/Desktop platforms
     initWindowsSize();
+    FlutterNativeSplash.remove();
   });
 }
 

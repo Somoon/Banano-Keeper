@@ -73,10 +73,10 @@ class Account extends ChangeNotifier {
     return name;
   }
 
-  void setRep(String newRep) {
+  void setRep(String newRep) async {
     int activeWallet = services<WalletsService>().activeWallet;
     String originalName = services<WalletsService>().walletsList[activeWallet];
-    services<DBManager>().updateAccountRep(originalName, index, newRep);
+    await services<DBManager>().updateAccountRep(originalName, index, newRep);
     representative = newRep;
     notifyListeners();
   }

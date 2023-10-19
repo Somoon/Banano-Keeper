@@ -385,8 +385,9 @@ class _SideDrawer extends State<SideDrawer>
 
   resetFn() async {
     services<AppRouter>().replaceAll([InitialPage()]);
-    services<WalletsService>().resetService();
-    services<DBManager>().deleteDatabase();
+
+    await services<WalletsService>().resetService();
+    await services<DBManager>().deleteDatabase();
   }
 
   /// creates a button that display a dialog to choose an item and peek at the active item

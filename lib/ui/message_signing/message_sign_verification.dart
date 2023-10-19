@@ -49,6 +49,7 @@ class MsgSignVerifyPage {
     double height = MediaQuery.of(context).size.height;
 
     return showModalBottomSheet<bool>(
+        isDismissible: false,
         enableDrag: true,
         isScrollControlled: true,
         context: context,
@@ -146,6 +147,7 @@ class MsgSignVerifyPage {
                                                 // addressController.clear();
                                                 Navigator.of(context)
                                                     .pop(false);
+                                                clear();
                                               });
                                             },
                                             style: ButtonStyle(

@@ -113,7 +113,9 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
         if (!mounted) {
           return;
         }
-        print('Error occurred: $err');
+        if (kDebugMode) {
+          print('Error occurred: $err');
+        }
         setState(() {
           _currentURI = null;
           if (err is FormatException) {
@@ -172,9 +174,9 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
         break;
       case 'banverify':
         final msgSignVerifyPage = MsgSignVerifyPage();
-        if (msgSignVerifyPage.isDisplayed) {
-          msgSignVerifyPage.clear();
-        }
+        // if (!msgSignVerifyPage.isDisplayed) {
+        msgSignVerifyPage.clear();
+        // }
         msgSignVerifyPage.show(context, services<ThemeModel>().curTheme);
         // print(deepLinkData);
         msgSignVerifyPage.addressController.text =
