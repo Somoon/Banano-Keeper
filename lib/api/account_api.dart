@@ -61,7 +61,8 @@ class AccountAPI {
     return response;
   }
 
-  processRequest(StateBlock block, subtype, [String publicKey = '']) async {
+  processRequest(StateBlock block, String subtype,
+      [String publicKey = '']) async {
     String powType = services<PoWSource>().getAPIName();
     String apiURL = services<PoWSource>().getAPIURL();
 
