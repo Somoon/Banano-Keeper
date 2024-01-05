@@ -38,7 +38,10 @@ class ActiveAccountState extends State<ActiveAccount>
     int accountIndex =
         watchOnly((WalletService x) => x.activeIndex, instanceName: walletName);
 
-    String accOrgName = wallet.accountsList[accountIndex];
+    String accOrgName = watchOnly(
+        (WalletService x) => x.accountsList[accountIndex],
+        instanceName: walletName);
+    // wallet.accountsList[accountIndex];
 
     var account = services<Account>(instanceName: accOrgName);
     var accountOpen =
@@ -50,9 +53,8 @@ class ActiveAccountState extends State<ActiveAccount>
     if (!account.doneovR && !completed) {
       services<QueueService>().add(account.getOverview(true));
     }
-    String currentAccount = watchOnly(
-        (WalletService x) => x.getCurrentAccount(),
-        instanceName: walletName);
+    String currentAccount =
+        watchX((WalletService x) => x.currentAccount, instanceName: walletName);
     double width = MediaQuery.of(context).size.width;
     return displayActiveCard(
         currentTheme, width, currentAccount, account, wallet, !accountOpen);

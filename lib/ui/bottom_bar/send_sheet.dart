@@ -327,6 +327,22 @@ class SendBottomSheet {
                   await account.setBalance(newRaw);
                   await services<QueueService>()
                       .add(account.onRefreshUpdateHistory());
+
+                  //have wallet walletName
+                  //need accountOrgName
+
+                  int accountIndex =
+                      services<WalletService>(instanceName: walletName)
+                          .activeIndex;
+                  String accountOrgName =
+                      services<WalletService>(instanceName: walletName)
+                          .accountsList[accountIndex];
+                  var account2 =
+                      services<Account>(instanceName: accountOrgName);
+                  await account2.setBalance(newRaw);
+                  await services<QueueService>()
+                      .add(account2.onRefreshUpdateHistory());
+
                   amountController.clear();
                   addressController.clear();
                   Navigator.of(_context).pop(true);
