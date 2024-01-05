@@ -65,6 +65,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  biometric_storage:
+    dependency: "direct main"
+    description:
+      name: biometric_storage
+      sha256: "2bae7ce64d4e3a390f8adfd0373ed1a82d567e3692e16a1bd0f72f91fb962ae3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.0+4"
   bip39:
     dependency: transitive
     description:

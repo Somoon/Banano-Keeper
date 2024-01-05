@@ -99,17 +99,17 @@ class _SideDrawer extends State<SideDrawer>
             children: <Widget>[
               const Gap(10),
 
-              /*
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
                   style: currentTheme.btnStyleNoBorder,
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => DBTest(),
-                      ),
-                    );
+                  onPressed: () async {
+                    // await BiometricUtil().getBioStoragePIN();
+                    // Navigator.of(context).push(
+                    //   MaterialPageRoute(
+                    //     builder: (context) => DBTest(),
+                    //   ),
+                    // );
                   },
                   child: Column(
                     children: [
@@ -131,7 +131,7 @@ class _SideDrawer extends State<SideDrawer>
                     ],
                   ),
                 ),
-              ),*/
+              ),
 
               //Wallet management button
               createPrimaryDrawerButton(

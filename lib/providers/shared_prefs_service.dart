@@ -1,6 +1,9 @@
 import 'dart:convert';
 
 import 'package:bananokeeper/api/representative_json.dart';
+import 'package:bananokeeper/providers/auth_biometric.dart';
+import 'package:bananokeeper/utils/utils.dart';
+import 'package:biometric_storage/biometric_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async' show Future;
@@ -124,12 +127,39 @@ class SharedPrefsModel {
   }
 
   getPin() async {
-    String pin = sharedPref.getString('pin') ?? "0";
+    String pinE = sharedPref.getString('pin') ?? "0";
+    final pin = await Utils().decryptSeed(pinE);
     return pin;
   }
 
   void savePin(pin) async {
-    sharedPref.setString('pin', pin);
+    final key = await bioStorageFetchKey();
+    final ecryptedPIN = await Utils().encryptSeed(pin, key);
+    sharedPref.setString('pin', ecryptedPIN);
+  }
+
+  bioStorageSaveKey(String masterKey) async {
+    BiometricStorageFile? _authStorage;
+
+    _authStorage = await BiometricStorage().getStorage('masterKey',
+        options: StorageFileInitOptions(
+          authenticationRequired: false,
+        ));
+
+    await _authStorage.write(masterKey);
+    print("written pin to secuStorage");
+  }
+
+  Future<String> bioStorageFetchKey() async {
+    BiometricStorageFile? authStorage;
+
+    authStorage = await BiometricStorage().getStorage('masterKey',
+        options: StorageFileInitOptions(
+          authenticationRequired: false,
+        ));
+
+    final result = await authStorage.read();
+    return result ?? '0';
   }
 
   getAuthOnBoot() async {

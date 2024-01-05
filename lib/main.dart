@@ -22,13 +22,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uni_links_desktop/uni_links_desktop.dart';
 import 'main_app_logic.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-
+import 'package:biometric_storage/biometric_storage.dart';
 //for debug prints kDebugMode
 import 'package:flutter/foundation.dart';
 // void main() => runApp(const MyApp());
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 bool isNewUser = false;
+BiometricStorageFile? masterKeyStorage;
+
 Future<void> _initSharedPref() async {
   SharedPreferences sharedPref = await SharedPreferences.getInstance();
   services.registerSingleton<SharedPrefsModel>(SharedPrefsModel(sharedPref));
@@ -50,6 +52,8 @@ Future<void> setupUserData() async {
 
   if (!userValues[0]) {
     isNewUser = true;
+    String masterKey = Utils().getRandString(64);
+    services<SharedPrefsModel>().bioStorageSaveKey(masterKey);
     // send user to firsttime page v
   } else {
     if (kDebugMode) {
@@ -92,8 +96,10 @@ Future<void> setupUserData() async {
 Future<void> loadWalletsFromDB(
     String activeWalletName, int activeAccountIndex) async {
   var walletsData = await services<DBManager>().getWallets();
+  final masterKey = await services<SharedPrefsModel>().bioStorageFetchKey();
   for (var walletData in walletsData) {
-    var seed = await Utils().decryptSeed(walletData['seed_encrypted']);
+    var seed =
+        await Utils().decryptSeed(walletData['seed_encrypted'], masterKey);
     var original_name = walletData['original_name'];
     int active_index = walletData['active_index'];
     services<WalletsService>().importWallet(

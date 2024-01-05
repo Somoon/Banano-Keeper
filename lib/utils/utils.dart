@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/api/currency_conversion.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/utils/tnacl/tnacl.dart';
 import 'package:custom_platform_device_id/platform_device_id.dart';
@@ -114,9 +116,17 @@ class Utils {
     return deviceId;
   }
 
+  String getRandString(int len) {
+    var random = Random.secure();
+    var values = List<int>.generate(len, (i) => random.nextInt(255));
+    // return base64UrlEncode(values);
+    return values.join();
+  }
+
   Future<String> encryptSeed(seed, [String? dID]) async {
-    dID = await Utils().getDeviceID();
-    String password = dID!;
+    String password = (dID == null)
+        ? await services<SharedPrefsModel>().bioStorageFetchKey()
+        : dID;
 
     Uint8List encrypted = NanoCrypt.encrypt(seed, password);
     String encryptedSeedHex = NanoHelpers.byteToHex(encrypted);
@@ -124,8 +134,10 @@ class Utils {
   }
 
   Future<String> decryptSeed(encryptedSeed, [String? dID]) async {
-    dID = await Utils().getDeviceID() ?? "";
-    String password = dID!;
+    String password = (dID == null)
+        ? await services<SharedPrefsModel>().bioStorageFetchKey()
+        : dID;
+
     Uint8List decrypted;
     String seed;
     try {

@@ -326,7 +326,7 @@ class InitialPageInformationState extends State<InitialPageInformation>
                         print(
                             "LATEST ID ${services<WalletsService>().latestWalletID}");
                       }
-                      setState(() async {
+                      setState(() {
                         //await
                         services<AppRouter>()
                             .push(SetupPinRoute(nextPage: 'initial'));
