@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 
 import 'package:bananokeeper/api/representative_json.dart';
 import 'package:bananokeeper/db/dbManager.dart';
-import 'package:bananokeeper/initial_pages/initial_page_one.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -25,7 +24,6 @@ import 'package:bananokeeper/ui/dialogs/themes_dialog.dart';
 import 'package:bananokeeper/ui/management/management_address_page.dart';
 import 'package:bananokeeper/ui/management/management_page.dart';
 import 'package:bananokeeper/ui/management/management_wallet_page.dart';
-import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:bananokeeper/ui/representative_pages/rep_page.dart';
 import 'package:bananokeeper/ui/dialogs/lang_dialog.dart';
 import 'package:bananokeeper/utils/utils.dart';

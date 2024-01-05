@@ -14,6 +14,7 @@ import 'package:bananokeeper/ui/active_address.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pinput/pinput.dart';
 import '../themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -30,6 +31,50 @@ class _home_body extends State<home_body>
 
   TextEditingController nameController = TextEditingController();
   @override
+  void initState() {
+    controller.addListener(_scrollListener);
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.removeListener(_scrollListener);
+    controller.dispose();
+    super.dispose();
+  }
+
+  int _itemCount = 7;
+  static const _scrollThreshold = 0.8;
+  void _scrollListener() async {
+    // if (controller.offset >=
+    //         controller.position.maxScrollExtent * _scrollThreshold &&
+    //     !controller.position.outOfRange) {
+    //   print('Scroll position is at ${_scrollThreshold * 100}%.');
+    // }
+    if (controller.offset >= controller.position.maxScrollExtent &&
+        !controller.position.outOfRange) {
+      await Future.delayed(const Duration(milliseconds: 250), () {
+        services<QueueService>().add(fetchMoreTrans(_acc));
+      });
+
+      setState(() {
+        print("each the bottom");
+      });
+    }
+  }
+
+  late Account _acc;
+  late final Future myFuture = getFuture();
+  bool firstBoot = true;
+  getFuture() async {
+    if (firstBoot) {
+      await _acc.getHistory();
+      firstBoot = false;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     // double height = MediaQuery.of(context).size.height;
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
@@ -45,7 +90,7 @@ class _home_body extends State<home_body>
     String accOrgName = wallet.accountsList[accountIndex];
 
     var account = services<Account>(instanceName: accOrgName);
-
+    _acc = account;
     List<AccountHistory> history =
         watchOnly((Account x) => x.history, instanceName: accOrgName);
 
@@ -144,7 +189,8 @@ class _home_body extends State<home_body>
                 child: Container(
                   child: //[
                       FutureBuilder(
-                    future: account.getHistory(),
+                    future: myFuture,
+                    // future: account.getHistory(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         if (history.isEmpty) {
@@ -221,6 +267,8 @@ class _home_body extends State<home_body>
   }
 
   _transListViewBuilder(account) {
+    _itemCount = account.history.length;
+
     return ListView.builder(
       controller: controller,
       // physics: const ClampingScrollPhysics(),
@@ -384,6 +432,13 @@ class _home_body extends State<home_body>
     await services<QueueService>().add(account.handleOverviewResponse(true));
 
     setState(() {});
+  }
+
+  Future<void> fetchMoreTrans(Account account) async {
+    int offset = account.history.length;
+    int size = 15;
+    await services<QueueService>()
+        .add(account.onRefreshUpdateHistory(offset, size));
   }
 
   Widget unopenedCard() {
