@@ -97,7 +97,7 @@ class WalletService extends ChangeNotifier {
       //   print("address: $address");
       // }
     }
-    // currentAccount.value = address;
+    currentAccount.value = address;
 
     if (nickname == "") {
       nickname = "Account $index";

@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:bananokeeper/api/representative_json.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/utils/utils.dart';
-import 'package:biometric_storage/biometric_storage.dart';
+import 'package:biometric_storage/biometric_storage_win.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async' show Future;
@@ -141,10 +142,17 @@ class SharedPrefsModel {
   bioStorageSaveKey(String masterKey) async {
     BiometricStorageFile? _authStorage;
 
-    _authStorage = await BiometricStorage().getStorage('masterKey',
-        options: StorageFileInitOptions(
-          authenticationRequired: false,
-        ));
+    if (!kIsWeb && Platform.isWindows) {
+      _authStorage = await Win32BiometricStoragePlugin().getStorage('masterKey',
+          options: StorageFileInitOptions(
+            authenticationRequired: false,
+          ));
+    } else {
+      _authStorage = await BiometricStorage().getStorage('masterKey',
+          options: StorageFileInitOptions(
+            authenticationRequired: false,
+          ));
+    }
 
     await _authStorage.write(masterKey);
     print("written pin to secuStorage");
@@ -153,10 +161,17 @@ class SharedPrefsModel {
   Future<String> bioStorageFetchKey() async {
     BiometricStorageFile? authStorage;
 
-    authStorage = await BiometricStorage().getStorage('masterKey',
-        options: StorageFileInitOptions(
-          authenticationRequired: false,
-        ));
+    if (!kIsWeb && Platform.isWindows) {
+      authStorage = await Win32BiometricStoragePlugin().getStorage('masterKey',
+          options: StorageFileInitOptions(
+            authenticationRequired: false,
+          ));
+    } else {
+      authStorage = await BiometricStorage().getStorage('masterKey',
+          options: StorageFileInitOptions(
+            authenticationRequired: false,
+          ));
+    }
 
     final result = await authStorage.read();
     return result ?? '0';
