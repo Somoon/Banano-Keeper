@@ -98,7 +98,7 @@ class _SideDrawer extends State<SideDrawer>
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               const Gap(10),
-// /*
+              /*
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
@@ -133,7 +133,7 @@ class _SideDrawer extends State<SideDrawer>
                   ),
                 ),
               ),
-// */
+ */
               //Wallet management button
               createPrimaryDrawerButton(
                 AppLocalizations.of(context)!.manageWallets,
