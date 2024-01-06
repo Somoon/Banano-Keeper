@@ -55,7 +55,7 @@ class WalletsService extends ChangeNotifier {
       print(await services<DBManager>().getWalletData(original_name));
     }
 
-    addWallet(wallet);
+    await addWallet(wallet);
     services.registerSingleton<WalletService>(wallet,
         instanceName: original_name);
     services<WalletService>(instanceName: original_name).createAccount(0);

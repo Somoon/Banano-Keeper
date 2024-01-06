@@ -192,25 +192,30 @@ class InitialPageImportState extends State<InitialPageImport>
       child: TextButton(
         onPressed: () async {
           if (NanoSeeds.isValidSeed(importSeedTextController.text)) {
-            services<WalletsService>().setLatestWalletID(0);
+            bool? ok = await services<AppRouter>()
+                .push(SetupPinRoute(nextPage: 'initial'));
 
-            await services<WalletsService>()
-                .createNewWallet(importSeedTextController.text);
-            // importSeedTextController.clear();
-            await services<WalletsService>().setActiveWallet(0);
+            if (ok != null && ok) {
+              services<WalletsService>().setLatestWalletID(0);
 
-            String walletName = services<WalletsService>().walletsList[0];
+              await services<WalletsService>()
+                  .createNewWallet(importSeedTextController.text);
+              // importSeedTextController.clear();
+              await services<WalletsService>().setActiveWallet(0);
 
-            services<WalletService>(instanceName: walletName).setActiveIndex(0);
-            services<SharedPrefsModel>().initliazeValues();
-            setState(() {
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (context) => SetupPin("initial"),
-              //   ),
-              // );
-              services<AppRouter>().push(SetupPinRoute(nextPage: 'initial'));
-            });
+              String walletName = services<WalletsService>().walletsList[0];
+
+              services<WalletService>(instanceName: walletName)
+                  .setActiveIndex(0);
+              services<SharedPrefsModel>().initliazeValues();
+              setState(() {
+                // Navigator.of(context).push(
+                //   MaterialPageRoute(
+                //     builder: (context) => SetupPin("initial"),
+                //   ),
+                // );
+              });
+            }
           }
         },
         style: ButtonStyle(
