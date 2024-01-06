@@ -290,9 +290,6 @@ class InitialPageInformationState extends State<InitialPageInformation>
                         (states) => currentTheme.text.withOpacity(0.3)),
                   ),
                   onPressed: () {
-                    if (kDebugMode) {
-                      print("CLICKED BACK");
-                    }
                     services<WalletsService>().deleteWallet(0);
                     Navigator.of(context).pop(true);
                   },
@@ -311,28 +308,31 @@ class InitialPageInformationState extends State<InitialPageInformation>
                   ),
                   onPressed: () async {
                     if (isCheckedNewWallet) {
-                      services<WalletsService>().setLatestWalletID(0);
+                      bool? ok = await services<AppRouter>()
+                          .push(SetupPinRoute(nextPage: 'initial'));
 
-                      await services<WalletsService>().createNewWallet(seed);
-                      services<WalletsService>().setActiveWallet(0);
+                      if (ok != null && ok) {
+                        services<WalletsService>().setLatestWalletID(0);
 
-                      String walletName =
-                          services<WalletsService>().walletsList[0];
+                        await services<WalletsService>().createNewWallet(seed);
+                        services<WalletsService>().setActiveWallet(0);
 
-                      services<WalletService>(instanceName: walletName)
-                          .setActiveIndex(0);
-                      services<SharedPrefsModel>().initliazeValues();
-                      if (kDebugMode) {
-                        print(
-                            "LATEST ID ${services<WalletsService>().latestWalletID}");
+                        String walletName =
+                            services<WalletsService>().walletsList[0];
+
+                        services<WalletService>(instanceName: walletName)
+                            .setActiveIndex(0);
+                        services<SharedPrefsModel>().initliazeValues();
+                        if (kDebugMode) {
+                          print(
+                              "LATEST ID ${services<WalletsService>().latestWalletID}");
+                        }
+                        setState(() {
+                          //await
+                          services<AppRouter>().replaceAll([HomeRoute()]);
+                          //after successful return create wallet
+                        });
                       }
-                      setState(() {
-                        //await
-                        services<AppRouter>()
-                            .push(SetupPinRoute(nextPage: 'initial'));
-
-                        //after successful return create wallet
-                      });
                     }
                   },
                   child: Text(

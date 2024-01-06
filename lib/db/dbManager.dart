@@ -38,6 +38,7 @@ class DBManager {
 );""";
 
   Future<void> deleteDatabase() async {
+    await database.close();
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final path = join(documentsDirectory.path, _databaseName);
     databaseFactory.deleteDatabase(path);

@@ -44,8 +44,8 @@ class _home_body extends State<home_body>
     super.dispose();
   }
 
-  int _itemCount = 7;
-  static const _scrollThreshold = 0.8;
+  // int _itemCount = 7;
+  // static const _scrollThreshold = 0.8;
   void _scrollListener() async {
     // if (controller.offset >=
     //         controller.position.maxScrollExtent * _scrollThreshold &&
@@ -59,7 +59,7 @@ class _home_body extends State<home_body>
       });
 
       setState(() {
-        print("each the bottom");
+        // print("each the bottom");
       });
     }
   }
@@ -267,7 +267,7 @@ class _home_body extends State<home_body>
   }
 
   _transListViewBuilder(account) {
-    _itemCount = account.history.length;
+    // _itemCount = account.history.length;
 
     return ListView.builder(
       controller: controller,

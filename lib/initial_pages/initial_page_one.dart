@@ -54,7 +54,10 @@ class InitialPageOneState extends State<InitialPageOne> with GetItStateMixin {
 
   Future<void> _initSharedPref() async {
     SharedPreferences sharedPref = await SharedPreferences.getInstance();
-    services.registerSingleton<SharedPrefsModel>(SharedPrefsModel(sharedPref));
+    if (!services.isRegistered<SharedPrefsModel>()) {
+      services
+          .registerSingleton<SharedPrefsModel>(SharedPrefsModel(sharedPref));
+    }
     print("sharedpred ready");
   }
 

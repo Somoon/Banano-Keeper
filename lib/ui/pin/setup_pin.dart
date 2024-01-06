@@ -10,12 +10,13 @@ import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/themes.dart';
+import 'package:gap/gap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:pinput/pinput.dart';
 
-@RoutePage(name: "SetupPinRoute")
+@RoutePage<bool>(name: "SetupPinRoute")
 class SetupPin extends StatefulWidget with GetItStatefulWidgetMixin {
   // SetupPin({super.key});
 
@@ -53,6 +54,7 @@ class SetupPinState extends State<SetupPin> with GetItStateMixin {
   @override
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
+    double width = MediaQuery.of(context).size.width;
 
     return SafeArea(
       child: ScaffoldMessenger(
@@ -119,7 +121,7 @@ class SetupPinState extends State<SetupPin> with GetItStateMixin {
                                 setState(() {
                                   firstWindow = false;
                                   pin = localPIN;
-                                  topMsg = "Confirm your PIN please";
+                                  topMsg = "Confirm your PIN";
                                 }),
                                 Future.delayed(
                                     const Duration(milliseconds: 1000), () {
@@ -137,7 +139,7 @@ class SetupPinState extends State<SetupPin> with GetItStateMixin {
                                   {
                                     setState(() {
                                       pinMatching = 1;
-                                      topMsg = "PIN saved.";
+                                      topMsg = "PIN saved";
                                     }),
                                     Future.delayed(
                                         const Duration(milliseconds: 1000), () {
@@ -159,8 +161,7 @@ class SetupPinState extends State<SetupPin> with GetItStateMixin {
                                           //         builder: (context) =>
                                           //             MainAppLogic()),
                                           //     ModalRoute.withName("/homepage"));
-                                          services<AppRouter>()
-                                              .replaceAll([HomeRoute()]);
+                                          services<AppRouter>().pop(true);
                                         }
                                       });
                                     })
@@ -185,6 +186,50 @@ class SetupPinState extends State<SetupPin> with GetItStateMixin {
                                   }
                               },
                           },
+                        ),
+                        Expanded(child: Gap(1)),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 25,
+                            right: 25,
+                            bottom: 25,
+                          ),
+                          child: SizedBox(
+                            height: 48,
+                            width: width - 40,
+                            child: OutlinedButton(
+                              style: ButtonStyle(
+                                overlayColor: MaterialStateColor.resolveWith(
+                                    (states) =>
+                                        currentTheme.text.withOpacity(0.3)),
+                                // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+
+                                side: MaterialStatePropertyAll<BorderSide>(
+                                  BorderSide(
+                                    color: currentTheme.buttonOutline,
+                                    width: 1,
+                                  ),
+                                ),
+                              ),
+                              onPressed: () async {
+                                //cancel
+                                services<AppRouter>().pop(false);
+                              },
+                              child: AutoSizeText(
+                                AppLocalizations.of(context)!.cancel,
+                                style: TextStyle(
+                                  color: currentTheme.text,
+                                  fontSize: currentTheme.fontSize,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),

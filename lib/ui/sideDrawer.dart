@@ -3,6 +3,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/db/dbtest.dart';
+import 'package:bananokeeper/initial_pages/initial_page_one.dart';
+import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/ui/dialogs/currency_diag.dart';
 import 'package:bananokeeper/ui/message_signing/bottomSheetSign.dart';
 import 'package:flutter/foundation.dart';
@@ -96,12 +98,13 @@ class _SideDrawer extends State<SideDrawer>
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               const Gap(10),
-/*
+// /*
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
                   style: currentTheme.btnStyleNoBorder,
                   onPressed: () async {
+                    services<DBManager>().deleteDatabase();
                     // await BiometricUtil().getBioStoragePIN();
                     // Navigator.of(context).push(
                     //   MaterialPageRoute(
@@ -130,7 +133,7 @@ class _SideDrawer extends State<SideDrawer>
                   ),
                 ),
               ),
-*/
+// */
               //Wallet management button
               createPrimaryDrawerButton(
                 AppLocalizations.of(context)!.manageWallets,
@@ -382,10 +385,15 @@ class _SideDrawer extends State<SideDrawer>
   }
 
   resetFn() async {
-    services<AppRouter>().replaceAll([InitialPage()]);
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => InitialPageOne()),
+        (Route<dynamic> route) => false);
+    await services<AppRouter>().replaceAll([InitialPage()]);
 
     await services<WalletsService>().resetService();
     await services<DBManager>().deleteDatabase();
+    services<SharedPrefsModel>().clearAll();
+    await services<SharedPrefsModel>().sharedPref.clear();
   }
 
   /// creates a button that display a dialog to choose an item and peek at the active item
