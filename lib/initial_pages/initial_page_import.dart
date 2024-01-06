@@ -214,6 +214,7 @@ class InitialPageImportState extends State<InitialPageImport>
                 //     builder: (context) => SetupPin("initial"),
                 //   ),
                 // );
+                services<AppRouter>().replaceAll([HomeRoute()]);
               });
             }
           }
