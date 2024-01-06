@@ -50,10 +50,7 @@ class WalletsService extends ChangeNotifier {
         WalletService(seed, name, original_name, encryptedSeed);
     try {
       await services<DBManager>().insertWallet(name, wallet.toMap());
-
-    }
-    catch(e)
-    {
+    } catch (e) {
       print("Error creating db info $e");
       print(await services<DBManager>().getWalletData(original_name));
     }
@@ -135,12 +132,13 @@ class WalletsService extends ChangeNotifier {
 
   /// unregisters wallets
   void unregisterWallets() {
-    for (int i = 0; i < walletsList.length; i++) {
-      services.unregister<WalletService>(instanceName: walletsList[i]);
+    for (int i = walletsList.length - 1; i >= 0; i--) {
+      print("deleting ${walletsList[i]}");
+      deleteWallet(i);
+      // services.unregister<WalletService>(instanceName: walletsList[i]);
     }
     walletsList.clear();
   }
-
 
   resetService() {
     unregisterWallets();

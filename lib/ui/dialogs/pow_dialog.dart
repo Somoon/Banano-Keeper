@@ -11,6 +11,7 @@ import 'package:gap/gap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:io';
 
 class PoWDialog extends StatefulWidget with GetItStatefulWidgetMixin {
   PoWDialog({super.key});
@@ -40,7 +41,13 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
       ),
     );
     for (String item in sources) {
-      powWidgets.add(createLangButton(item, AppLocalizations.of(context)));
+      if (item == 'Local PoW') {
+        if (!Platform.isWindows) {
+          powWidgets.add(createLangButton(item, AppLocalizations.of(context)));
+        }
+      } else {
+        powWidgets.add(createLangButton(item, AppLocalizations.of(context)));
+      }
     }
 
     return Container(

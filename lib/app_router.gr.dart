@@ -76,7 +76,7 @@ abstract class _$AppRouter extends RootStackRouter {
     },
     SetupPinRoute.name: (routeData) {
       final args = routeData.argsAs<SetupPinRouteArgs>();
-      return AutoRoutePage<dynamic>(
+      return AutoRoutePage<bool>(
         routeData: routeData,
         child: SetupPin(
           args.nextPage,

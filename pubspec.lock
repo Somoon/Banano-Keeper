@@ -65,6 +65,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  biometric_storage:
+    dependency: "direct main"
+    description:
+      name: biometric_storage
+      sha256: "2bae7ce64d4e3a390f8adfd0373ed1a82d567e3692e16a1bd0f72f91fb962ae3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.0+4"
   bip39:
     dependency: transitive
     description:
@@ -406,6 +414,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_easyloading:
+    dependency: "direct main"
+    description:
+      name: flutter_easyloading
+      sha256: ba21a3c883544e582f9cc455a4a0907556714e1e9cf0eababfcb600da191d17c
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.5"
   flutter_launcher_icons:
     dependency: "direct main"
     description:
@@ -451,6 +467,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  flutter_spinkit:
+    dependency: transitive
+    description:
+      name: flutter_spinkit
+      sha256: b39c753e909d4796906c5696a14daf33639a76e017136c8d82bf3e620ce5bb8e
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.2.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -1226,6 +1250,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.1"
+  uni_links_desktop:
+    dependency: "direct main"
+    description:
+      name: uni_links_desktop
+      sha256: a0218c91d6d88f32b749482d571640ca9912e2aeaa390688afbf364bc5075a5c
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.6"
   uni_links_platform_interface:
     dependency: transitive
     description:
@@ -1330,6 +1362,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.4"
+  win32_registry:
+    dependency: transitive
+    description:
+      name: win32_registry
+      sha256: "66e78552f17501aced68fe77425b13156998f1bd3d58f1cd8cd0af2dbe4520e3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   xdg_directories:
     dependency: transitive
     description:

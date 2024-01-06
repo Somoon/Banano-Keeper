@@ -717,6 +717,7 @@ class MsgSignPage {
     messageController.clear();
     signController.clear();
     errMsg = '';
+    isDisplayed = false;
   }
 
   dismiss() {

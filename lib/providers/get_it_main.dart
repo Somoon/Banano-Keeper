@@ -36,7 +36,7 @@ void initServices() {
 }
 
 void resetServices() {
-  services<SharedPrefsModel>().clearAll();
+  // services<SharedPrefsModel>().clearAll();
 
   if (services.isRegistered<WalletsService>())
     services.unregister<WalletsService>();

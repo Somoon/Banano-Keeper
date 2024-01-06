@@ -3,6 +3,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/db/dbtest.dart';
+import 'package:bananokeeper/initial_pages/initial_page_one.dart';
+import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/ui/dialogs/currency_diag.dart';
 import 'package:bananokeeper/ui/message_signing/bottomSheetSign.dart';
 import 'package:flutter/foundation.dart';
@@ -10,7 +12,6 @@ import 'package:flutter/material.dart';
 
 import 'package:bananokeeper/api/representative_json.dart';
 import 'package:bananokeeper/db/dbManager.dart';
-import 'package:bananokeeper/initial_pages/initial_page_one.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -25,7 +26,6 @@ import 'package:bananokeeper/ui/dialogs/themes_dialog.dart';
 import 'package:bananokeeper/ui/management/management_address_page.dart';
 import 'package:bananokeeper/ui/management/management_page.dart';
 import 'package:bananokeeper/ui/management/management_wallet_page.dart';
-import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:bananokeeper/ui/representative_pages/rep_page.dart';
 import 'package:bananokeeper/ui/dialogs/lang_dialog.dart';
 import 'package:bananokeeper/utils/utils.dart';
@@ -98,18 +98,19 @@ class _SideDrawer extends State<SideDrawer>
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               const Gap(10),
-
               /*
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
                   style: currentTheme.btnStyleNoBorder,
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => DBTest(),
-                      ),
-                    );
+                  onPressed: () async {
+                    services<DBManager>().deleteDatabase();
+                    // await BiometricUtil().getBioStoragePIN();
+                    // Navigator.of(context).push(
+                    //   MaterialPageRoute(
+                    //     builder: (context) => DBTest(),
+                    //   ),
+                    // );
                   },
                   child: Column(
                     children: [
@@ -131,8 +132,8 @@ class _SideDrawer extends State<SideDrawer>
                     ],
                   ),
                 ),
-              ),*/
-
+              ),
+ */
               //Wallet management button
               createPrimaryDrawerButton(
                 AppLocalizations.of(context)!.manageWallets,
@@ -384,9 +385,15 @@ class _SideDrawer extends State<SideDrawer>
   }
 
   resetFn() async {
-    services<AppRouter>().replaceAll([InitialPage()]);
-    services<WalletsService>().resetService();
-    services<DBManager>().deleteDatabase();
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => InitialPageOne()),
+        (Route<dynamic> route) => false);
+    await services<AppRouter>().replaceAll([InitialPage()]);
+
+    await services<WalletsService>().resetService();
+    await services<DBManager>().deleteDatabase();
+    services<SharedPrefsModel>().clearAll();
+    await services<SharedPrefsModel>().sharedPref.clear();
   }
 
   /// creates a button that display a dialog to choose an item and peek at the active item

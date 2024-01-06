@@ -9,9 +9,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AccountAPI {
-  getHistory(String address, [int count = 10]) async {
+  getHistory(String address, [int size = 10, offset = 0]) async {
     String apiURL =
         'https://api.spyglass.pw/banano/v2/account/confirmed-transactions';
+
     http.Response response = await http.post(
       Uri.parse(apiURL),
       headers: <String, String>{
@@ -22,10 +23,10 @@ class AccountAPI {
         "includeChange": true,
         "includeReceive": true,
         "includeSend": true,
-        "size": count
+        "offset": offset,
+        "size": size
       }),
     );
-
     return response;
   }
 
@@ -61,7 +62,8 @@ class AccountAPI {
     return response;
   }
 
-  processRequest(StateBlock block, subtype, [String publicKey = '']) async {
+  processRequest(StateBlock block, String subtype,
+      [String publicKey = '']) async {
     String powType = services<PoWSource>().getAPIName();
     String apiURL = services<PoWSource>().getAPIURL();
 

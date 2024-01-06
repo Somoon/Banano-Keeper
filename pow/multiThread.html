@@ -36,18 +36,18 @@ var threads = getUrlParameter('threads');
         if(threads != false) NUM_THREADS = threads;
         // var hash = "BD9F737DDECB0A34DFBA0EDF7017ACB0EF0AA04A6F7A73A406191EF80BB290AD";
         var workers = pow_initiate(NUM_THREADS, '');
-        pow_callback(workers, hash, function(){
+        var test = pow_callback(workers, hash, function(){
             start = Date.now();
-            console.log("Started");
+            // console.log("Started");
         }, function(data){
-            console.log('Done');
+            // console.log('Done');
             var end = Date.now();
             var time = (end - start) / 1000;
             console.log("Time spent " + time);
-            console.log(data)
+            // console.log(data)
             Print.postMessage(data);
             window.stop();
-            console.log('stopp');
+            //console.log('stopp');
         });
         
         function hex_uint8(hex) {

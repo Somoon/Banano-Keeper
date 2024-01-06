@@ -73,10 +73,10 @@ class Account extends ChangeNotifier {
     return name;
   }
 
-  void setRep(String newRep) {
+  void setRep(String newRep) async {
     int activeWallet = services<WalletsService>().activeWallet;
     String originalName = services<WalletsService>().walletsList[activeWallet];
-    services<DBManager>().updateAccountRep(originalName, index, newRep);
+    await services<DBManager>().updateAccountRep(originalName, index, newRep);
     representative = newRep;
     notifyListeners();
   }
@@ -109,8 +109,8 @@ class Account extends ChangeNotifier {
 
   bool hasReceivables = false;
 
-  getHistory() async {
-    var historyRes = await AccountAPI().getHistory(getAddress(), 8);
+  getHistory([offset = 0, size = 10]) async {
+    var historyRes = await AccountAPI().getHistory(getAddress(), size, offset);
 
     res = jsonDecode(historyRes.body);
     if (!completed) {
@@ -153,12 +153,13 @@ class Account extends ChangeNotifier {
     completed = true;
   }
 
-  onRefreshUpdateHistory() async {
-    await getHistory();
+  onRefreshUpdateHistory([offset = 0, size = 10]) async {
+    await getHistory(offset, size);
 
     var _history = history;
     if (res == null || res.length == 0) return;
-    res.reversed.forEach((row) {
+    //reversed.
+    res.forEach((row) {
       var exist = false;
       AccountHistory t = AccountHistory(
           row['hash'],
@@ -176,7 +177,9 @@ class Account extends ChangeNotifier {
         }
       });
       if (!exist) {
-        _history.insert(0, t);
+        (offset == 0) ? _history.insert(0, t) : _history.add(t);
+
+        // _history.insert(0, t);
         exist = false;
       }
     });

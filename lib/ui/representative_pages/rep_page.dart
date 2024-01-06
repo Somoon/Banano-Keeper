@@ -275,7 +275,10 @@ class RepPage {
                                                           left: 20,
                                                           right: 20,
                                                         ),
-                                                        child: Row(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           mainAxisAlignment:
                                                               MainAxisAlignment
                                                                   .spaceBetween,
@@ -288,6 +291,7 @@ class RepPage {
                                                                         .offColor,
                                                               ),
                                                             ),
+                                                            const Gap(5),
                                                             Text(
                                                               score,
                                                               style: TextStyle(
