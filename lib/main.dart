@@ -22,14 +22,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uni_links_desktop/uni_links_desktop.dart';
 import 'main_app_logic.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:biometric_storage/biometric_storage.dart';
 //for debug prints kDebugMode
 import 'package:flutter/foundation.dart';
 // void main() => runApp(const MyApp());
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 bool isNewUser = false;
-BiometricStorageFile? masterKeyStorage;
 
 Future<void> _initSharedPref() async {
   SharedPreferences sharedPref = await SharedPreferences.getInstance();
