@@ -503,8 +503,8 @@ class ManualRepChange {
   dismiss() {
     if (isDisplayed) {
       // addressControllerFocusNode.dispose();
-      isDisplayed = false;
       Navigator.of(_context).pop();
+      isDisplayed = false;
     }
   }
 }

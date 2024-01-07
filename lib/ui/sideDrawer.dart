@@ -155,7 +155,7 @@ class _SideDrawer extends State<SideDrawer>
                 accountName,
                 Management(
                   pageContent: AccountManagementPage(),
-                  pageTitle: AppLocalizations.of(context)!.manageWallets,
+                  pageTitle: AppLocalizations.of(context)!.manageAccounts,
                 ),
               ),
 

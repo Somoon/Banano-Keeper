@@ -75,7 +75,7 @@ class MsgSignVerifyPage {
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: SizedBox(
-                      height: height / 1.25,
+                      height: height / 1.15,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20.0),
                         child: ScaffoldMessenger(

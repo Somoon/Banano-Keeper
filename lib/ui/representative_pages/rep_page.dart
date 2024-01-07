@@ -424,6 +424,7 @@ class RepPage {
                       }
                       // properly make sure field is cleared
                       ManualRepChange().addressController.clear();
+                      ManualRepChange().isDisplayed = false;
                     });
                   },
                   child: Text(
