@@ -1,6 +1,7 @@
 import 'dart:async';
-
-import 'package:auto_route/annotations.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/localization_service.dart';
@@ -14,14 +15,12 @@ import 'package:bananokeeper/ui/message_signing/bottomSheetSign.dart';
 import 'package:bananokeeper/ui/message_signing/message_sign_verification.dart';
 import 'package:bananokeeper/ui/representative_pages/manual_rep_change.dart';
 import 'package:bananokeeper/utils/utils.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:bananokeeper/ui/wallet_picker.dart';
 import 'package:bananokeeper/ui/sideDrawer.dart';
 import 'package:bananokeeper/ui/home_body.dart';
 import 'package:bananokeeper/ui/bottom_bar/bottom_bar.dart';
-import 'package:flutter/services.dart';
 
+import 'package:auto_route/annotations.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -215,11 +214,18 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
 
     return MaterialApp(
       theme: ThemeData(
+        canvasColor: currentTheme.primary,
         primarySwatch: currentTheme.materialColor,
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           splashColor: currentTheme.text.withOpacity(0.3),
           backgroundColor: currentTheme.primary,
           foregroundColor: currentTheme.textSecondary,
+        ),
+        appBarTheme: AppBarTheme(
+          iconTheme: IconThemeData(
+            color: currentTheme.textDisabled,
+            fill: 0,
+          ),
         ),
       ),
       debugShowCheckedModeBanner: false,
@@ -272,9 +278,9 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
         leading: Builder(
           builder: (context) => IconButton(
             style: currentTheme.btnStyleNoBorder,
-            splashRadius: 20,
-            splashColor: currentTheme.textDisabled,
-            highlightColor: currentTheme.text,
+            splashRadius: 15,
+            splashColor: currentTheme.textDisabled.withOpacity(0.3),
+            highlightColor: currentTheme.text.withOpacity(0.4),
             icon: const Icon(Icons.menu), //, color: Colors.black38),
             // icon: new Icon(Icons.settings),
             onPressed: () => Scaffold.of(context).openDrawer(),

@@ -299,6 +299,8 @@ class Account extends ChangeNotifier {
                 previous = jsonDecode(res)['hash'];
                 await onRefreshUpdateHistory();
               }
+              hasReceivables = false;
+              notifyListeners();
             }
 
             // notifyListeners();

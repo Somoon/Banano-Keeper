@@ -1,8 +1,9 @@
 // import 'dart:async';
 
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/api/account_history_response.dart';
 import 'package:bananokeeper/placeholders/transctions.dart';
 import 'package:bananokeeper/providers/account.dart';
@@ -12,12 +13,12 @@ import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/ui/active_address.dart';
 import 'package:bananokeeper/utils/utils.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:pinput/pinput.dart';
-import '../themes.dart';
+import 'package:bananokeeper/themes.dart';
+import 'package:gap/gap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class home_body extends StatefulWidget with GetItStatefulWidgetMixin {
   home_body({super.key});
@@ -28,8 +29,13 @@ class home_body extends StatefulWidget with GetItStatefulWidgetMixin {
 class _home_body extends State<home_body>
     with WidgetsBindingObserver, GetItStateMixin {
   final ScrollController controller = ScrollController();
-
+  bool returnToTopButton = false;
+  late Account _acc;
+  late final Future myFuture = getFuture();
+  bool firstBoot = true;
   TextEditingController nameController = TextEditingController();
+  bool bottomLoadingIcon = false;
+
   @override
   void initState() {
     controller.addListener(_scrollListener);
@@ -44,41 +50,27 @@ class _home_body extends State<home_body>
     super.dispose();
   }
 
-  // int _itemCount = 7;
-  static const _scrollThreshold = 0.2;
-  bool showbtn = false;
-  double _elevation = 20.0;
   void _scrollListener() async {
-    double showoffset =
-        10.0; //Back to top botton will show on scroll offset 10.0
-
+    double showoffset = 10.0;
     if (controller.offset > showoffset) {
-      showbtn = true;
-      setState(() {
-        //update state
-      });
+      returnToTopButton = true;
+      setState(() {});
     } else {
-      showbtn = false;
-      setState(() {
-        //update state
-      });
+      returnToTopButton = false;
+      setState(() {});
     }
 
     if (controller.offset >= controller.position.maxScrollExtent &&
         !controller.position.outOfRange) {
-      await Future.delayed(const Duration(milliseconds: 150), () {
-        services<QueueService>().add(fetchMoreTrans(_acc));
-      });
-
-      setState(() {
-        // print("each the bottom");
-      });
+      bottomLoadingIcon = true;
+      // await Future.delayed(const Duration(milliseconds: 150), () {
+      await services<QueueService>().add(fetchMoreTrans(_acc));
+      // });
+      bottomLoadingIcon = false;
+      setState(() {});
     }
   }
 
-  late Account _acc;
-  late final Future myFuture = getFuture();
-  bool firstBoot = true;
   getFuture() async {
     if (firstBoot) {
       await _acc.getHistory();
@@ -102,13 +94,14 @@ class _home_body extends State<home_body>
     String accOrgName = wallet.accountsList[accountIndex];
 
     var account = services<Account>(instanceName: accOrgName);
+    bool hasReceivables =
+        watchOnly((Account x) => x.hasReceivables, instanceName: accOrgName);
     _acc = account;
     List<AccountHistory> history =
         watchOnly((Account x) => x.history, instanceName: accOrgName);
 
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: height,
@@ -157,45 +150,46 @@ class _home_body extends State<home_body>
                   textDirection: TextDirection.ltr,
                   style: TextStyle(color: currentTheme.text, fontSize: 24),
                 ),
-                // if (account.hasReceivables) ...[
-                //   Container(
-                //     width: 30,
-                //     child: IconButton(
-                //       style: ButtonStyle(
-                //         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                //           RoundedRectangleBorder(
-                //             borderRadius: BorderRadius.circular(30.0),
-                //             side: BorderSide(color: currentTheme.text),
-                //           ),
-                //         ),
-                //       ),
-                //       splashRadius: 9,
-                //       onPressed: () {
-                //         print("i am supposed to be doing magic");
-                //       },
-                //       icon: Text(
-                //         "+",
-                //         style: TextStyle(
-                //           color: currentTheme.text,
-                //           fontSize: currentTheme.fontSize - 2,
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ]
+                if (hasReceivables) ...[
+                  Container(
+                    width: 20,
+                    child: IconButton(
+                      style: ButtonStyle(
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                            side: BorderSide(color: currentTheme.text),
+                          ),
+                        ),
+                      ),
+                      splashRadius: 9,
+                      onPressed: () {
+                        print("i am supposed to be doing magic");
+                      },
+                      icon: Text(
+                        "+",
+                        style: TextStyle(
+                          color: currentTheme.text,
+                          fontSize: currentTheme.fontSize - 2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ]
               ],
             ),
           ),
 
           // transactionsBody(),
+
           Expanded(
             child: Scaffold(
               backgroundColor: Colors.transparent,
               floatingActionButton: AnimatedOpacity(
                 duration:
                     const Duration(milliseconds: 500), //show/hide animation
-                opacity:
-                    showbtn ? 1.0 : 0.0, //set obacity to 1 on visible, or hide
+                opacity: returnToTopButton ? 1.0 : 0.0,
                 child: FloatingActionButton(
                   onPressed: () {
                     controller.animateTo(
@@ -209,56 +203,106 @@ class _home_body extends State<home_body>
                   child: const Icon(Icons.arrow_upward),
                 ),
               ),
-              body: RefreshIndicator(
-                onRefresh: () => addItemToList(account),
-                child: ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context).copyWith(
-                    dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
+              body: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  CustomMaterialIndicator(
+                    edgeOffset: 50,
+                    onRefresh: () => addItemToList(account),
+                    // onStateChanged: (change) {
+                    //   if (change.didChange(to: IndicatorState.complete)) {
+                    //     _renderCompleteState = true;
+                    //   } else if (change.didChange(to: IndicatorState.idle)) {
+                    //     _renderCompleteState = false;
+                    //   }
+                    // },
+                    withRotation: false,
+                    // durations: const RefreshIndicatorDurations(
+                    //   completeDuration: Duration(seconds: 2),
+                    // ),
+                    indicatorBuilder:
+                        (BuildContext context, IndicatorController controller) {
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: currentTheme.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child:
+                            // _renderCompleteState
+                            //     ? const Icon(
+                            //         Icons.check,
+                            //         color: Colors.white,
+                            //       )
+                            //     :
+                            SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: currentTheme.text,
+                            value: controller.isDragging || controller.isArmed
+                                ? controller.value.clamp(0.0, 1.0)
+                                : null,
+                          ),
+                        ),
+                      );
                     },
-                  ),
-                  child: Container(
-                    child: FutureBuilder(
-                      future: myFuture,
-                      // future: account.getHistory(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          if (history.isEmpty) {
-                            return TransactionsPlaceholder();
-                          }
-                          //return const CircularProgressIndicator();
-                        } else if (snapshot.connectionState ==
-                            ConnectionState.done) {
-                          // if (!completed) {
-                          //   account.handleResponse();
-                          // }
-                          // If we got an error
-                          if (snapshot.hasError) {
-                            return TransactionsPlaceholder();
-                            // Center(
-                            //   child: Text(
-                            //     '${snapshot.error} occurred',
-                            //     style: const TextStyle(fontSize: 18),
-                            //   ),
-                            // );
-                          }
-                        }
-                        if (history.isEmpty) {
-                          return unopenedCard();
-                        } else {
-                          return _transListViewBuilder(account);
-                        }
-                        // else if (snapshot.hasData) {
-                        //   return _transListViewBuilder();
-                        // } else {
-                        //   return const Text("No data available");
-                        // }
-                      },
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context).copyWith(
+                        dragDevices: {
+                          PointerDeviceKind.touch,
+                          PointerDeviceKind.mouse,
+                        },
+                      ),
+                      child: Container(
+                        child: FutureBuilder(
+                          future: myFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              if (history.isEmpty) {
+                                return TransactionsPlaceholder();
+                              }
+                            } else if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              if (snapshot.hasError) {
+                                return TransactionsPlaceholder();
+                              }
+                            }
+                            if (history.isEmpty) {
+                              return unopenedCard();
+                            } else {
+                              return _transListViewBuilder(account);
+                            }
+                            // else if (snapshot.hasData) {
+                            //   return _transListViewBuilder();
+                            // } else {
+                            //   return const Text("No data available");
+                            // }
+                          },
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  if (bottomLoadingIcon) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Container(
+                        height: 20,
+                        width: 20,
+                        decoration: BoxDecoration(
+                          color: currentTheme.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: CircularProgressIndicator(
+                          backgroundColor: currentTheme.primary,
+                        ),
+                      ),
+                    )
+                  ],
+                ],
               ),
             ),
           ),
@@ -462,7 +506,6 @@ class _home_body extends State<home_body>
     await services<QueueService>().add(account.onRefreshUpdateHistory());
     await services<QueueService>().add(account.getOverview(true));
     await services<QueueService>().add(account.handleOverviewResponse(true));
-
     setState(() {});
   }
 
