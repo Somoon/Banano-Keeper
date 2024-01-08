@@ -766,9 +766,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
           createStateNewWallet = true;
           bool? result = await createNewWalletDialog(currentTheme, seed,
               mnemonicWidget, appLocalizations, mnemonicPhrase.join(" "));
-          if (kDebugMode) {
-            print(result);
-          }
+          // if (kDebugMode) {
+          //   print(result);
+          // }
           if (result ?? false) {
             await services<WalletsService>().createNewWallet(seed);
             setState(() {});

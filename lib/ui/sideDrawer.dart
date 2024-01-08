@@ -104,13 +104,13 @@ class _SideDrawer extends State<SideDrawer>
                 child: TextButton(
                   style: currentTheme.btnStyleNoBorder,
                   onPressed: () async {
-                    services<DBManager>().deleteDatabase();
+                    // services<DBManager>().deleteDatabase();
                     // await BiometricUtil().getBioStoragePIN();
-                    // Navigator.of(context).push(
-                    //   MaterialPageRoute(
-                    //     builder: (context) => DBTest(),
-                    //   ),
-                    // );
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => DBTest(),
+                      ),
+                    );
                   },
                   child: Column(
                     children: [
@@ -133,7 +133,7 @@ class _SideDrawer extends State<SideDrawer>
                   ),
                 ),
               ),
- */
+              */
               //Wallet management button
               createPrimaryDrawerButton(
                 AppLocalizations.of(context)!.manageWallets,
@@ -155,7 +155,7 @@ class _SideDrawer extends State<SideDrawer>
                 accountName,
                 Management(
                   pageContent: AccountManagementPage(),
-                  pageTitle: AppLocalizations.of(context)!.manageWallets,
+                  pageTitle: AppLocalizations.of(context)!.manageAccounts,
                 ),
               ),
 

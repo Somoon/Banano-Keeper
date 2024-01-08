@@ -214,6 +214,7 @@ class InitialPageImportState extends State<InitialPageImport>
                 //     builder: (context) => SetupPin("initial"),
                 //   ),
                 // );
+                services<AppRouter>().replaceAll([HomeRoute()]);
               });
             }
           }
@@ -325,7 +326,7 @@ class InitialPageImportState extends State<InitialPageImport>
         if (value!.length >= 64) {
           if (value.isNotEmpty) {
             bool isCorrectHex = NanoSeeds.isValidSeed(value);
-            print('isCorrectHex? $isCorrectHex');
+            // print('isCorrectHex? $isCorrectHex');
             if (!isCorrectHex) {
               return AppLocalizations.of(context)!.invalidSeed;
             }

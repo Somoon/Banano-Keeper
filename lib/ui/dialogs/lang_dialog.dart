@@ -74,11 +74,13 @@ class LangDialogState extends State<LangDialog> with GetItStateMixin {
       width: double.infinity,
       child: TextButton(
         style: currentTheme.btnStyleNoBorder,
-        onPressed: () {
-          _setlang(label['language']!);
-          setState(() {});
-          // Navigator.pop(context);
-        },
+        onPressed: (currentLanguage['language'] == label['language'])
+            ? null
+            : () {
+                _setlang(label['language']!);
+                setState(() {});
+                // Navigator.pop(context);
+              },
         child: Text(
           // appLocalizations!.
           label['displayedLanguage']!,
