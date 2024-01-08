@@ -12,10 +12,11 @@ Its features:
 - Scan QR Code to send.
 - Set account-specific representative.
 - Authentication using pin and/or biometric.
-- Enable/Disable auth on startup.
-- Change PIN.
+- Auth on startup.
 - Themes (more to come).
 - Localization support (more to come).
+- Local work generation
+- Message signing
 
 Currently, only Android version is compiled and ready to be tested.
 

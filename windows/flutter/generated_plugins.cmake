@@ -6,7 +6,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   bitsdojo_window_windows
   local_auth_windows
   permission_handler_windows
-  platform_device_id_windows
   smart_auth
   uni_links_desktop
 )

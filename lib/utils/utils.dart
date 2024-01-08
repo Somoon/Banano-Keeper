@@ -7,7 +7,6 @@ import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/utils/tnacl/tnacl.dart';
-import 'package:custom_platform_device_id/platform_device_id.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -101,19 +100,6 @@ class Utils {
         fontFamily: 'monospace',
       ),
     );
-  }
-
-  getDeviceID() async {
-    String? deviceId = "000";
-    try {
-      deviceId = await PlatformDeviceId.getDeviceId;
-    } on PlatformException {
-      if (kDebugMode) {
-        print('getDeviceID ERROR');
-      }
-      deviceId = 'Failed to get deviceId.';
-    }
-    return deviceId;
   }
 
   String getRandString(int len) {

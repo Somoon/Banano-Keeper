@@ -211,8 +211,17 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
         watchOnly((LocalizationModel x) => x.supportedLocales);
     // print("not new user - in homepage aka main_app_logic ");
     double width = MediaQuery.of(context).size.width;
+    var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
 
     return MaterialApp(
+      theme: ThemeData(
+        primarySwatch: currentTheme.materialColor,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          splashColor: currentTheme.text.withOpacity(0.3),
+          backgroundColor: currentTheme.primary,
+          foregroundColor: currentTheme.textSecondary,
+        ),
+      ),
       debugShowCheckedModeBanner: false,
       // -----------------------
       localizationsDelegates: const [

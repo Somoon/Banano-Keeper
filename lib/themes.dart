@@ -86,6 +86,7 @@ abstract class BaseTheme {
     ),
     // backgroundColor: MaterialStatePropertyAll<Color>(Colors.green),
   );
+  late MaterialColor materialColor = getMaterialColor(text);
 }
 
 class YellowTheme extends BaseTheme {
@@ -170,6 +171,7 @@ class SlateTheme extends BaseTheme {
   Color offColor = const Color(0xFFeef5db);
   Color buttonOutline = const Color.fromARGB(210, 196, 206, 94);
 }
+
 /*
 class ThemeModel extends ChangeNotifier {
   //themeList =  [ 1,2,3,4,5]
@@ -341,3 +343,24 @@ class ThemeViewModel extends ChangeNotifier {
 ...
 }
  */
+MaterialColor getMaterialColor(Color color) {
+  final int red = color.red;
+  final int green = color.green;
+  final int blue = color.blue;
+  final int alpha = color.alpha;
+
+  final Map<int, Color> shades = {
+    50: Color.fromARGB(alpha, red, green, blue),
+    100: Color.fromARGB(alpha, red, green, blue),
+    200: Color.fromARGB(alpha, red, green, blue),
+    300: Color.fromARGB(alpha, red, green, blue),
+    400: Color.fromARGB(alpha, red, green, blue),
+    500: Color.fromARGB(alpha, red, green, blue),
+    600: Color.fromARGB(alpha, red, green, blue),
+    700: Color.fromARGB(alpha, red, green, blue),
+    800: Color.fromARGB(alpha, red, green, blue),
+    900: Color.fromARGB(alpha, red, green, blue),
+  };
+
+  return MaterialColor(color.value, shades);
+}

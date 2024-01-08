@@ -1,10 +1,10 @@
-import 'package:bananokeeper/app_router.dart';
 import 'package:flutter/material.dart';
-
+import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/themes.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ThemesDialog extends StatefulWidget with GetItStatefulWidgetMixin {
   ThemesDialog({super.key});
@@ -45,11 +45,12 @@ class ThemesDialogState extends State<ThemesDialog> with GetItStateMixin {
               thickness: 1,
             ),
             TextButton(
+              style: currentTheme.btnStyleNoBorder,
               onPressed: () {
                 services<AppRouter>().pop();
               },
               child: Text(
-                'Close',
+                AppLocalizations.of(context)!.close,
                 style: TextStyle(color: currentTheme.text),
               ),
             ),
@@ -64,6 +65,7 @@ class ThemesDialogState extends State<ThemesDialog> with GetItStateMixin {
     return SizedBox(
       width: double.infinity,
       child: TextButton(
+        style: currentTheme.btnStyleNoBorder,
         onPressed: (services<ThemeModel>().activeTheme == label)
             ? null
             : () {

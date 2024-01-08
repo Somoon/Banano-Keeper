@@ -24,7 +24,7 @@ class CurrencyDialogState extends State<CurrencyDialog> with GetItStateMixin {
 
     List<Widget> currgWidgets = [];
     for (String item in currencies) {
-      currgWidgets.add(createLangButton(item, AppLocalizations.of(context)));
+      currgWidgets.add(createCurrencyButton(item));
     }
     return Container(
       constraints: const BoxConstraints(
@@ -63,7 +63,7 @@ class CurrencyDialogState extends State<CurrencyDialog> with GetItStateMixin {
     );
   }
 
-  Widget createLangButton(String label, appLocalizations) {
+  Widget createCurrencyButton(String label) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     var currentCurrency = watchOnly((UserData x) => x.getCurrency());
     return SizedBox(
@@ -78,7 +78,6 @@ class CurrencyDialogState extends State<CurrencyDialog> with GetItStateMixin {
                 // Navigator.pop(context);
               },
         child: Text(
-          // appLocalizations!.
           label,
           style: TextStyle(
               color: (currentCurrency != label

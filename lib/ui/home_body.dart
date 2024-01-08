@@ -45,13 +45,25 @@ class _home_body extends State<home_body>
   }
 
   // int _itemCount = 7;
-  // static const _scrollThreshold = 0.8;
+  static const _scrollThreshold = 0.2;
+  bool showbtn = false;
+  double _elevation = 20.0;
   void _scrollListener() async {
-    // if (controller.offset >=
-    //         controller.position.maxScrollExtent * _scrollThreshold &&
-    //     !controller.position.outOfRange) {
-    //   print('Scroll position is at ${_scrollThreshold * 100}%.');
-    // }
+    double showoffset =
+        10.0; //Back to top botton will show on scroll offset 10.0
+
+    if (controller.offset > showoffset) {
+      showbtn = true;
+      setState(() {
+        //update state
+      });
+    } else {
+      showbtn = false;
+      setState(() {
+        //update state
+      });
+    }
+
     if (controller.offset >= controller.position.maxScrollExtent &&
         !controller.position.outOfRange) {
       await Future.delayed(const Duration(milliseconds: 150), () {
@@ -177,55 +189,75 @@ class _home_body extends State<home_body>
 
           // transactionsBody(),
           Expanded(
-            child: RefreshIndicator(
-              onRefresh: () => addItemToList(account),
-              child: ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(
-                  dragDevices: {
-                    PointerDeviceKind.touch,
-                    PointerDeviceKind.mouse,
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              floatingActionButton: AnimatedOpacity(
+                duration:
+                    const Duration(milliseconds: 500), //show/hide animation
+                opacity:
+                    showbtn ? 1.0 : 0.0, //set obacity to 1 on visible, or hide
+                child: FloatingActionButton(
+                  onPressed: () {
+                    controller.animateTo(
+                        //go to top of scroll
+                        0, //scroll offset to go
+                        duration: const Duration(
+                            milliseconds: 250), //duration of scroll
+                        curve: Curves.fastOutSlowIn //scroll type
+                        );
                   },
+                  child: const Icon(Icons.arrow_upward),
                 ),
-                child: Container(
-                  child: //[
-                      FutureBuilder(
-                    future: myFuture,
-                    // future: account.getHistory(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        if (history.isEmpty) {
-                          return TransactionsPlaceholder();
-                        }
-                        //return const CircularProgressIndicator();
-                      } else if (snapshot.connectionState ==
-                          ConnectionState.done) {
-                        // if (!completed) {
-                        //   account.handleResponse();
-                        // }
-                        // If we got an error
-                        if (snapshot.hasError) {
-                          return TransactionsPlaceholder();
-                          // Center(
-                          //   child: Text(
-                          //     '${snapshot.error} occurred',
-                          //     style: const TextStyle(fontSize: 18),
-                          //   ),
-                          // );
-                        }
-                      }
-                      if (history.isEmpty) {
-                        return unopenedCard();
-                      } else {
-                        return _transListViewBuilder(account);
-                      }
-                      // else if (snapshot.hasData) {
-                      //   return _transListViewBuilder();
-                      // } else {
-                      //   return const Text("No data available");
-                      // }
+              ),
+              body: RefreshIndicator(
+                onRefresh: () => addItemToList(account),
+                child: ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context).copyWith(
+                    dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
                     },
                   ),
-                  //],
+                  child: Container(
+                    child: FutureBuilder(
+                      future: myFuture,
+                      // future: account.getHistory(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          if (history.isEmpty) {
+                            return TransactionsPlaceholder();
+                          }
+                          //return const CircularProgressIndicator();
+                        } else if (snapshot.connectionState ==
+                            ConnectionState.done) {
+                          // if (!completed) {
+                          //   account.handleResponse();
+                          // }
+                          // If we got an error
+                          if (snapshot.hasError) {
+                            return TransactionsPlaceholder();
+                            // Center(
+                            //   child: Text(
+                            //     '${snapshot.error} occurred',
+                            //     style: const TextStyle(fontSize: 18),
+                            //   ),
+                            // );
+                          }
+                        }
+                        if (history.isEmpty) {
+                          return unopenedCard();
+                        } else {
+                          return _transListViewBuilder(account);
+                        }
+                        // else if (snapshot.hasData) {
+                        //   return _transListViewBuilder();
+                        // } else {
+                        //   return const Text("No data available");
+                        // }
+                      },
+                    ),
+                  ),
                 ),
               ),
             ),
