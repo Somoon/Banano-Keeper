@@ -78,6 +78,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
               thickness: 1,
             ),
             TextButton(
+              style: currentTheme.btnStyleNoBorder,
               onPressed: () {
                 services<AppRouter>().pop();
               },
@@ -103,6 +104,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
     return SizedBox(
       width: double.infinity,
       child: TextButton(
+        style: currentTheme.btnStyleNoBorder,
         onPressed: () async {
           bool canauth = await BiometricUtil().canAuth();
           bool? verified = false;

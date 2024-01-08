@@ -1,19 +1,17 @@
-import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:bananokeeper/app_router.dart';
-import 'package:bananokeeper/providers/pow/local_pow.dart';
 import 'package:bananokeeper/providers/pow/local_work.dart';
 import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:bananokeeper/providers/user_data.dart';
-import 'package:flutter/material.dart';
-
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/themes.dart';
-import 'package:gap/gap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'dart:io';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:gap/gap.dart';
 
 class PoWDialog extends StatefulWidget with GetItStatefulWidgetMixin {
   PoWDialog({super.key});
@@ -105,6 +103,7 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
               thickness: 1,
             ),
             TextButton(
+              style: currentTheme.btnStyleNoBorder,
               onPressed: () {
                 services<AppRouter>().pop(context);
               },
