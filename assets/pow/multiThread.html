@@ -2,16 +2,16 @@
 <html>
 
 <head>
-    
+
 </head>
 
 <body>
-    
-        
-    
-    <script src="pow.js"></script>
-    <script src="startThreads.js"></script>
-    <script>
+
+
+
+<script src="pow.js"></script>
+<script src="startThreads.js"></script>
+<script>
         var getUrlParameter = function getUrlParameter(sParam) {
   var sPageURL = window.location.search.substring(1),
       sURLVariables = sPageURL.split('&'),
@@ -29,14 +29,25 @@
 };
 
 
-var hash = getUrlParameter('hash');
-var threads = getUrlParameter('threads');
-        var start = 0;
-        var NUM_THREADS = 3;
-        if(threads != false) NUM_THREADS = threads;
-        // var hash = "BD9F737DDECB0A34DFBA0EDF7017ACB0EF0AA04A6F7A73A406191EF80BB290AD";
-        var workers = pow_initiate(NUM_THREADS, '');
-        var test = pow_callback(workers, hash, function(){
+var hash = '';//getUrlParameter('hash');
+var threads = '';//getUrlParameter('threads');
+var start = 0;
+var NUM_THREADS = 3;
+// if(threads != false) NUM_THREADS = threads;
+// var hash = "BD9F737DDECB0A34DFBA0EDF7017ACB0EF0AA04A6F7A73A406191EF80BB290AD";
+
+window.hash = "";
+      window.type = "";
+
+      setInterval(async () => {
+        if (window.hash == "") return;
+        let computingHash = window.hash;
+        window.hash = "";
+        window.work = "";
+ window.start = 0;
+
+        var workers = pow_initiate(threads, '');
+        pow_callback(workers, computingHash, function(){
             start = Date.now();
             // console.log("Started");
         }, function(data){
@@ -45,10 +56,15 @@ var threads = getUrlParameter('threads');
             var time = (end - start) / 1000;
             console.log("Time spent " + time);
             // console.log(data)
-            Print.postMessage(data);
-            window.stop();
-            //console.log('stopp');
+            //window.Print.postMessage(data);
+            window.flutter_inappwebview.callHandler('Print', data);
+            //does nothing
+            //window.stop();
         });
+
+      }, 100);
+
+
         
         function hex_uint8(hex) {
         	var length = (hex.length / 2) | 0;

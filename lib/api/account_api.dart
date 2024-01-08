@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
-import 'package:bananokeeper/providers/pow/local_pow.dart';
+import 'package:bananokeeper/providers/pow/local_work.dart';
 import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AccountAPI {
-  getHistory(String address, [int size = 10, offset = 0]) async {
+  getHistory(String address, [int size = 25, offset = 0]) async {
     String apiURL =
         'https://api.spyglass.pw/banano/v2/account/confirmed-transactions';
 
@@ -69,7 +69,8 @@ class AccountAPI {
 
     Map<String, dynamic> request = {};
     if (powType == 'Local PoW') {
-      LocalPoW lPow = LocalPoW();
+      LocalWork lPow = services<LocalWork>();
+      // await lPow.init();
 
       lPow.completer = Completer<String>();
       String hashForWork = (subtype == 'open' ? publicKey : block.previous);

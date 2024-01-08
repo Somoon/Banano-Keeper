@@ -70,11 +70,13 @@ class CurrencyDialogState extends State<CurrencyDialog> with GetItStateMixin {
       width: double.infinity,
       child: TextButton(
         style: currentTheme.btnStyleNoBorder,
-        onPressed: () {
-          _setCurrency(label);
-          setState(() {});
-          // Navigator.pop(context);
-        },
+        onPressed: (services<UserData>().getCurrency() == label)
+            ? null
+            : () {
+                _setCurrency(label);
+                setState(() {});
+                // Navigator.pop(context);
+              },
         child: Text(
           // appLocalizations!.
           label,

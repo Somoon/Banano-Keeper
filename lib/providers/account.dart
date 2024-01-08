@@ -109,7 +109,7 @@ class Account extends ChangeNotifier {
 
   bool hasReceivables = false;
 
-  getHistory([offset = 0, size = 10]) async {
+  getHistory([offset = 0, size = 25]) async {
     var historyRes = await AccountAPI().getHistory(getAddress(), size, offset);
 
     res = jsonDecode(historyRes.body);
@@ -139,7 +139,6 @@ class Account extends ChangeNotifier {
           AccountHistory t = AccountHistory(hash, address, type, height,
               timestamp, date, amountRaw, amount, newRep);
 
-          // if (kDebugMode) {}
           _history.add(t);
         }
         history = List.from(_history);
@@ -153,7 +152,7 @@ class Account extends ChangeNotifier {
     completed = true;
   }
 
-  onRefreshUpdateHistory([offset = 0, size = 10]) async {
+  onRefreshUpdateHistory([offset = 0, size = 25]) async {
     await getHistory(offset, size);
 
     var _history = history;
@@ -179,7 +178,6 @@ class Account extends ChangeNotifier {
       if (!exist) {
         (offset == 0) ? _history.insert(0, t) : _history.add(t);
 
-        // _history.insert(0, t);
         exist = false;
       }
     });
@@ -294,7 +292,6 @@ class Account extends ChangeNotifier {
 
                 var res =
                     await AccountAPI().processRequest(sendBlock, "receive");
-                // .processRequest(sendBlock.toJson(), "receive");
 
                 newBalance = Decimal.tryParse(newRaw).toString();
 
@@ -305,8 +302,6 @@ class Account extends ChangeNotifier {
             }
 
             // notifyListeners();
-
-            // print("DONE EXUCTING NOTIFYLIS");
           }
         }
       }
@@ -358,7 +353,6 @@ class Account extends ChangeNotifier {
 
     String hashResponse =
         await AccountAPI().processRequest(openBlock, "open", publicKey);
-    // await AccountAPI().processRequest(openBlock.toJson(), "open");
 
     if (jsonDecode(hashResponse)['hash'] != null &&
         NanoHelpers.isHexString(jsonDecode(hashResponse)['hash'])) {

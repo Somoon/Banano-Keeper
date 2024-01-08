@@ -32,7 +32,8 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 android {
 
     namespace "app.moonano.bananokeeper.bananokeeper"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 34
+//    flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {

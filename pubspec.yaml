@@ -80,6 +80,7 @@ dependencies:
       url: https://github.com/Somoon/biometric_storage.git
       ref: main # branch name
   flutter_easyloading: ^3.0.5
+  flutter_inappwebview: ^6.0.0
 #  cryptography: ^2.5.0
 
 
@@ -116,11 +117,11 @@ flutter:
     - images/greymonkey.png
     - images/qrOptionFace.png
     - images/icon.png
-    - pow/multiThread.html
-    - pow/pow.js
-    - pow/pow.wasm
-    - pow/startThreads.js
-    - pow/thread.js
+    - assets/pow/multiThread.html
+    - assets/pow/pow.js
+    - assets/pow/pow.wasm
+    - assets/pow/startThreads.js
+    - assets/pow/thread.js
 
   generate: true
 

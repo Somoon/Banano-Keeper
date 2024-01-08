@@ -64,11 +64,13 @@ class ThemesDialogState extends State<ThemesDialog> with GetItStateMixin {
     return SizedBox(
       width: double.infinity,
       child: TextButton(
-        onPressed: () {
-          _setTheme(label);
-          setState(() {});
-          // Navigator.pop(context);
-        },
+        onPressed: (services<ThemeModel>().activeTheme == label)
+            ? null
+            : () {
+                _setTheme(label);
+                setState(() {});
+                // Navigator.pop(context);
+              },
         child: Text(
           label,
           style: TextStyle(

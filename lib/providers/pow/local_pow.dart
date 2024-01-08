@@ -19,16 +19,17 @@ class LocalPoW {
   late WebViewController controller = WebViewController();
 
   //maybe have multi/different hosts in case one is down (gh?)
-  String powScriptURL = 'https://moonano.net/assets/data/pow/multiThread.html';
+  String moonanoURL = 'https://moonano.net/assets/data/pow/multiThread.html';
+  String ghURL = 'https://somoon.github.io/Banano-Keeper-pow/multiThread.html';
 
   setWork(String work) {
     completer.complete(work);
   }
 
   generateWork({required String hash}) async {
+    String powURL = ghURL;
     int threads = services<UserData>().getThreadCount();
-    String completeURL =
-        '$powScriptURL?hash=$hash&threads=${threads.toString()}';
+    String completeURL = '$powURL?hash=$hash&threads=${threads.toString()}';
     WebViewController controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..addJavaScriptChannel(

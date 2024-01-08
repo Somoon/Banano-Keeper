@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:auto_route/annotations.dart';
 import 'package:bananokeeper/api/account_api.dart';
 import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/app_router.dart';
@@ -11,6 +10,7 @@ import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/themes.dart';
+import 'package:bananokeeper/ui/loading_widget.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -272,8 +272,8 @@ class SendBottomSheet {
               }
 
               if (verified != null && verified) {
-                // LoadingIndicatorDialog().show(context,
-                //     text: AppLocalizations.of(context)!.loadingWidgetSendMsg);
+                LoadingIndicatorDialog().show(_context,
+                    text: AppLocalizations.of(_context)!.loadingWidgetSendMsg);
 
                 await services<QueueService>().add(account.getOverview(true));
                 await services<QueueService>()
@@ -315,9 +315,7 @@ class SendBottomSheet {
                 var sendHash =
                     await AccountAPI().processRequest(sendBlock, "send");
 
-                // Close the dialog programmatically
-                // We use "mounted" variable to get rid of the "Do not use BuildContexts across async gaps" warning
-                // LoadingIndicatorDialog().dismiss();
+                LoadingIndicatorDialog().dismiss();
 
                 //if
                 //{"error":"Invalid block balance for given subtype"}

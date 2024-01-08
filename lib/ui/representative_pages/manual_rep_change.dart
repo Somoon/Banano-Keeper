@@ -479,12 +479,12 @@ class ManualRepChange {
       }
 
       if (verified) {
-        // LoadingIndicatorDialog().show(context,
-        //     text: AppLocalizations.of(context)!.loadingWidgetChangeRepMsg);
+        LoadingIndicatorDialog().show(context,
+            text: AppLocalizations.of(context)!.loadingWidgetChangeRepMsg);
 
         bool result =
             await account.changeRepresentative(addressController.text);
-        // LoadingIndicatorDialog().dismiss();
+        LoadingIndicatorDialog().dismiss();
         if (result) {
           addressController.clear();
           Navigator.of(context).pop(true);

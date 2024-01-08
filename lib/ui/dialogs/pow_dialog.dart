@@ -1,5 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bananokeeper/app_router.dart';
+import 'package:bananokeeper/providers/pow/local_pow.dart';
+import 'package:bananokeeper/providers/pow/local_work.dart';
 import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/material.dart';
@@ -80,7 +82,7 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
                   color: currentTheme.text,
                 ),
               ),
-              Container(
+              SizedBox(
                 width: 250,
                 child: Slider(
                   activeColor: Colors.purple,
@@ -124,17 +126,24 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
       width: double.infinity,
       child: TextButton(
         style: currentTheme.btnStyleNoBorder,
-        onPressed: () async {
-          _setSource(label);
-          print(label);
-          if (label == 'Local PoW') {
-            if (!await Permission.bluetoothConnect.isGranted) {
-              Permission.bluetoothConnect.request();
-            }
-          }
-          setState(() {});
-          // Navigator.pop(context);
-        },
+        onPressed: (services<PoWSource>().getAPIName() == label)
+            ? null
+            : () async {
+                if (label == 'Local PoW') {
+                  if (!await Permission.bluetoothConnect.isGranted) {
+                    Permission.bluetoothConnect.request();
+                  }
+                  services<LocalWork>().init();
+                } else if (services<PoWSource>().getAPIName() == 'Local PoW') {
+                  //stop and dispose of local webserver if not in use
+                  // print('shutting down webvserver');
+                  await services<LocalWork>().disposelocalServer();
+                }
+                _setSource(label);
+                setState(() {});
+
+                // Navigator.pop(context);
+              },
         child: Text(
           // appLocalizations!.
           label,
@@ -147,10 +156,10 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
     );
   }
 
-  void _setSource(String PoWName) {
+  void _setSource(String poWName) {
     setState(() {
-      services<PoWSource>().setAPI(PoWName);
-      services<SharedPrefsModel>().savePoWSource(PoWName);
+      services<PoWSource>().setAPI(poWName);
+      services<SharedPrefsModel>().savePoWSource(poWName);
     });
   }
 }

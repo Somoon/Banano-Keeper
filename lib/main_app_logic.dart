@@ -4,6 +4,8 @@ import 'package:auto_route/annotations.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/localization_service.dart';
+import 'package:bananokeeper/providers/pow/local_work.dart';
+import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/themes.dart';
@@ -46,6 +48,12 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
   @override
   void initState() {
     super.initState();
+    //start local webserver if local pow is enabled
+    if (services<PoWSource>().getAPIName() == 'Local PoW') {
+      if (!services<LocalWork>().localhostServer.isRunning()) {
+        services<LocalWork>().init();
+      }
+    }
     _initURIHandler();
     _incomingLinkHandler();
   }

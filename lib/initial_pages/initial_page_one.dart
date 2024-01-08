@@ -3,13 +3,9 @@
 import 'package:auto_route/annotations.dart';
 import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/db/dbManager.dart';
-import 'package:bananokeeper/initial_pages/initial_page_import.dart';
-import 'package:bananokeeper/initial_pages/initial_page_new_information.dart';
-import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
-import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:flutter/material.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -19,8 +15,6 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:bananokeeper/providers/account.dart';
 
 @RoutePage(name: "InitialPage")
 class InitialPageOne extends StatefulWidget with GetItStatefulWidgetMixin {
@@ -58,7 +52,7 @@ class InitialPageOneState extends State<InitialPageOne> with GetItStateMixin {
       services
           .registerSingleton<SharedPrefsModel>(SharedPrefsModel(sharedPref));
     }
-    print("sharedpred ready");
+    // print("sharedpred ready");
   }
 
   Future<void> setupUserData() async {
@@ -66,17 +60,9 @@ class InitialPageOneState extends State<InitialPageOne> with GetItStateMixin {
 
     var userValues = await services<SharedPrefsModel>().getStoredValues();
     services<UserData>().updateRepresentatives();
-    // services<WalletsService>().createMockWallet();
 
     //new app launch - no data
-
-    if (!userValues[0]) {
-      // send user to firsttime page v
-      // services<WalletsService>().setLatestWalletID(0);
-
-      // services<WalletsService>().createNewWallet();
-      // services<SharedPrefsModel>().sharedPref.setBool("isInitialized", true);
-    }
+    if (!userValues[0]) {}
   }
 
   @override

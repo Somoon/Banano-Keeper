@@ -54,7 +54,7 @@ class _home_body extends State<home_body>
     // }
     if (controller.offset >= controller.position.maxScrollExtent &&
         !controller.position.outOfRange) {
-      await Future.delayed(const Duration(milliseconds: 250), () {
+      await Future.delayed(const Duration(milliseconds: 150), () {
         services<QueueService>().add(fetchMoreTrans(_acc));
       });
 
@@ -436,7 +436,7 @@ class _home_body extends State<home_body>
 
   Future<void> fetchMoreTrans(Account account) async {
     int offset = account.history.length;
-    int size = 15;
+    int size = 25;
     await services<QueueService>()
         .add(account.onRefreshUpdateHistory(offset, size));
   }

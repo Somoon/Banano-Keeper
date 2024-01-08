@@ -4,9 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class PoWSource extends ChangeNotifier {
-  final String kaliumAPI = "https://kaliumapi.appditto.com/api";
-  final String boosterAPI = "https://booster.dev-ptera.com/banano-rpc";
-
+  //node used to send transaction block
   Map<String, String> listOfAPIS = {
     "Kalium": "https://kaliumapi.appditto.com/api",
     "Booster": "https://booster.dev-ptera.com/banano-rpc",
