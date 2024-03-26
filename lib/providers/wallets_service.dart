@@ -22,7 +22,11 @@ class WalletsService extends ChangeNotifier {
       activeWallet = nID;
       String orgName = walletsList[activeWallet];
       services<SharedPrefsModel>().saveActiveWallet(orgName);
-      notifyListeners();
+      try {
+        notifyListeners();
+      } catch (e) {
+        print("hicup notifying services $e");
+      }
     }
   }
 

@@ -154,8 +154,8 @@ class WalletManagementPageState extends State<WalletManagementPage>
             //Wallet name portion
             GestureDetector(
               onTap: () {
+                services<WalletsService>().setActiveWallet(index);
                 setState(() {
-                  services<WalletsService>().setActiveWallet(index);
                   // currentWallet.setActiveIndex(index);
                   // currentWallet.setActiveAccount(loadedAccounts[index]);
                 });

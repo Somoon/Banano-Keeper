@@ -5,8 +5,6 @@ import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:bananokeeper/providers/auth_biometric.dart';
-import 'package:bananokeeper/ui/pin/setup_pin.dart';
-import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:bananokeeper/themes.dart';
 import 'package:gap/gap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
@@ -42,35 +40,10 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
             Column(
               children: [
                 createChangePINButton(currentTheme),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      AutoSizeText(
-                        "Auth on startup: ",
-                        style: TextStyle(
-                          color: currentTheme.text,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Switch(
-                        // This bool value toggles the switch.
-                        value: authOnBootStatus,
-                        activeColor: currentTheme.text,
-                        activeTrackColor: Colors.black38,
-                        inactiveThumbColor: currentTheme.textDisabled,
-
-                        onChanged: (bool value) {
-                          changeAuthValue(value);
-                        },
-                      ),
-                    ],
-                  ),
-                )
-                // createStartupBehaviourButton(),
-
-                // createThemeButton("Login Auth"),
+                const Divider(
+                  thickness: 1,
+                ),
+                createAuthOnStartUp(currentTheme, authOnBootStatus)
               ],
             ),
             const Gap(15),
@@ -89,6 +62,35 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Padding createAuthOnStartUp(BaseTheme currentTheme, bool authOnBootStatus) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          AutoSizeText(
+            "Auth on startup: ",
+            style: TextStyle(
+              color: currentTheme.text,
+              fontSize: 16,
+            ),
+          ),
+          Switch(
+            // This bool value toggles the switch.
+            value: authOnBootStatus,
+            activeColor: currentTheme.text,
+            activeTrackColor: Colors.black38,
+            inactiveThumbColor: currentTheme.textDisabled,
+
+            onChanged: (bool value) {
+              changeAuthValue(value);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -122,7 +124,6 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
             });
           }
           setState(() {});
-          // Navigator.pop(context);
         },
         child: Text(
           AppLocalizations.of(context)!.changePINButton,

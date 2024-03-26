@@ -288,7 +288,7 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
         ),
       ),
       // ------ MAIN BODY ------------------
-      body: home_body(),
+      body: HomeBody(),
       bottomNavigationBar: BottomBarApp(),
     );
   }
@@ -324,7 +324,7 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
                 elevation: 0,
               ),
               // ------ MAIN BODY ------------------
-              body: home_body(),
+              body: HomeBody(),
 
               bottomNavigationBar: BottomBarApp(),
             ),

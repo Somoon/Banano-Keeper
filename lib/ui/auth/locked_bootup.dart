@@ -11,13 +11,13 @@ import 'package:bananokeeper/themes.dart';
 
 @RoutePage<bool>(name: "LockedBootupRoute")
 class LockedBootup extends StatefulWidget with GetItStatefulWidgetMixin {
-  LockedBootup({Key? key}) : super(key: key);
+  LockedBootup({super.key});
 
   @override
-  _LockedBootupState createState() => _LockedBootupState();
+  LockedBootupState createState() => LockedBootupState();
 }
 
-class _LockedBootupState extends State<LockedBootup> with GetItStateMixin {
+class LockedBootupState extends State<LockedBootup> with GetItStateMixin {
   @override
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
@@ -31,6 +31,7 @@ class _LockedBootupState extends State<LockedBootup> with GetItStateMixin {
           AutoSizeText(
             "App Locked",
             style: TextStyle(
+              decoration: TextDecoration.none,
               color: currentTheme.text,
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -53,7 +54,10 @@ class _LockedBootupState extends State<LockedBootup> with GetItStateMixin {
                   //AppLocalizations.of(context)!.authMsgChangeRep
                 }
                 if (verified != null && verified) {
-                  services<AppRouter>().pop(true);
+                  // services<AppRouter>().push(HomeRoute());
+                  // await services<AppRouter>().replaceAll([InitialPage()]);
+
+                  // services<AppRouter>().pop(true);
                   Navigator.of(context).pop(true);
                 }
               },

@@ -26,6 +26,7 @@ class UserData extends ChangeNotifier {
   late String currency = "USD";
   late double minToReceive = 0.01;
   late String powSource = "Kalium";
+  // late String nodeName = "Kalium";
   late int threadCount = 3;
   late String blockExplorer = "";
   late bool Notifs = false;
@@ -99,6 +100,15 @@ class UserData extends ChangeNotifier {
     threadCount = newThreadCount;
     notifyListeners();
   }
+
+  // String getNode() {
+  //   return powSource;
+  // }
+  //
+  // void setNode(node) {
+  //   nodeName = node;
+  //   notifyListeners();
+  // }
 
   /// Rep data
   List<Representative>? representatives;

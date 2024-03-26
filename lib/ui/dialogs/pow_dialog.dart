@@ -34,7 +34,7 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
       Padding(
         padding: const EdgeInsets.all(15.0),
         child: AutoSizeText(
-          "Select the source which will be used when doing a transaction.",
+          "Select the PoW generation source which will be used when doing a transaction.",
           style: currentTheme.textStyle,
           maxFontSize: 12,
         ),
@@ -134,6 +134,8 @@ class PoWDialogState extends State<PoWDialog> with GetItStateMixin {
                   }
                   services<LocalWork>().init();
                 } else if (services<PoWSource>().getAPIName() == 'Local PoW') {
+                  //before label assignment - localpow was enabled
+
                   //stop and dispose of local webserver if not in use
                   // print('shutting down webvserver');
                   await services<LocalWork>().disposelocalServer();

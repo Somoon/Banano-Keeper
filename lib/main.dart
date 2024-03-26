@@ -5,6 +5,7 @@ import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/initial_pages/initial_page_one.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/localization_service.dart';
+import 'package:bananokeeper/providers/pow/node_selector.dart';
 import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
@@ -67,6 +68,7 @@ Future<void> setupUserData() async {
     services<UserData>().setRepUpdateTime(userValues[9]);
     services<UserData>().setThreadCount(userValues[10]);
     services<UserData>().setAuthOnBoot(userValues[11]);
+    services<NodeSelector>().setNode(userValues[12]);
 
     //get active wallet and index
 

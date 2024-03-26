@@ -4,8 +4,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/db/dbtest.dart';
 import 'package:bananokeeper/initial_pages/initial_page_one.dart';
+import 'package:bananokeeper/providers/pow/node_selector.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/ui/dialogs/currency_diag.dart';
+import 'package:bananokeeper/ui/dialogs/node_dialog.dart';
 import 'package:bananokeeper/ui/message_signing/bottomSheetSign.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -85,6 +87,7 @@ class _SideDrawer extends State<SideDrawer>
     //     .accounts[x.wallets[x.activeWallet].getActiveIndex()]);
     var statusBarHeight = MediaQuery.of(context).viewPadding.top;
     String selectedPoWName = watchOnly((PoWSource x) => x.getAPIName());
+    String selectedNodeName = watchOnly((NodeSelector x) => x.getNodeName());
     //side drawer
     return SafeArea(
       top: false,
@@ -218,7 +221,7 @@ class _SideDrawer extends State<SideDrawer>
               createDialogButton("PoW Source", selectedPoWName, PoWDialog()),
 
               // createDialogButton("Block Explorer", "1", ThemesDialog()),
-              // createDialogButton("Data Source", "1", ThemesDialog()),
+              createDialogButton("Node", selectedNodeName, NodeDialog()),
 
               createDialogButton(AppLocalizations.of(context)!.themes,
                   activeTheme, ThemesDialog()),

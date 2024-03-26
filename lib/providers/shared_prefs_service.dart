@@ -118,6 +118,15 @@ class SharedPrefsModel {
     sharedPref.setString('PoWSource', powSource);
   }
 
+  getNode() async {
+    String nodeName = sharedPref.getString('nodeName') ?? "Kalium";
+    return nodeName;
+  }
+
+  void saveNode(String powSource) async {
+    sharedPref.setString('nodeName', powSource);
+  }
+
   getThreadCount() async {
     int poWThreadCount = sharedPref.getInt('PoWThreadCount') ?? 3;
     return poWThreadCount;
@@ -194,6 +203,7 @@ class SharedPrefsModel {
     var activeAccount = 0;
     var latestWalletID = 0;
     String powSource = "Kalium";
+    String nodeName = "Kalium";
     int powThreadCount = 3;
     String pin = "0";
     List<Representative> repList = [];
@@ -211,6 +221,7 @@ class SharedPrefsModel {
       repList = await getRepresentatives();
       repUpdate = await getRepUpdateTime();
       authOnBoot = await getAuthOnBoot();
+      nodeName = await getNode();
     }
 
     return [
@@ -226,6 +237,7 @@ class SharedPrefsModel {
       repUpdate, //9
       powThreadCount, //10
       authOnBoot, //11
+      nodeName, //12
     ];
   }
 
@@ -269,5 +281,6 @@ class SharedPrefsModel {
     if (sharedPref.containsKey("PoWThreadCount"))
       sharedPref.remove("PoWThreadCount");
     if (sharedPref.containsKey("authOnBoot")) sharedPref.remove("authOnBoot");
+    if (sharedPref.containsKey("nodeName")) sharedPref.remove("nodeName");
   }
 }
