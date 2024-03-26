@@ -24,12 +24,31 @@ class UserData extends ChangeNotifier {
   late int lockoutTime = 0;
   late bool authOnBoot = false;
   late String currency = "USD";
+  late bool autoReceive = true;
   late double minToReceive = 0.01;
   late String powSource = "Kalium";
   // late String nodeName = "Kalium";
   late int threadCount = 3;
   late String blockExplorer = "";
-  late bool Notifs = false;
+  late bool notifs = false;
+
+  setAutoReceive(bool state) {
+    autoReceive = state;
+    services<SharedPrefsModel>().saveAutoReceive(state);
+  }
+
+  bool getAutoReceive() {
+    return autoReceive;
+  }
+
+  setMinToReceive(double value) {
+    minToReceive = value;
+    services<SharedPrefsModel>().saveMinToReceive(value);
+  }
+
+  double getMinToReceive() {
+    return minToReceive;
+  }
 
   getCurrency() {
     return currency;

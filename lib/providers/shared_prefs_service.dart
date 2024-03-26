@@ -195,6 +195,24 @@ class SharedPrefsModel {
     sharedPref.setBool('authOnBoot', newStatus);
   }
 
+  getMinToReceive() async {
+    double minToReceive = sharedPref.getDouble('minToReceive') ?? 0.01;
+    return minToReceive;
+  }
+
+  void saveMinToReceive(double value) async {
+    sharedPref.setDouble('minToReceive', value);
+  }
+
+  getAutoReceive() async {
+    bool status = sharedPref.getBool('autoReceive') ?? true;
+    return status;
+  }
+
+  void saveAutoReceive(bool newStatus) async {
+    sharedPref.setBool('autoReceive', newStatus);
+  }
+
   Future<List> getStoredValues() async {
     var isInit = sharedPref.containsKey('isInitialized');
     var lang = "English";
@@ -209,6 +227,8 @@ class SharedPrefsModel {
     List<Representative> repList = [];
     int repUpdate = 0;
     bool authOnBoot = false;
+    bool autoReceive = true;
+    double minToReceive = 0.01;
     if (isInit) {
       lang = await getLang();
       theme = await getTheme();
@@ -222,6 +242,8 @@ class SharedPrefsModel {
       repUpdate = await getRepUpdateTime();
       authOnBoot = await getAuthOnBoot();
       nodeName = await getNode();
+      autoReceive = await getAutoReceive();
+      minToReceive = await getMinToReceive();
     }
 
     return [
@@ -238,6 +260,8 @@ class SharedPrefsModel {
       powThreadCount, //10
       authOnBoot, //11
       nodeName, //12
+      autoReceive, //13
+      minToReceive, //14
     ];
   }
 
@@ -282,5 +306,9 @@ class SharedPrefsModel {
       sharedPref.remove("PoWThreadCount");
     if (sharedPref.containsKey("authOnBoot")) sharedPref.remove("authOnBoot");
     if (sharedPref.containsKey("nodeName")) sharedPref.remove("nodeName");
+    if (sharedPref.containsKey("autoReceive")) sharedPref.remove("autoReceive");
+    if (sharedPref.containsKey("minToReceive")) {
+      sharedPref.remove("minToReceive");
+    }
   }
 }

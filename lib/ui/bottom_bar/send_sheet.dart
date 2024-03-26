@@ -315,7 +315,7 @@ class SendBottomSheet {
 
                 var sendHash =
                     await AccountAPI().processRequest(sendBlock, "send");
-
+                FocusScope.of(_context).unfocus();
                 LoadingIndicatorDialog().dismiss();
 
                 //if

@@ -7,7 +7,7 @@ class PoWSource extends ChangeNotifier {
   //node used to send transaction block
   Map<String, String> listOfAPIS = {
     "Kalium": "https://kaliumapi.appditto.com/api",
-    "Booster": "https://booster.dev-ptera.com/banano-rpc",
+    // "Booster": "https://booster.dev-ptera.com/banano-rpc",
     "Local PoW": "https://kaliumapi.appditto.com/api", //for now like this
     //   boompow TBA
     //   moonano

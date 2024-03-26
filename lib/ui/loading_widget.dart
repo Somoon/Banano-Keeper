@@ -12,6 +12,7 @@ class LoadingIndicatorDialog {
   late BuildContext _context;
   bool isDisplayed = false;
   bool showCancelButton = false;
+  //TODO: changable by user
   final int cancelTimeoutSeconds = 10;
   factory LoadingIndicatorDialog() {
     return _singleton;
@@ -32,7 +33,7 @@ class LoadingIndicatorDialog {
         builder: (BuildContext context) {
           _context = context;
           isDisplayed = true;
-
+          showCancelButton = false;
           return StatefulBuilder(builder:
               (BuildContext context, void Function(void Function()) setState) {
             Future.delayed(
@@ -85,6 +86,7 @@ class LoadingIndicatorDialog {
                               style: theme.btnStyleNoBorder,
                               onPressed: () {
                                 services<LocalWork>().cancelWork();
+
                                 dismiss(resultStatus: false);
 
                                 // Navigator.pop(context);

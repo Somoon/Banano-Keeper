@@ -92,7 +92,7 @@ class AccountAPI {
         hash: hashForWork,
       );
       String fetchedWork = await lPow.completer.operation.value;
-      print(fetchedWork);
+      // print(fetchedWork);
       block.work = fetchedWork;
 
       request = {

@@ -8,6 +8,7 @@ import 'package:bananokeeper/providers/pow/node_selector.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/ui/dialogs/currency_diag.dart';
 import 'package:bananokeeper/ui/dialogs/node_dialog.dart';
+import 'package:bananokeeper/ui/dialogs/receive_dialog.dart';
 import 'package:bananokeeper/ui/message_signing/bottomSheetSign.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -215,7 +216,10 @@ class _SideDrawer extends State<SideDrawer>
                 ),
               ),
               createDialogButton("Currency", currentCurrency, CurrencyDialog()),
-              // createDialogButton("Min. to receive", "1", ThemesDialog()),
+              createDialogButton(
+                  "Receive settings",
+                  "min to receive here if Auto enabled else; off",
+                  ReceiveDialog()),
 
               // Already done and working.
               createDialogButton("PoW Source", selectedPoWName, PoWDialog()),
