@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:async/async.dart';
 import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/pow/local_work.dart';
@@ -84,15 +85,14 @@ class AccountAPI {
     Map<String, dynamic> request = {};
     if (powType == 'Local PoW') {
       LocalWork lPow = services<LocalWork>();
-      // await lPow.init();
 
-      lPow.completer = Completer<String>();
+      lPow.completer = CancelableCompleter<String>();
       String hashForWork = (subtype == 'open' ? publicKey : block.previous);
       lPow.generateWork(
         hash: hashForWork,
       );
-      String fetchedWork = await lPow.completer.future;
-      // print(fetchedWork);
+      String fetchedWork = await lPow.completer.operation.value;
+      print(fetchedWork);
       block.work = fetchedWork;
 
       request = {

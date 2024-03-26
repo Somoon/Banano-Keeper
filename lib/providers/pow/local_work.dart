@@ -1,11 +1,13 @@
 import 'dart:async';
+import 'package:async/async.dart';
 import 'package:flutter/foundation.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class LocalWork extends ChangeNotifier {
-  Completer<String> completer = Completer<String>();
+  // Completer<String> completer = Completer<String>();
+  CancelableCompleter<String> completer = CancelableCompleter<String>();
   InAppLocalhostServer localhostServer =
       InAppLocalhostServer(documentRoot: 'assets/pow');
   late HeadlessInAppWebView headlessWebView;
@@ -59,7 +61,16 @@ class LocalWork extends ChangeNotifier {
   }
 
   setWork(String work) {
-    completer.complete(work);
+    if (completer.isCanceled) {
+      completer.complete("");
+    } else {
+      completer.complete(work);
+    }
+  }
+
+  cancelWork() {
+    completer.operation.cancel();
+    print('canceled work');
   }
 
   generateWork({required String hash}) async {

@@ -273,7 +273,8 @@ class SendBottomSheet {
 
               if (verified != null && verified) {
                 LoadingIndicatorDialog().show(_context,
-                    text: AppLocalizations.of(_context)!.loadingWidgetSendMsg);
+                    text: AppLocalizations.of(_context)!.loadingWidgetSendMsg,
+                    theme: currentTheme);
 
                 await services<QueueService>().add(account.getOverview(true));
                 await services<QueueService>()

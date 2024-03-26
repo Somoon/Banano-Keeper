@@ -185,7 +185,7 @@ class ManualRepChange {
                 child: OutlinedButton(
                   style: currentTheme.btnStyle,
                   onPressed: () async {
-                    changeRep(context, account);
+                    changeRep(context, account, currentTheme);
                   },
                   child: Text(
                     appLocalizations!.changeButton,
@@ -460,7 +460,7 @@ class ManualRepChange {
     );
   }
 
-  changeRep(BuildContext context, Account account) async {
+  changeRep(BuildContext context, Account account, currentTheme) async {
     if (NanoAccounts.isValid(NanoAccountType.BANANO, addressController.text)) {
       bool canauth = await BiometricUtil().canAuth();
       bool verified = false;
@@ -480,7 +480,8 @@ class ManualRepChange {
 
       if (verified) {
         LoadingIndicatorDialog().show(context,
-            text: AppLocalizations.of(context)!.loadingWidgetChangeRepMsg);
+            text: AppLocalizations.of(context)!.loadingWidgetChangeRepMsg,
+            theme: currentTheme);
 
         bool result =
             await account.changeRepresentative(addressController.text);
