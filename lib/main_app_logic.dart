@@ -227,6 +227,10 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
             fill: 0,
           ),
         ),
+        checkboxTheme: CheckboxThemeData(
+          checkColor: MaterialStateProperty.all(currentTheme.text),
+          fillColor: MaterialStateProperty.all(Colors.white),
+        ),
       ),
       debugShowCheckedModeBanner: false,
       // -----------------------

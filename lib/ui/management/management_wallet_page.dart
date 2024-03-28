@@ -923,9 +923,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
                         child: Row(
                           children: [
                             Checkbox(
-                              checkColor: currentTheme.textDisabled,
+                              checkColor: currentTheme.text,
                               fillColor:
-                                  MaterialStateProperty.resolveWith(getColor),
+                                  MaterialStateProperty.all(Colors.white),
                               value: isCheckedNewWallet,
                               onChanged: (bool? value) {
                                 setState(() {

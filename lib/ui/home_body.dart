@@ -99,11 +99,11 @@ class HomeBodyState extends State<HomeBody>
     var account = services<Account>(instanceName: accOrgName);
     bool hasReceivables =
         watchOnly((Account x) => x.hasReceivables, instanceName: accOrgName);
-    // try{
-    //   if ( _acc.getAddress() != account.getAddress()) {
-    //     firstBoot = true;
-    //   }
-    // }catch (e){}
+    try {
+      if (_acc.getAddress() != account.getAddress()) {
+        firstBoot = true;
+      }
+    } catch (e) {}
 
     _acc = account;
     // print(_acc.getAddress());

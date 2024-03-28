@@ -1,14 +1,13 @@
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bananokeeper/app_router.dart';
-import 'package:bananokeeper/providers/shared_prefs_service.dart';
-import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/material.dart';
 
+import 'package:bananokeeper/app_router.dart';
+import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/themes.dart';
-import 'package:gap/gap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gap/gap.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class ReceiveDialog extends StatefulWidget with GetItStatefulWidgetMixin {
   ReceiveDialog({super.key});
@@ -18,25 +17,16 @@ class ReceiveDialog extends StatefulWidget with GetItStatefulWidgetMixin {
 }
 
 class ReceiveDialogState extends State<ReceiveDialog> with GetItStateMixin {
-  final amountController = TextEditingController();
+  // final amountController = TextEditingController();
   FocusNode amountControllerFocusNode = FocusNode();
-  double amount = 0.0;
+  double? amount;
+
   @override
   void initState() {
     super.initState();
     amountControllerFocusNode.addListener(() {
-      if (amountControllerFocusNode.hasFocus) {
-        print(amountController.text);
-        try {
-          double? valueInt = double.tryParse(amountController.text);
-
-          if (valueInt != null) {
-            if (valueInt >= 0) {
-              print('OK amount $valueInt');
-              amount = valueInt;
-            }
-          }
-        } catch (_) {}
+      if (!amountControllerFocusNode.hasFocus) {
+        checkAmountChanged();
       }
     });
   }
@@ -46,8 +36,10 @@ class ReceiveDialogState extends State<ReceiveDialog> with GetItStateMixin {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     bool autoReceive = watchOnly((UserData x) => x.getAutoReceive());
     double minToReceive = watchOnly((UserData x) => x.getMinToReceive());
-    bool validAmount = false;
-    amountController.text = minToReceive.toString();
+    RegExp regex = RegExp(r'([.]*0)(?!.*\d)');
+    String amountNoTrail = minToReceive.toString().replaceAll(regex, '');
+    // amountController.text = minToReceive.toString();
+    double width = MediaQuery.of(context).size.width;
 
     return GestureDetector(
       onTap: () {
@@ -68,74 +60,78 @@ class ReceiveDialogState extends State<ReceiveDialog> with GetItStateMixin {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Column(
-                children: [
-                  createAuthOnStartUp(currentTheme, autoReceive),
-                  if (autoReceive) ...[
-                    Text(
-                      "Minimum to receive:",
-                      style: TextStyle(
-                        color: currentTheme.text,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 100, right: 100),
-                      child: TextFormField(
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        focusNode: amountControllerFocusNode,
-                        controller: amountController,
-                        autofocus: false,
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          filled: true,
-                          fillColor: currentTheme.secondary,
-                          isDense: false,
-                          isCollapsed: true,
-                          contentPadding: const EdgeInsets.all(
-                            // left: 8,
-                            // right: 8,
-                            8,
-                          ),
-                          hintText:
-                              AppLocalizations.of(context)!.enterAmountHint,
-                          hintStyle:
-                              TextStyle(color: currentTheme.textDisabled),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
+              createAutoReceiveButton(currentTheme, autoReceive),
+              if (autoReceive) ...[
+                SizedBox(
+                  width: width * .7,
+                  child: Column(
+                    children: [
+                      Text(
+                        "Minimum to receive:",
+                        style: TextStyle(
+                          color: currentTheme.text,
+                          fontSize: 16,
                         ),
-                        autovalidateMode: AutovalidateMode.always,
-                        validator: (value) {
-                          if (value != null) {
-                            double? valueInt = double.tryParse(value);
+                      ),
+                      const Gap(10),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 100, right: 100),
+                        child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          focusNode: amountControllerFocusNode,
+                          // controller: amountController,
+                          initialValue: amountNoTrail,
+                          autofocus: false,
+                          textAlignVertical: TextAlignVertical.center,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            filled: true,
+                            fillColor: currentTheme.secondary,
+                            isDense: false,
+                            isCollapsed: true,
+                            contentPadding: const EdgeInsets.all(
+                              // left: 8,
+                              // right: 8,
+                              8,
+                            ),
+                            hintText: minToReceive.toString(),
+                            // AppLocalizations.of(context)!.enterAmountHint,
+                            hintStyle:
+                                TextStyle(color: currentTheme.textDisabled),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
 
-                            try {
-                              if (valueInt != null) {
-                                if (valueInt >= 0.0) {
+                          autovalidateMode: AutovalidateMode.always,
+                          validator: (value) {
+                            if (value != null) {
+                              double? valueInt = double.tryParse(value);
+
+                              try {
+                                if (valueInt != null && valueInt >= 0.0) {
                                   amount = valueInt;
-                                  amountController.text = amount.toString();
+                                  // amountController.text = amount.toString();
                                   setState(() {});
                                   return null;
                                 } else {
                                   // return AppLocalizations.of(context)!
                                   //     .cantNegative;
                                 }
-                              }
-                            } catch (_) {}
-                          }
-                          return null;
-                        },
-                        style: TextStyle(color: currentTheme.text),
+                              } catch (_) {}
+                            }
+                            return null;
+                          },
+                          style: TextStyle(color: currentTheme.text),
+                        ),
                       ),
-                    ),
-                  ],
-                ],
-              ),
+                    ],
+                  ),
+                ),
+              ],
               const Gap(15),
               const Divider(
                 thickness: 1,
@@ -157,7 +153,7 @@ class ReceiveDialogState extends State<ReceiveDialog> with GetItStateMixin {
     );
   }
 
-  Padding createAuthOnStartUp(BaseTheme currentTheme, bool autoReceive) {
+  Padding createAutoReceiveButton(BaseTheme currentTheme, bool autoReceive) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0.0),
       child: Row(
@@ -192,35 +188,14 @@ class ReceiveDialogState extends State<ReceiveDialog> with GetItStateMixin {
     });
   }
 
-  Widget createCurrencyButton(String label) {
-    var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-    var currentCurrency = watchOnly((UserData x) => x.getCurrency());
-    return SizedBox(
-      width: double.infinity,
-      child: TextButton(
-        style: currentTheme.btnStyleNoBorder,
-        onPressed: (services<UserData>().getCurrency() == label)
-            ? null
-            : () {
-                _setCurrency(label);
-                setState(() {});
-                // Navigator.pop(context);
-              },
-        child: Text(
-          label,
-          style: TextStyle(
-              color: (currentCurrency != label
-                  ? currentTheme.text
-                  : currentTheme.textDisabled)),
-        ),
-      ),
-    );
-  }
-
-  void _setCurrency(String currency) {
-    setState(() {
-      services<UserData>().setCurrency(currency);
-      // services<SharedPrefsModel>().saveLang(lang); //move to setCurrency
-    });
+  checkAmountChanged() {
+    try {
+      if (amount != null && amount! >= 0.0) {
+        double savedMinAmount = services<UserData>().getMinToReceive();
+        if ((amount != savedMinAmount)) {
+          services<UserData>().setMinToReceive(amount!);
+        }
+      }
+    } catch (_) {}
   }
 }

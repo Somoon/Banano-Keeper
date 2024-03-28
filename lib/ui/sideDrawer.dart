@@ -89,6 +89,13 @@ class _SideDrawer extends State<SideDrawer>
     var statusBarHeight = MediaQuery.of(context).viewPadding.top;
     String selectedPoWName = watchOnly((PoWSource x) => x.getAPIName());
     String selectedNodeName = watchOnly((NodeSelector x) => x.getNodeName());
+    bool autoReceiveStatus = watchOnly((UserData x) => x.getAutoReceive());
+    String receiveStr =
+        'Auto receive: ${(autoReceiveStatus == true ? 'on' : 'off')}';
+    if (autoReceiveStatus) {
+      double minToReceive = watchOnly((UserData x) => x.getMinToReceive());
+      receiveStr = 'Min. to receive: $minToReceive';
+    }
     //side drawer
     return SafeArea(
       top: false,
@@ -217,9 +224,7 @@ class _SideDrawer extends State<SideDrawer>
               ),
               createDialogButton("Currency", currentCurrency, CurrencyDialog()),
               createDialogButton(
-                  "Receive settings",
-                  "min to receive here if Auto enabled else; off",
-                  ReceiveDialog()),
+                  "Receive settings", receiveStr, ReceiveDialog()),
 
               // Already done and working.
               createDialogButton("PoW Source", selectedPoWName, PoWDialog()),

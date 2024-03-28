@@ -161,7 +161,14 @@ void main() async {
     registerProtocol('banverify');
   }
 
-  //remove splash ready to start
+  /* if (Platform.isWindows) {
+    runApp(const MyApp());
+    // setup window size for PC/Desktop platforms
+    initWindowsSize();
+    //remove splash ready to start
+    FlutterNativeSplash.remove();
+  } else {
+    */
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(
@@ -171,23 +178,26 @@ void main() async {
 
     // setup window size for PC/Desktop platforms
     initWindowsSize();
+    //remove splash ready to start
+
     FlutterNativeSplash.remove();
   });
+  // }
 }
 
 void initWindowsSize() {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     // if (Platform.isWindows) {
     // await DesktopWindow.setMinWindowSize(const Size(400, 400));
-    doWhenWindowReady(() {
-      final win = appWindow;
-      const initialSize = Size(600, 850);
-      win.minSize = initialSize;
-      win.size = initialSize;
-      win.alignment = Alignment.center;
-      win.title = "Banano Keeper";
-      win.show();
-    });
+    // doWhenWindowReady(() {
+    final win = appWindow;
+    const initialSize = Size(600, 850);
+    win.minSize = initialSize;
+    win.size = initialSize;
+    win.alignment = Alignment.center;
+    win.title = "Banano Keeper";
+    win.show();
+    // });
   }
 }
 

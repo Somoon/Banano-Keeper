@@ -1,5 +1,4 @@
 import 'package:bananokeeper/app_router.dart';
-import 'package:biometric_storage/biometric_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 
