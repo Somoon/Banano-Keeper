@@ -152,7 +152,7 @@ class AccountAPI {
   }
 
   getRepresentatives() async {
-    String apiURL = '${currentDataSource}v1/representatives/scores';
+    String apiURL = '${currentDataSource}/v1/representatives/scores';
     http.Response response;
     try {
       response = await http.get(
