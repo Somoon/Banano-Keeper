@@ -213,6 +213,15 @@ class SharedPrefsModel {
     sharedPref.setBool('autoReceive', newStatus);
   }
 
+  getAuthForSmallTx() async {
+    bool status = sharedPref.getBool('authForSmallTx') ?? true;
+    return status;
+  }
+
+  void saveAuthForSmallTx(bool newStatus) async {
+    sharedPref.setBool('authForSmallTx', newStatus);
+  }
+
   getNumOfAllowedRx() async {
     int numOfAllowedReceivables =
         sharedPref.getInt('numOfAllowedReceivables') ?? 10;
@@ -240,6 +249,7 @@ class SharedPrefsModel {
     bool autoReceive = true;
     double minToReceive = 0.01;
     int numOfAllowedReceivables = 10;
+    bool authForSmallTx = true;
     if (isInit) {
       lang = await getLang();
       theme = await getTheme();
@@ -275,6 +285,7 @@ class SharedPrefsModel {
       autoReceive, //13
       minToReceive, //14
       numOfAllowedReceivables, //15
+      authForSmallTx, //16
     ];
   }
 
@@ -322,6 +333,12 @@ class SharedPrefsModel {
     if (sharedPref.containsKey("autoReceive")) sharedPref.remove("autoReceive");
     if (sharedPref.containsKey("minToReceive")) {
       sharedPref.remove("minToReceive");
+      if (sharedPref.containsKey("numOfAllowedReceivables")) {
+        sharedPref.remove("numOfAllowedReceivables");
+      }
+      if (sharedPref.containsKey("authForSmallTx")) {
+        sharedPref.remove("authForSmallTx");
+      }
     }
   }
 }

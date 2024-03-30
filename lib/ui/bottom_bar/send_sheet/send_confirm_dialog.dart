@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -156,16 +157,23 @@ class SendConfirmDialogState extends State<SendConfirmDialog>
                     ),
                   ),
                   onPressed: () async {
-                    bool canauth = await BiometricUtil().canAuth();
+                    bool authForSmallTx =
+                        watchOnly((UserData x) => x.getAuthForSmallTx());
+                    Decimal amount = Decimal.parse(widget.inputAmount);
                     bool? verified = false;
-
-                    if (!canauth) {
-                      verified = await services<AppRouter>()
-                          .push<bool>(VerifyPINRoute());
+                    if (authForSmallTx && amount <= Decimal.parse("10")) {
+                      verified = true;
                     } else {
-                      verified = await BiometricUtil().authenticate(
-                          appLocalization
-                              .authMsgConfirmSend(widget.inputAmount));
+                      bool canauth = await BiometricUtil().canAuth();
+
+                      if (!canauth) {
+                        verified = await services<AppRouter>()
+                            .push<bool>(VerifyPINRoute());
+                      } else {
+                        verified = await BiometricUtil().authenticate(
+                            appLocalization
+                                .authMsgConfirmSend(widget.inputAmount));
+                      }
                     }
 
                     if (verified != null && verified) {

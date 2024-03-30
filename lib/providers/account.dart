@@ -223,7 +223,14 @@ class Account extends ChangeNotifier {
         if (overviewResp.isNotEmpty || overviewResp != null) {
           opened = overviewResp['opened'] ?? false;
           hasReceivables = (overviewResp['receivable'] > 0);
-          receivablesAmount = overviewResp['receivable'];
+          try {
+            receivablesAmount =
+                double.tryParse(overviewResp['receivable'].toString())!;
+          } catch (e) {
+            if (kDebugMode) {
+              print('receivablesAmount failed $e');
+            }
+          }
 
           var recRes = await AccountAPI().getReceivables(address);
           receivablesCount = jsonDecode(recRes.body).length;

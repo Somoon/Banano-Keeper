@@ -147,7 +147,7 @@
   "loadingWidgetSendMsg": " Sending...",
   "changePINButton": "Change PIN",
   "resetAppTitle": "Reset App",
-  "resetAppWarning": "This will delete all of the app data including your wallets.\nMake sure you have a backup of your seed(s). \n\nClick yes to continue, this is irreversible.",
+  "resetAppWarning": "This will delete all of the app data including your wallets.\nMake sure you have a backup of your seed(s). \n\nClick confirm to continue, this is irreversible.",
   "currency": "Currency",
   "messageSigningTitle": "Message Signing",
   "messageSingingInfoDialogExplanation": "A private key associated with an account can be used to sign a message and generate a digital signature.\nThe generated digital signature can be used by anyone to verify the authenticity and integrity of the message.\nSigning messages is a very useful method for verifying your identity without compromising your private key and putting your funds at risk.",
@@ -187,7 +187,7 @@
   },
   "minimumToReceiveTextFieldTitle": "Minimum to receive:",
   "autoReceiveTextButton": "Auto receive:",
-  "receiveSettingsTextButton": "Receive settings",
+  "receiveSettingsTextButton": "Receive Settings",
   "powSourceTextButton": "PoW Source",
   "nodeTextButton": "Node",
   "newRxTextButton": "new ({state})",
@@ -220,5 +220,10 @@
         "example": "1"
       }
     }
-  }
+  },
+  "advancedSettingsLabel": "Advanced Settings",
+  "noAuthSmallTxConfirmTitle": "Confirm disabling authentication",
+  "noAuthSmallTxConfirmText": "Enabling this will disable authentication for sending values less than and equal to 10 BAN.\nAuth on startup must be enabled to use this feature.\n\nClick confirm to enable.",
+  "noAuthOnBootSmallTxSnackBar": "Auth on startup need to be enabled first.",
+  "advancedSettingsnoAuthSmallTxText": "No auth on send (<=10BAN):"
 }

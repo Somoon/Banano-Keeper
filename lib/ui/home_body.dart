@@ -136,7 +136,7 @@ class HomeBodyState extends State<HomeBody>
     bool _receiving =
         watchOnly((Account x) => x.receiving, instanceName: accOrgName);
     if (_receiving) {
-      makeItems();
+      rainAnimation();
     }
     if (!account.doneovR && !completed) {
       services<QueueService>().add(account.getOverview(true));
@@ -233,7 +233,7 @@ class HomeBodyState extends State<HomeBody>
                               //     const Duration(
                               //       seconds: 5,
                               //     ), () {
-                              //   makeItems();
+                              //   rainAnimation();
                               // });
                             });
                           },
@@ -803,7 +803,7 @@ class HomeBodyState extends State<HomeBody>
     return ddmi;
   }
 
-  void makeItems() {
+  void rainAnimation() {
     setState(() {
       items.clear();
       if (_receivablesAmount == 0) _receivablesAmount = 1;

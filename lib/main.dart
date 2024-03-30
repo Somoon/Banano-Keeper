@@ -48,6 +48,7 @@ populateUserData(userValues) async {
   services<UserData>().setAutoReceive(userValues[13]);
   services<UserData>().setMinToReceive(userValues[14]);
   services<UserData>().setNumOfAllowedRx(userValues[15]);
+  services<UserData>().setAuthForSmallTx(userValues[16]);
 }
 
 Future<void> setupUserData() async {

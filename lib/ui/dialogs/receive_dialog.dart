@@ -46,13 +46,11 @@ class ReceiveDialogState extends State<ReceiveDialog> with GetItStateMixin {
     double minToReceive = watchOnly((UserData x) => x.getMinToReceive());
     RegExp regex = RegExp(r'([.]*0)(?!.*\d)');
     String amountNoTrail = minToReceive.toString().replaceAll(regex, '');
-    // amountController.text = minToReceive.toString();
     double width = MediaQuery.of(context).size.width;
 
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
-        // setState(() {});
       },
       child: Container(
         constraints: const BoxConstraints(

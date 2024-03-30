@@ -6,6 +6,7 @@ import 'package:bananokeeper/db/dbtest.dart';
 import 'package:bananokeeper/initial_pages/initial_page_one.dart';
 import 'package:bananokeeper/providers/pow/node_selector.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
+import 'package:bananokeeper/ui/dialogs/advanced_dialog.dart';
 import 'package:bananokeeper/ui/dialogs/currency_diag.dart';
 import 'package:bananokeeper/ui/dialogs/node_dialog.dart';
 import 'package:bananokeeper/ui/dialogs/receive_dialog.dart';
@@ -262,6 +263,11 @@ class _SideDrawer extends State<SideDrawer>
                 "",
                 SecurityDialog(),
               ),
+              createDialogButton(
+                AppLocalizations.of(context)!.advancedSettingsLabel,
+                "",
+                AdvancedDialog(),
+              ),
 
               createDialogButton(
                 AppLocalizations.of(context)!.language,
@@ -401,7 +407,7 @@ class _SideDrawer extends State<SideDrawer>
                         }
                       },
                       child: Text(
-                        appLocalizations.yes,
+                        appLocalizations.confirm,
                         style: currentTheme.textStyle,
                       ),
                     ),
