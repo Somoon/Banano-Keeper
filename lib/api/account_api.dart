@@ -12,55 +12,67 @@ import 'dart:convert';
 
 class AccountAPI {
   getHistory(String address, [int size = 25, offset = 0]) async {
-    String apiURL =
-        'https://api.spyglass.pw/banano/v2/account/confirmed-transactions';
-
-    http.Response response = await http.post(
-      Uri.parse(apiURL),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'address': address,
-        "includeChange": true,
-        "includeReceive": true,
-        "includeSend": true,
-        "offset": offset,
-        "size": size
-      }),
-    );
+    String apiURL = '$currentDataSource/v2/account/confirmed-transactions';
+    http.Response response;
+    try {
+      response = await http.post(
+        Uri.parse(apiURL),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'address': address,
+          "includeChange": true,
+          "includeReceive": true,
+          "includeSend": true,
+          "offset": offset,
+          "size": size
+        }),
+      );
+    } catch (e) {
+      getNextDataSource();
+      response = getHistory(address, size, offset);
+    }
     return response;
   }
 
   getOverview(String address) async {
     // print('ACCOUNT_API: GETOVERVIEW:');
 
-    String apiURL =
-        'https://api.spyglass.pw/banano/v1/account/overview/$address';
-    http.Response response = await http.get(
-      Uri.parse(apiURL),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-
+    String apiURL = '$currentDataSource/v1/account/overview/$address';
+    http.Response response;
+    try {
+      response = await http.get(
+        Uri.parse(apiURL),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+    } catch (e) {
+      getNextDataSource();
+      response = getOverview(address);
+    }
     return response;
   }
 
   getReceivables(String address, [size = 10]) async {
-    String apiURL =
-        'https://api.spyglass.pw/banano/v1/account/receivable-transactions';
-    http.Response response = await http.post(
-      Uri.parse(apiURL),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'address': address,
-        'size': size,
-      }),
-    );
-
+    String apiURL = '$currentDataSource/v1/account/receivable-transactions';
+    http.Response response;
+    try {
+      response = await http.post(
+        Uri.parse(apiURL),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'address': address,
+          'size': size,
+        }),
+      );
+    } catch (e) {
+      getNextDataSource();
+      response = getReceivables(address, size = 10)();
+    }
     return response;
   }
 
@@ -140,14 +152,37 @@ class AccountAPI {
   }
 
   getRepresentatives() async {
-    String apiURL = 'https://api.spyglass.pw/banano/v1/representatives/scores';
-    http.Response response = await http.get(
-      Uri.parse(apiURL),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
+    String apiURL = '${currentDataSource}v1/representatives/scores';
+    http.Response response;
+    try {
+      response = await http.get(
+        Uri.parse(apiURL),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+    } catch (e) {
+      getNextDataSource();
+      response = getRepresentatives();
+    }
 
     return response;
   }
+
+  String currentDataSource = "https://api.creeper.banano.cc/banano";
+  getNextDataSource() {
+    int idx = dataSources.indexOf(currentDataSource);
+    if (idx == 2) {
+      currentDataSource = dataSources[0];
+    } else {
+      currentDataSource = dataSources[idx + 1];
+    }
+    return currentDataSource;
+  }
+
+  var dataSources = [
+    "https://api.creeper.banano.cc/banano",
+    "https://api.spyglass.pw/banano",
+    "https://spyglass.banano.trade/banano"
+  ];
 }
