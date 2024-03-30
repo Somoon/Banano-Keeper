@@ -112,20 +112,19 @@ class ActiveAccountState extends State<ActiveAccount>
                             initialValue: currentAccount,
                             // Callback that sets the selected popup menu item.
                             onSelected: (item) {
-                              setState(() {
-                                int walletID =
-                                    services<WalletsService>().activeWallet;
-                                String walletName = services<WalletsService>()
-                                    .walletsList[walletID];
-                                if (item !=
-                                    services<WalletService>(
-                                            instanceName: walletName)
-                                        .getActiveIndex()) {
+                              int walletID =
+                                  services<WalletsService>().activeWallet;
+                              String walletName = services<WalletsService>()
+                                  .walletsList[walletID];
+                              if (item !=
                                   services<WalletService>(
                                           instanceName: walletName)
-                                      .setActiveIndex(item);
-                                }
-                              });
+                                      .getActiveIndex()) {
+                                services<WalletService>(
+                                        instanceName: walletName)
+                                    .setActiveIndex(item);
+                              }
+                              setState(() {});
                             },
                             itemBuilder: (BuildContext context) =>
                                 createDropDownMenuItems(wallet, currentTheme),

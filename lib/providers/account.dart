@@ -110,6 +110,7 @@ class Account extends ChangeNotifier {
   bool hasReceivables = false;
 
   getHistory([offset = 0, size = 25]) async {
+    print('getHistory called ${address}');
     var historyRes = await AccountAPI().getHistory(getAddress(), size, offset);
 
     res = jsonDecode(historyRes.body);
@@ -299,6 +300,8 @@ class Account extends ChangeNotifier {
                 previous = jsonDecode(res)['hash'];
                 await onRefreshUpdateHistory();
               }
+              hasReceivables = false;
+              notifyListeners();
             }
 
             // notifyListeners();

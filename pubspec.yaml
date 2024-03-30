@@ -80,6 +80,8 @@ dependencies:
       ref: main # branch name
   flutter_easyloading: ^3.0.5
   flutter_inappwebview: ^6.0.0
+  custom_refresh_indicator: ^3.0.0
+  async: ^2.11.0
 #  cryptography: ^2.5.0
 
 

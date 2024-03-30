@@ -5,6 +5,7 @@ import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/initial_pages/initial_page_one.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/localization_service.dart';
+import 'package:bananokeeper/providers/pow/node_selector.dart';
 import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
@@ -67,6 +68,7 @@ Future<void> setupUserData() async {
     services<UserData>().setRepUpdateTime(userValues[9]);
     services<UserData>().setThreadCount(userValues[10]);
     services<UserData>().setAuthOnBoot(userValues[11]);
+    services<NodeSelector>().setNode(userValues[12]);
 
     //get active wallet and index
 
@@ -159,7 +161,14 @@ void main() async {
     registerProtocol('banverify');
   }
 
-  //remove splash ready to start
+  /* if (Platform.isWindows) {
+    runApp(const MyApp());
+    // setup window size for PC/Desktop platforms
+    initWindowsSize();
+    //remove splash ready to start
+    FlutterNativeSplash.remove();
+  } else {
+    */
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(
@@ -169,23 +178,26 @@ void main() async {
 
     // setup window size for PC/Desktop platforms
     initWindowsSize();
+    //remove splash ready to start
+
     FlutterNativeSplash.remove();
   });
+  // }
 }
 
 void initWindowsSize() {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     // if (Platform.isWindows) {
     // await DesktopWindow.setMinWindowSize(const Size(400, 400));
-    doWhenWindowReady(() {
-      final win = appWindow;
-      const initialSize = Size(600, 850);
-      win.minSize = initialSize;
-      win.size = initialSize;
-      win.alignment = Alignment.center;
-      win.title = "Banano Keeper";
-      win.show();
-    });
+    // doWhenWindowReady(() {
+    final win = appWindow;
+    const initialSize = Size(600, 850);
+    win.minSize = initialSize;
+    win.size = initialSize;
+    win.alignment = Alignment.center;
+    win.title = "Banano Keeper";
+    win.show();
+    // });
   }
 }
 

@@ -175,7 +175,7 @@ class ListRepChange {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             onPressed: () async {
-              changeRep(context, account, rep.address);
+              changeRep(context, account, rep.address, currentTheme);
             },
             child: Center(
               child: Container(
@@ -240,7 +240,8 @@ class ListRepChange {
     );
   }
 
-  changeRep(BuildContext context, Account account, String repAddress) async {
+  changeRep(BuildContext context, Account account, String repAddress,
+      currentTheme) async {
     if (NanoAccounts.isValid(NanoAccountType.BANANO, repAddress)) {
       bool canauth = await BiometricUtil().canAuth();
       bool verified = false;
@@ -260,7 +261,8 @@ class ListRepChange {
 
       if (verified) {
         LoadingIndicatorDialog().show(context,
-            text: AppLocalizations.of(context)!.loadingWidgetChangeRepMsg);
+            text: AppLocalizations.of(context)!.loadingWidgetChangeRepMsg,
+            theme: currentTheme);
 
         bool result = await account.changeRepresentative(repAddress);
 

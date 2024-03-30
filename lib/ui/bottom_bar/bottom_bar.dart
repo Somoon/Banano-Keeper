@@ -9,16 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:bananokeeper/themes.dart';
-import 'package:bananokeeper/api/account_api.dart';
-import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
-import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
-import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/ui/loading_widget.dart';
-import 'package:bananokeeper/ui/pin/verify_pin.dart';
 import 'package:bananokeeper/utils/utils.dart';
 import 'package:gap/gap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
@@ -27,10 +22,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:decimal/decimal.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
-import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:nanodart/nanodart.dart';
 
 class BottomBarApp extends StatefulWidget with GetItStatefulWidgetMixin {
   BottomBarApp({super.key});

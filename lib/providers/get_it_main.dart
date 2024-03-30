@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/providers/pow/local_work.dart';
+import 'package:bananokeeper/providers/pow/node_selector.dart';
 import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
@@ -20,7 +23,10 @@ void initServices() {
   services.registerSingleton<UserData>(UserData());
   services.registerSingleton<DBManager>(DBManager());
   services.registerSingleton<PoWSource>(PoWSource());
-  services.registerSingleton<LocalWork>(LocalWork());
+  if (!Platform.isWindows) {
+    services.registerSingleton<LocalWork>(LocalWork());
+  }
+  services.registerSingleton<NodeSelector>(NodeSelector());
   services.registerSingleton<QueueService>(QueueService());
 }
 
@@ -46,4 +52,7 @@ void resetServices() {
   }
   if (services.isRegistered<Account>()) services.unregister<Account>();
   if (services.isRegistered<LocalWork>()) services.unregister<LocalWork>();
+  if (services.isRegistered<NodeSelector>()) {
+    services.unregister<NodeSelector>();
+  }
 }

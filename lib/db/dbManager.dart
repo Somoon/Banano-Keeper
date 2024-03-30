@@ -37,18 +37,27 @@ class DBManager {
 	PRIMARY KEY("ID" AUTOINCREMENT)
 );""";
 
+  getDBPath() async {
+    Directory dbDir;
+    if (Platform.isWindows) {
+      dbDir = await getApplicationSupportDirectory();
+    } else {
+      dbDir = await getApplicationDocumentsDirectory();
+    }
+
+    return dbDir;
+  }
+
   Future<void> deleteDatabase() async {
     await database.close();
-    final documentsDirectory = await getApplicationDocumentsDirectory();
+    final documentsDirectory = await getDBPath();
     final path = join(documentsDirectory.path, _databaseName);
     databaseFactory.deleteDatabase(path);
   }
 
   Future<void> init() async {
-    final documentsDirectory = await getApplicationDocumentsDirectory();
-    // final Directory tempDir = await getTemporaryDirectory();
+    final documentsDirectory = await getDBPath();
     final path = join(documentsDirectory.path, _databaseName);
-    // print(tempDir);
     if (Platform.isWindows || Platform.isLinux) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;

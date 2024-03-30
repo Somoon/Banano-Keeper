@@ -110,7 +110,7 @@ class VerifyPINState extends State<VerifyPIN> with GetItStateMixin {
                                     const Duration(milliseconds: 1500), () {
                                   setState(() {
                                     if (incorrectAttempt >= 3) {
-                                      services<AppRouter>().pop<bool>(false);
+                                      // services<AppRouter>().pop<bool>(false);
                                       Navigator.of(context).pop(false);
                                     }
                                     pinController.clear();
@@ -124,7 +124,7 @@ class VerifyPINState extends State<VerifyPIN> with GetItStateMixin {
                                     const Duration(milliseconds: 200), () {
                                   setState(() {
                                     pinController.clear();
-                                    services<AppRouter>().pop<bool>(true);
+                                    // services<AppRouter>().pop<bool>(true);
                                     Navigator.of(context).pop(true);
                                   });
                                 })

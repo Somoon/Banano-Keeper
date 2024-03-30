@@ -241,8 +241,8 @@ class InitialPageInformationState extends State<InitialPageInformation>
                         children: [
                           Checkbox(
                             checkColor: currentTheme.text,
-                            fillColor:
-                                MaterialStateProperty.resolveWith(getColor),
+                            fillColor: MaterialStateProperty.all(Colors.white),
+                            // MaterialStateProperty.resolveWith(getColor),
                             value: isCheckedNewWallet,
                             onChanged: (bool? value) {
                               setState(() {
@@ -261,7 +261,6 @@ class InitialPageInformationState extends State<InitialPageInformation>
                                       ? appLocalizations.seed.toLowerCase()
                                       : appLocalizations.mnemonicPhrase
                                           .toLowerCase())),
-                              // 'I have backed up the new wallet ${}.',
                               style: TextStyle(
                                 color: currentTheme.textDisabled,
                                 fontSize: currentTheme.fontSize - 3,

@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:async/async.dart';
 import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/pow/local_work.dart';
+import 'package:bananokeeper/providers/pow/node_selector.dart';
 import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -65,19 +67,31 @@ class AccountAPI {
   processRequest(StateBlock block, String subtype,
       [String publicKey = '']) async {
     String powType = services<PoWSource>().getAPIName();
-    String apiURL = services<PoWSource>().getAPIURL();
+    String nodeURL = services<PoWSource>().getNodeURL();
+
+    //if pow pre-generated before sending, use user's set node
+    if (powType == "Local PoW")
+    // || Bpow
+    //)
+    {
+      nodeURL = services<NodeSelector>().getNodeURL();
+    }
+    /*
+    if powType local OR bpow
+    -> get node from node_selector
+       nodeURL
+     */
 
     Map<String, dynamic> request = {};
     if (powType == 'Local PoW') {
       LocalWork lPow = services<LocalWork>();
-      // await lPow.init();
 
-      lPow.completer = Completer<String>();
+      lPow.completer = CancelableCompleter<String>();
       String hashForWork = (subtype == 'open' ? publicKey : block.previous);
       lPow.generateWork(
         hash: hashForWork,
       );
-      String fetchedWork = await lPow.completer.future;
+      String fetchedWork = await lPow.completer.operation.value;
       // print(fetchedWork);
       block.work = fetchedWork;
 
@@ -88,9 +102,6 @@ class AccountAPI {
       };
       // }
     } else {
-      if (kDebugMode) {
-        print("processRequest $apiURL");
-      }
       request = {
         "action": "process",
         "block": json.encode(block.toJson()),
@@ -98,9 +109,12 @@ class AccountAPI {
         "subtype": subtype
       };
     }
+    if (kDebugMode) {
+      print("processRequest $nodeURL");
+    }
 
     http.Response response = await http.post(
-      Uri.parse(apiURL),
+      Uri.parse(nodeURL),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

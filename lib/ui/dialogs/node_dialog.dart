@@ -1,36 +1,48 @@
-import 'package:bananokeeper/api/currency_conversion.dart';
-import 'package:bananokeeper/app_router.dart';
-import 'package:bananokeeper/providers/user_data.dart';
 import 'package:flutter/material.dart';
-
+import 'package:bananokeeper/app_router.dart';
+import 'package:bananokeeper/providers/pow/node_selector.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
+import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/themes.dart';
-import 'package:gap/gap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:gap/gap.dart';
 
-class CurrencyDialog extends StatefulWidget with GetItStatefulWidgetMixin {
-  CurrencyDialog({super.key});
+class NodeDialog extends StatefulWidget with GetItStatefulWidgetMixin {
+  NodeDialog({super.key});
 
   @override
-  CurrencyDialogState createState() => CurrencyDialogState();
+  NodeialogState createState() => NodeialogState();
 }
 
-class CurrencyDialogState extends State<CurrencyDialog> with GetItStateMixin {
+class NodeialogState extends State<NodeDialog> with GetItStateMixin {
   @override
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-    List<String> currencies = get<CurrencyConversion>().price.keys.toList();
+    List<String> sources = get<NodeSelector>().listOfNodes.keys.toList();
 
-    List<Widget> currgWidgets = [];
-    for (String item in currencies) {
-      currgWidgets.add(createCurrencyButton(item));
-      /*currgWidgets.add(
-      const Divider(
-        thickness: 1,
-      ));
-      */
+    List<Widget> nodeWidgets = [];
+    nodeWidgets.add(
+      Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: AutoSizeText(
+          "Select the node a transaction block will be processed at.",
+          style: currentTheme.textStyle,
+          maxFontSize: 12,
+        ),
+      ),
+    );
+    for (String item in sources) {
+      // if (item == 'Local PoW') {
+      //   if (!Platform.isWindows) {
+      //     powWidgets.add(createLangButton(item, AppLocalizations.of(context)));
+      //   }
+      // } else {
+      nodeWidgets.add(createNodeButton(item, AppLocalizations.of(context)));
+      // }
     }
+
     return Container(
       constraints: const BoxConstraints(
         minWidth: 100,
@@ -46,7 +58,7 @@ class CurrencyDialogState extends State<CurrencyDialog> with GetItStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Column(
-              children: currgWidgets,
+              children: nodeWidgets,
             ),
             const Gap(15),
             const Divider(
@@ -55,7 +67,7 @@ class CurrencyDialogState extends State<CurrencyDialog> with GetItStateMixin {
             TextButton(
               style: currentTheme.btnStyleNoBorder,
               onPressed: () {
-                Navigator.of(context).pop();
+                services<AppRouter>().pop(context);
               },
               child: Text(
                 AppLocalizations.of(context)!.close,
@@ -68,24 +80,24 @@ class CurrencyDialogState extends State<CurrencyDialog> with GetItStateMixin {
     );
   }
 
-  Widget createCurrencyButton(String label) {
+  Widget createNodeButton(String label, appLocalizations) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-    var currentCurrency = watchOnly((UserData x) => x.getCurrency());
+    var currentSource = watchOnly((NodeSelector x) => x.getNodeName());
     return SizedBox(
       width: double.infinity,
       child: TextButton(
         style: currentTheme.btnStyleNoBorder,
-        onPressed: (services<UserData>().getCurrency() == label)
+        onPressed: (services<NodeSelector>().getNodeName() == label)
             ? null
-            : () {
-                _setCurrency(label);
+            : () async {
+                _setSource(label);
                 setState(() {});
-                // Navigator.pop(context);
               },
         child: Text(
+          // appLocalizations!.
           label,
           style: TextStyle(
-              color: (currentCurrency != label
+              color: (currentSource != label
                   ? currentTheme.text
                   : currentTheme.textDisabled)),
         ),
@@ -93,10 +105,10 @@ class CurrencyDialogState extends State<CurrencyDialog> with GetItStateMixin {
     );
   }
 
-  void _setCurrency(String currency) {
+  void _setSource(String nodeName) {
     setState(() {
-      services<UserData>().setCurrency(currency);
-      // services<SharedPrefsModel>().saveLang(lang); //move to setCurrency
+      services<NodeSelector>().setNode(nodeName);
+      services<SharedPrefsModel>().saveNode(nodeName);
     });
   }
 }

@@ -154,8 +154,8 @@ class WalletManagementPageState extends State<WalletManagementPage>
             //Wallet name portion
             GestureDetector(
               onTap: () {
+                services<WalletsService>().setActiveWallet(index);
                 setState(() {
-                  services<WalletsService>().setActiveWallet(index);
                   // currentWallet.setActiveIndex(index);
                   // currentWallet.setActiveAccount(loadedAccounts[index]);
                 });
@@ -923,9 +923,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
                         child: Row(
                           children: [
                             Checkbox(
-                              checkColor: currentTheme.textDisabled,
+                              checkColor: currentTheme.text,
                               fillColor:
-                                  MaterialStateProperty.resolveWith(getColor),
+                                  MaterialStateProperty.all(Colors.white),
                               value: isCheckedNewWallet,
                               onChanged: (bool? value) {
                                 setState(() {
