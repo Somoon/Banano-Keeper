@@ -52,7 +52,8 @@ class Utils {
     return shorted;
   }
 
-  Widget colorffix(String banAddress, currentTheme) {
+  Widget colorffix(String banAddress, currentTheme, [double? fontSize]) {
+    fontSize ??= currentTheme.fontSize;
     if (banAddress.length == 64) {
       Widget str = RichText(
         text: TextSpan(
@@ -61,7 +62,7 @@ class Utils {
               text: banAddress.substring(0, 16),
               style: TextStyle(
                 color: currentTheme.text,
-                fontSize: currentTheme.fontSize - 5,
+                fontSize: fontSize! - 5,
                 height: 1.3,
                 fontFamily: 'monospace',
               ),
@@ -70,7 +71,7 @@ class Utils {
               text: banAddress.substring(17, 55),
               style: TextStyle(
                 color: currentTheme.textDisabled,
-                fontSize: currentTheme.fontSize - 5,
+                fontSize: fontSize - 5,
                 height: 1.3,
                 fontFamily: 'monospace',
               ),
@@ -79,7 +80,7 @@ class Utils {
               text: banAddress.substring(56, 64),
               style: TextStyle(
                 color: currentTheme.text,
-                fontSize: currentTheme.fontSize - 5,
+                fontSize: fontSize - 5,
                 height: 1.3,
                 fontFamily: 'monospace',
               ),
@@ -95,7 +96,7 @@ class Utils {
       maxLines: 2,
       style: TextStyle(
         color: currentTheme.text,
-        fontSize: currentTheme.fontSize,
+        fontSize: fontSize,
         height: 1.3,
         fontFamily: 'monospace',
       ),
@@ -158,14 +159,26 @@ class Utils {
         RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
   }
 
+  String preciseValue(Decimal value) {
+    RegExp regex = RegExp(r'([.]*0)(?!.*\d)');
+    String amountNoTrail = value
+        .toStringAsPrecision(3)
+        .replaceAll(regex, '')
+        .replaceAllMapped(
+            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+    return amountNoTrail;
+  }
+
   Widget formatBalance(
       activeAccountBalance, currentTheme, String userCurrency) {
     // String userCurrency = services<UserData>().currency;
     Decimal convertedPrice = Decimal.parse(
             services<CurrencyConversion>().price[userCurrency]!.toString()) *
         amountFromRaw(activeAccountBalance);
+
+    String pValue = preciseValue(convertedPrice);
     String textC =
-        "${services<CurrencyConversion>().symbol[userCurrency]}${convertedPrice.toStringAsFixed(2)}";
+        "${services<CurrencyConversion>().symbol[userCurrency]}${(pValue)}";
     return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         //Center Row contents horizontally,

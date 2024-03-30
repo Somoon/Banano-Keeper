@@ -22,6 +22,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     bool authOnBootStatus = watchOnly((UserData x) => x.getAuthOnBoot());
+    bool authForSmallTx = watchOnly((UserData x) => x.getAuthForSmallTx());
 
     return Container(
       constraints: const BoxConstraints(
@@ -43,7 +44,8 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
                 const Divider(
                   thickness: 1,
                 ),
-                createAuthOnStartUp(currentTheme, authOnBootStatus)
+                createAuthOnStartUp(
+                    currentTheme, authOnBootStatus, authForSmallTx)
               ],
             ),
             const Gap(15),
@@ -66,7 +68,8 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
     );
   }
 
-  Padding createAuthOnStartUp(BaseTheme currentTheme, bool authOnBootStatus) {
+  Padding createAuthOnStartUp(
+      BaseTheme currentTheme, bool authOnBootStatus, bool authForSmallTx) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0.0),
       child: Row(
@@ -87,12 +90,22 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
             inactiveThumbColor: currentTheme.textDisabled,
 
             onChanged: (bool value) {
+              if (authForSmallTx && !value) {
+                changeSmallTxAuthValue(false);
+              }
               changeAuthValue(value);
             },
           ),
         ],
       ),
     );
+  }
+
+  changeSmallTxAuthValue(bool value) {
+    setState(() {
+      services<UserData>().setAuthForSmallTx(value);
+      services<SharedPrefsModel>().saveAuthForSmallTx(value);
+    });
   }
 
   changeAuthValue(bool value) {
