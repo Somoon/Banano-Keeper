@@ -90,11 +90,16 @@ class _SideDrawer extends State<SideDrawer>
     String selectedPoWName = watchOnly((PoWSource x) => x.getAPIName());
     String selectedNodeName = watchOnly((NodeSelector x) => x.getNodeName());
     bool autoReceiveStatus = watchOnly((UserData x) => x.getAutoReceive());
-    String receiveStr =
-        'Auto receive: ${(autoReceiveStatus == true ? 'on' : 'off')}';
+    String receiveStr = AppLocalizations.of(context)!.autoReceiveStatusMessage(
+        (autoReceiveStatus == true
+            ? AppLocalizations.of(context)!.on
+            : AppLocalizations.of(context)!.off));
+
+    double minToReceive = watchOnly((UserData x) => x.getMinToReceive());
+
     if (autoReceiveStatus) {
-      double minToReceive = watchOnly((UserData x) => x.getMinToReceive());
-      receiveStr = 'Min. to receive: $minToReceive';
+      receiveStr =
+          AppLocalizations.of(context)!.minToReceiveStatusMessage(minToReceive);
     }
     //side drawer
     return SafeArea(
@@ -201,7 +206,7 @@ class _SideDrawer extends State<SideDrawer>
               ///
 
               createSigningBottomSheetButton(
-                "Message Signing",
+                AppLocalizations.of(context)!.messageSigningTitle,
               ),
 
               // AppLocalizations.of(context)!.representative,
@@ -222,23 +227,47 @@ class _SideDrawer extends State<SideDrawer>
                   color: currentTheme.offColor,
                 ),
               ),
-              createDialogButton("Currency", currentCurrency, CurrencyDialog()),
               createDialogButton(
-                  "Receive settings", receiveStr, ReceiveDialog()),
+                AppLocalizations.of(context)!.currency,
+                currentCurrency,
+                CurrencyDialog(),
+              ),
+              createDialogButton(
+                AppLocalizations.of(context)!.receiveSettingsTextButton,
+                receiveStr,
+                ReceiveDialog(),
+              ),
 
               // Already done and working.
-              createDialogButton("PoW Source", selectedPoWName, PoWDialog()),
+              createDialogButton(
+                AppLocalizations.of(context)!.powSourceTextButton,
+                selectedPoWName,
+                PoWDialog(),
+              ),
 
               // createDialogButton("Block Explorer", "1", ThemesDialog()),
-              createDialogButton("Node", selectedNodeName, NodeDialog()),
-
-              createDialogButton(AppLocalizations.of(context)!.themes,
-                  activeTheme, ThemesDialog()),
               createDialogButton(
-                  AppLocalizations.of(context)!.security, "", SecurityDialog()),
+                AppLocalizations.of(context)!.nodeTextButton,
+                selectedNodeName,
+                NodeDialog(),
+              ),
 
-              createDialogButton(AppLocalizations.of(context)!.language,
-                  activeLanguage['displayedLanguage']!, LangDialog()),
+              createDialogButton(
+                AppLocalizations.of(context)!.themes,
+                activeTheme,
+                ThemesDialog(),
+              ),
+              createDialogButton(
+                AppLocalizations.of(context)!.security,
+                "",
+                SecurityDialog(),
+              ),
+
+              createDialogButton(
+                AppLocalizations.of(context)!.language,
+                activeLanguage['displayedLanguage']!,
+                LangDialog(),
+              ),
               // createDialogButton("Contacts/Bookmark", "1", ThemesDialog()),
               // createDialogButton("Notifications", "1", ThemesDialog()),
               // createDialogButton("switch to nano?", "1", ThemesDialog()),

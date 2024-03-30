@@ -213,6 +213,16 @@ class SharedPrefsModel {
     sharedPref.setBool('autoReceive', newStatus);
   }
 
+  getNumOfAllowedRx() async {
+    int numOfAllowedReceivables =
+        sharedPref.getInt('numOfAllowedReceivables') ?? 10;
+    return numOfAllowedReceivables;
+  }
+
+  void saveNumOfAllowedRx(int value) async {
+    sharedPref.setInt('numOfAllowedReceivables', value);
+  }
+
   Future<List> getStoredValues() async {
     var isInit = sharedPref.containsKey('isInitialized');
     var lang = "English";
@@ -229,6 +239,7 @@ class SharedPrefsModel {
     bool authOnBoot = false;
     bool autoReceive = true;
     double minToReceive = 0.01;
+    int numOfAllowedReceivables = 10;
     if (isInit) {
       lang = await getLang();
       theme = await getTheme();
@@ -244,6 +255,7 @@ class SharedPrefsModel {
       nodeName = await getNode();
       autoReceive = await getAutoReceive();
       minToReceive = await getMinToReceive();
+      numOfAllowedReceivables = await getNumOfAllowedRx();
     }
 
     return [
@@ -262,6 +274,7 @@ class SharedPrefsModel {
       nodeName, //12
       autoReceive, //13
       minToReceive, //14
+      numOfAllowedReceivables, //15
     ];
   }
 

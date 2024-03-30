@@ -108,6 +108,7 @@ class Account extends ChangeNotifier {
   bool doneovR = false;
 
   bool hasReceivables = false;
+  int receivables = 0;
 
   getHistory([offset = 0, size = 25]) async {
     print('getHistory called ${address}');
@@ -219,6 +220,8 @@ class Account extends ChangeNotifier {
         if (overviewResp.isNotEmpty || overviewResp != null) {
           opened = overviewResp['opened'] ?? false;
           hasReceivables = (overviewResp['receivable'] > 0);
+          receivables = overviewResp['receivable'];
+
           if (hasReceivables && !opened) {
             if (kDebugMode) {
               print(
@@ -247,64 +250,10 @@ class Account extends ChangeNotifier {
               setRep(newRep);
             }
             setLastUpdate(int.parse(currentTime.toString()));
+            notifyListeners();
 
-            //get receivables
-            if (hasReceivables) {
-              //get blocks data
-              var recRes = await AccountAPI().getReceivables(address);
-
-              //latest hash
-              var hist = await AccountAPI().getHistory(address, 1);
-              var historyData = jsonDecode(hist.body);
-              String previous = historyData[0]['hash'];
-
-              var data = jsonDecode(recRes.body);
-
-              for (var row in data) {
-                var receivableHash = row['hash'];
-                var receivableRaw = row['amountRaw'];
-
-                var newRaw =
-                    (BigInt.parse(newBalance) + BigInt.parse(receivableRaw))
-                        .toString();
-
-                int accountType = NanoAccountType.BANANO;
-                String calculatedHash = NanoBlocks.computeStateHash(
-                    accountType,
-                    address,
-                    previous,
-                    representative,
-                    BigInt.parse(newRaw),
-                    receivableHash);
-
-                int activeWallet = services<WalletsService>().activeWallet;
-                String walletName =
-                    services<WalletsService>().walletsList[activeWallet];
-
-                String privateKey =
-                    services<WalletService>(instanceName: walletName)
-                        .getPrivateKey(index);
-                // Signing a block
-                String sign =
-                    NanoSignatures.signBlock(calculatedHash, privateKey);
-
-                StateBlock sendBlock = StateBlock(address, previous,
-                    representative, newRaw, receivableHash, sign);
-
-                var res =
-                    await AccountAPI().processRequest(sendBlock, "receive");
-
-                newBalance = Decimal.tryParse(newRaw).toString();
-
-                setBalance(newBalance);
-                previous = jsonDecode(res)['hash'];
-                await onRefreshUpdateHistory();
-              }
-              hasReceivables = false;
-              notifyListeners();
-            }
-
-            // notifyListeners();
+            //get Receivables
+            if (hasReceivables) receiveTransactions(false);
           }
         }
       }
@@ -312,6 +261,80 @@ class Account extends ChangeNotifier {
       if (kDebugMode) {
         print("HandleOVerviewResp: $e");
       }
+    }
+  }
+
+  receiveTransactions([bool direct = true]) async {
+    bool isAutoReceiveAllowed = services<UserData>().getAutoReceive();
+    if (direct) isAutoReceiveAllowed = true;
+    //get receivables
+    if (hasReceivables && isAutoReceiveAllowed) {
+      int transactionsProccessed = 0;
+      //get min. amount to receive
+      Decimal minAmountToReceive =
+          Decimal.tryParse(services<UserData>().getMinToReceive().toString())!;
+      int numOfAllowedTx = services<UserData>().getNumOfAllowedRx();
+
+      //get blocks data
+      var recRes = await AccountAPI().getReceivables(address);
+
+      //latest hash
+      var hist = await AccountAPI().getHistory(address, 1);
+      var historyData = jsonDecode(hist.body);
+      String previous = historyData[0]['hash'];
+
+      var data = jsonDecode(recRes.body);
+
+      for (var row in data) {
+        if (transactionsProccessed >= numOfAllowedTx) break;
+
+        var receivableHash = row['hash'];
+        var receivableRaw = row['amountRaw'];
+
+        Decimal receivableDec = Utils().amountFromRaw(receivableRaw);
+        if (receivableDec >= minAmountToReceive) {
+          String newBalance = getBalance();
+          var newRaw = (BigInt.parse(newBalance) + BigInt.parse(receivableRaw))
+              .toString();
+
+          int accountType = NanoAccountType.BANANO;
+          String calculatedHash = NanoBlocks.computeStateHash(
+              accountType,
+              address,
+              previous,
+              representative,
+              BigInt.parse(newRaw),
+              receivableHash);
+
+          int activeWallet = services<WalletsService>().activeWallet;
+          String walletName =
+              services<WalletsService>().walletsList[activeWallet];
+
+          String privateKey = services<WalletService>(instanceName: walletName)
+              .getPrivateKey(index);
+          // Signing a block
+          String sign = NanoSignatures.signBlock(calculatedHash, privateKey);
+
+          StateBlock receiveBlock = StateBlock(
+              address, previous, representative, newRaw, receivableHash, sign);
+
+          var res = await AccountAPI().processRequest(receiveBlock, "receive");
+
+          newBalance = Decimal.tryParse(newRaw).toString();
+
+          setBalance(newBalance);
+          previous = jsonDecode(res)['hash'];
+          await onRefreshUpdateHistory();
+          transactionsProccessed++;
+        } else {
+          print(
+              'receivable amount does not meet user req.: $minAmountToReceive  > $receivableDec');
+        }
+
+        receivables--;
+      }
+      if (receivables < 1) hasReceivables = false;
+      notifyListeners();
     }
   }
 

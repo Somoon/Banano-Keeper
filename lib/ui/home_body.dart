@@ -99,6 +99,8 @@ class HomeBodyState extends State<HomeBody>
     var account = services<Account>(instanceName: accOrgName);
     bool hasReceivables =
         watchOnly((Account x) => x.hasReceivables, instanceName: accOrgName);
+    int receivablesCount =
+        watchOnly((Account x) => x.receivables, instanceName: accOrgName);
     try {
       if (_acc.getAddress() != account.getAddress()) {
         firstBoot = true;
@@ -178,30 +180,48 @@ class HomeBodyState extends State<HomeBody>
                   textDirection: TextDirection.ltr,
                   style: TextStyle(color: currentTheme.text, fontSize: 24),
                 ),
+                const Gap(5),
                 if (hasReceivables) ...[
-                  SizedBox(
-                    width: 20,
-                    child: IconButton(
+                  Container(
+                    height: 30,
+                    alignment: Alignment.center,
+                    child: TextButton(
                       style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                          currentTheme.secondary,
+                          // Colors.green,
+                        ),
+                        padding: MaterialStateProperty.all(
+                          const EdgeInsets.all(5),
+                        ),
+                        minimumSize:
+                            MaterialStateProperty.all(const Size(50, 20)),
+                        // tapTargetSize: MaterialTapTargetSize.shrinkWrapped,
+                        alignment: Alignment.center,
                         shape:
                             MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                            side: BorderSide(color: currentTheme.text),
+                            borderRadius: BorderRadius.circular(10.0),
+                            side: const BorderSide(color: Colors.black38),
                           ),
                         ),
                       ),
-                      splashRadius: 9,
+                      // splashRadius: 9,
                       onPressed: () {
                         if (kDebugMode) {
                           print("i am supposed to be doing magic");
                         }
+                        setState(() {
+                          _acc.receiveTransactions();
+                        });
                       },
-                      icon: Text(
-                        "+",
+                      child: AutoSizeText(
+                        "new ($receivablesCount)",
+                        maxLines: 1,
+                        maxFontSize: currentTheme.fontSize - 5,
                         style: TextStyle(
-                          color: currentTheme.text,
-                          fontSize: currentTheme.fontSize - 2,
+                          color: currentTheme.textSecondary,
+                          // fontSize: currentTheme.fontSize - 5,
                         ),
                       ),
                     ),

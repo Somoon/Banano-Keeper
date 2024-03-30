@@ -164,5 +164,30 @@
   "enterMessageLabel": "Message",
   "enterSignLabel": "Signature",
   "signValidMessage": "Signature is valid",
-  "signInvalidMessage": "Signature is invalid"
+  "signInvalidMessage": "Signature is invalid",
+  "off": "off",
+  "on": "on",
+  "autoReceiveStatusMessage": "Auto receive: {state}",
+  "@autoReceiveStatusMessage": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "off"
+      }
+    }
+  },
+  "minToReceiveStatusMessage": "Min. to receive: {valueDouble}",
+  "@minToReceiveStatusMessage": {
+    "placeholders": {
+      "valueDouble": {
+        "type": "double",
+        "example": "0.01"
+      }
+    }
+  },
+  "minimumToReceiveTextFieldTitle": "Minimum to receive:",
+  "autoReceiveTextButton": "Auto receive:",
+  "receiveSettingsTextButton": "Receive settings",
+  "powSourceTextButton": "PoW Source",
+  "nodeTextButton": "Node"
 }

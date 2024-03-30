@@ -26,6 +26,7 @@ class UserData extends ChangeNotifier {
   late String currency = "USD";
   late bool autoReceive = true;
   late double minToReceive = 0.01;
+  late int numOfAllowedReceivables = 10;
   late String powSource = "Kalium";
   // late String nodeName = "Kalium";
   late int threadCount = 3;
@@ -35,15 +36,27 @@ class UserData extends ChangeNotifier {
   setAutoReceive(bool state) {
     autoReceive = state;
     services<SharedPrefsModel>().saveAutoReceive(state);
+    notifyListeners();
   }
 
   bool getAutoReceive() {
     return autoReceive;
   }
 
-  setMinToReceive(double value) {
+  setNumOfAllowedRx(int state) {
+    numOfAllowedReceivables = state;
+    services<SharedPrefsModel>().saveNumOfAllowedRx(numOfAllowedReceivables);
+    notifyListeners();
+  }
+
+  int getNumOfAllowedRx() {
+    return numOfAllowedReceivables;
+  }
+
+  setMinToReceive(double value) async {
     minToReceive = value;
     services<SharedPrefsModel>().saveMinToReceive(value);
+    notifyListeners();
   }
 
   double getMinToReceive() {
@@ -94,6 +107,7 @@ class UserData extends ChangeNotifier {
 
   setLockType(String type) {
     lockType = type;
+    notifyListeners();
   }
 
   getLockType() {

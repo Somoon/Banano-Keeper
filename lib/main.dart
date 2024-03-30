@@ -35,6 +35,21 @@ Future<void> _initSharedPref() async {
   services.registerSingleton<SharedPrefsModel>(SharedPrefsModel(sharedPref));
 }
 
+populateUserData(userValues) async {
+  services<LocalizationModel>().setLocale(userValues[1]);
+  services<ThemeModel>().setTheme(userValues[2]);
+  services<UserData>().setPin(userValues[6]);
+  services<PoWSource>().setAPI(userValues[7]);
+  services<UserData>().setRepresentativesList(userValues[8]);
+  services<UserData>().setRepUpdateTime(userValues[9]);
+  services<UserData>().setThreadCount(userValues[10]);
+  services<UserData>().setAuthOnBoot(userValues[11]);
+  services<NodeSelector>().setNode(userValues[12]);
+  services<UserData>().setAutoReceive(userValues[13]);
+  services<UserData>().setMinToReceive(userValues[14]);
+  services<UserData>().setNumOfAllowedRx(userValues[15]);
+}
+
 Future<void> setupUserData() async {
   await _initSharedPref();
   await services<DBManager>().init();
@@ -60,15 +75,7 @@ Future<void> setupUserData() async {
     }
     await services.allReady();
     //set theme and language
-    services<LocalizationModel>().setLocale(userValues[1]);
-    services<ThemeModel>().setTheme(userValues[2]);
-    services<UserData>().setPin(userValues[6]);
-    services<PoWSource>().setAPI(userValues[7]);
-    services<UserData>().setRepresentativesList(userValues[8]);
-    services<UserData>().setRepUpdateTime(userValues[9]);
-    services<UserData>().setThreadCount(userValues[10]);
-    services<UserData>().setAuthOnBoot(userValues[11]);
-    services<NodeSelector>().setNode(userValues[12]);
+    await populateUserData(userValues);
 
     //get active wallet and index
 
