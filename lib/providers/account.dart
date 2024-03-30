@@ -108,7 +108,9 @@ class Account extends ChangeNotifier {
   bool doneovR = false;
 
   bool hasReceivables = false;
-  int receivables = 0;
+  int receivablesCount = 0;
+  double receivablesAmount = 0.0;
+  bool receiving = false;
 
   getHistory([offset = 0, size = 25]) async {
     print('getHistory called ${address}');
@@ -199,6 +201,7 @@ class Account extends ChangeNotifier {
       var overview = await AccountAPI().getOverview(getAddress());
 
       overviewResp = jsonDecode(overview.body);
+      // print(overviewResp);
 
       // if (kDebugMode) {
       //   print(
@@ -220,7 +223,10 @@ class Account extends ChangeNotifier {
         if (overviewResp.isNotEmpty || overviewResp != null) {
           opened = overviewResp['opened'] ?? false;
           hasReceivables = (overviewResp['receivable'] > 0);
-          receivables = overviewResp['receivable'];
+          receivablesAmount = overviewResp['receivable'];
+
+          var recRes = await AccountAPI().getReceivables(address);
+          receivablesCount = jsonDecode(recRes.body).length;
 
           if (hasReceivables && !opened) {
             if (kDebugMode) {
@@ -284,6 +290,7 @@ class Account extends ChangeNotifier {
       String previous = historyData[0]['hash'];
 
       var data = jsonDecode(recRes.body);
+      // receivablesCount = data.length;
 
       for (var row in data) {
         if (transactionsProccessed >= numOfAllowedTx) break;
@@ -293,6 +300,7 @@ class Account extends ChangeNotifier {
 
         Decimal receivableDec = Utils().amountFromRaw(receivableRaw);
         if (receivableDec >= minAmountToReceive) {
+          setReceiving(true);
           String newBalance = getBalance();
           var newRaw = (BigInt.parse(newBalance) + BigInt.parse(receivableRaw))
               .toString();
@@ -323,17 +331,25 @@ class Account extends ChangeNotifier {
           newBalance = Decimal.tryParse(newRaw).toString();
 
           setBalance(newBalance);
+          // print(jsonDecode(res));
           previous = jsonDecode(res)['hash'];
           await onRefreshUpdateHistory();
           transactionsProccessed++;
-        } else {
+          receivablesCount--;
+        } /*else {
           print(
               'receivable amount does not meet user req.: $minAmountToReceive  > $receivableDec');
-        }
-
-        receivables--;
+        }*/
       }
-      if (receivables < 1) hasReceivables = false;
+      if (receivablesCount < 1) hasReceivables = false;
+      setReceiving(false);
+      notifyListeners();
+    }
+  }
+
+  setReceiving(bool status) {
+    if (status != receiving) {
+      receiving = status;
       notifyListeners();
     }
   }

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/user_data.dart';
-import 'package:bananokeeper/ui/bottom_bar/send_sheet.dart';
+import 'package:bananokeeper/ui/bottom_bar/send_sheet/send_sheet.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

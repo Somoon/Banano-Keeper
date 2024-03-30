@@ -189,6 +189,36 @@
   "autoReceiveTextButton": "Auto receive:",
   "receiveSettingsTextButton": "Receive settings",
   "powSourceTextButton": "PoW Source",
-  "nodeTextButton": "Node"
-
+  "nodeTextButton": "Node",
+  "newRxTextButton": "new ({state})",
+  "@newRxTextButton": {
+    "placeholders": {
+      "state": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "noOfAllowedTxTextButton": "Number of reicevables at a time: {state}",
+  "@noOfAllowedTxTextButton": {
+    "placeholders": {
+      "state": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "confirm": "Confirm",
+  "sendingConfirmationDialogTitle": "Sending Confirmation",
+  "sending": "Sending",
+  "to": "To",
+  "authMsgConfirmSend": "Authenticate to send {state} BAN.",
+  "@authMsgConfirmSend": {
+    "placeholders": {
+      "state": {
+        "type": "String",
+        "example": "1"
+      }
+    }
+  }
 }

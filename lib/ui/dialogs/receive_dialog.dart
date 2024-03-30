@@ -72,10 +72,10 @@ class ReceiveDialogState extends State<ReceiveDialog> with GetItStateMixin {
               const Gap(15),
               createAllowedTxNumButton(currentTheme),
               createAutoReceiveButton(currentTheme, autoReceive),
-              if (autoReceive) ...[
-                createMinToReceiveTextField(
-                    width, currentTheme, amountNoTrail, minToReceive),
-              ],
+              // if (autoReceive) ...[
+              createMinToReceiveTextField(
+                  width, currentTheme, amountNoTrail, minToReceive),
+              // ],
               const Gap(15),
               const Divider(
                 thickness: 1,
@@ -101,7 +101,7 @@ class ReceiveDialogState extends State<ReceiveDialog> with GetItStateMixin {
     return Column(
       children: [
         AutoSizeText(
-          "Number of reicevables at a time: $txCount",
+          AppLocalizations.of(context)!.noOfAllowedTxTextButton(txCount),
           maxLines: 1,
           style: TextStyle(
             fontSize: 15,

@@ -1,16 +1,11 @@
-import 'dart:convert';
-
-import 'package:bananokeeper/api/account_api.dart';
-import 'package:bananokeeper/api/state_block.dart';
 import 'package:bananokeeper/app_router.dart';
-import 'package:bananokeeper/providers/auth_biometric.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/queue_service.dart';
 import 'package:bananokeeper/providers/user_data.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/themes.dart';
-import 'package:bananokeeper/ui/loading_widget.dart';
+import 'package:bananokeeper/ui/bottom_bar/send_sheet/send_confirm_dialog.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -198,12 +193,14 @@ class SendBottomSheet {
                                 height: 40,
                               ),
                               createSendButton(account, currentTheme,
-                                  appLocalizations, width),
+                                  appLocalizations, width, context),
                               const SizedBox(
                                 height: 10,
                               ),
-                              createQRButton(
-                                  currentTheme, appLocalizations, width),
+                              if (!Platform.isWindows) ...[
+                                createQRButton(
+                                    currentTheme, appLocalizations, width),
+                              ]
                             ],
                           ),
                         ),
@@ -229,8 +226,8 @@ class SendBottomSheet {
     // sent = false;
   }
 
-  Widget createSendButton(
-      Account account, currentTheme, appLocalizations, width) {
+  Widget createSendButton(Account account, currentTheme, appLocalizations,
+      width, BuildContext context) {
     return SizedBox(
       height: 48,
       width: width - 40,
@@ -260,102 +257,33 @@ class SendBottomSheet {
 
             Decimal maxAmount = Utils().amountFromRaw(account.getBalance());
             if ((amount > Decimal.parse("0") && amount <= maxAmount)) {
-              bool canauth = await BiometricUtil().canAuth();
-              bool? verified = false;
+              String inputAddress = addressController.text;
+              String inputAmount = amountController.text;
 
-              if (!canauth) {
-                verified =
-                    await services<AppRouter>().push<bool>(VerifyPINRoute());
-              } else {
-                verified = await BiometricUtil()
-                    .authenticate(appLocalizations.authMsgWalletDel);
-              }
+              bool? awaitConfirmation = await showDialog(
+                  barrierDismissible: true,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return Dialog(
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(25))),
+                          backgroundColor: currentTheme.primary,
+                          child: SendConfirmDialog(
+                              inputAddress: inputAddress,
+                              inputAmount: inputAmount,
+                              account: account),
+                        );
+                      },
+                    );
+                  });
 
-              if (verified != null && verified) {
-                LoadingIndicatorDialog().show(_context,
-                    text: AppLocalizations.of(_context)!.loadingWidgetSendMsg,
-                    theme: currentTheme);
-
-                await services<QueueService>().add(account.getOverview(true));
-                await services<QueueService>()
-                    .add(account.handleOverviewResponse(true));
-
-                String sendAmountRaw =
-                    Utils().rawFromAmount(amountController.text);
-                String destAddress = addressController.text;
-                var hist = await AccountAPI().getHistory(account.address, 1);
-                var historyData = jsonDecode(hist.body);
-                String previous = historyData[0]['hash'];
-
-                var newRaw = (BigInt.parse(account.getBalance()) -
-                        BigInt.parse(sendAmountRaw))
-                    .toString();
-
-                int accountType = NanoAccountType.BANANO;
-                String calculatedHash = NanoBlocks.computeStateHash(
-                    accountType,
-                    account.address,
-                    previous,
-                    account.representative,
-                    BigInt.parse(newRaw),
-                    destAddress);
-                int activeWallet = services<WalletsService>().activeWallet;
-                String walletName =
-                    services<WalletsService>().walletsList[activeWallet];
-
-                String privateKey =
-                    services<WalletService>(instanceName: walletName)
-                        .getPrivateKey(account.index);
-                // Signing a block
-                String sign =
-                    NanoSignatures.signBlock(calculatedHash, privateKey);
-
-                StateBlock sendBlock = StateBlock(account.address, previous,
-                    account.representative, newRaw, destAddress, sign);
-
-                var sendHash =
-                    await AccountAPI().processRequest(sendBlock, "send");
-                FocusScope.of(_context).unfocus();
-                LoadingIndicatorDialog().dismiss();
-
-                //if
-                //{"error":"Invalid block balance for given subtype"}
-                //else
-                if (jsonDecode(sendHash)['hash'] != null &&
-                    NanoHelpers.isHexString(jsonDecode(sendHash)['hash'])) {
-                  await account.setBalance(newRaw);
-                  await services<QueueService>()
-                      .add(account.onRefreshUpdateHistory());
-
-                  //have wallet walletName
-                  //need accountOrgName
-
-                  int accountIndex =
-                      services<WalletService>(instanceName: walletName)
-                          .activeIndex;
-                  String accountOrgName =
-                      services<WalletService>(instanceName: walletName)
-                          .accountsList[accountIndex];
-                  var account2 =
-                      services<Account>(instanceName: accountOrgName);
-                  await account2.setBalance(newRaw);
-                  await services<QueueService>()
-                      .add(account2.onRefreshUpdateHistory());
-
-                  amountController.clear();
-                  addressController.clear();
-                  Navigator.of(_context).pop(true);
-                } else {
-                  //ERR?
-                  if (kDebugMode) {
-                    print(sendHash);
-                  }
-                }
-
-                // setState(() {
-
-                //   Navigator.of(context).pop(true);
-                // });
+              if (awaitConfirmation != null && awaitConfirmation == true) {
+                amountController.clear();
+                addressController.clear();
+                Navigator.of(_context).pop(true);
               }
             }
           }

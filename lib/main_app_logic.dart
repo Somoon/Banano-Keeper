@@ -10,7 +10,7 @@ import 'package:bananokeeper/providers/pow/pow_source.dart';
 import 'package:bananokeeper/providers/wallet_service.dart';
 import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/themes.dart';
-import 'package:bananokeeper/ui/bottom_bar/send_sheet.dart';
+import 'package:bananokeeper/ui/bottom_bar/send_sheet/send_sheet.dart';
 import 'package:bananokeeper/ui/message_signing/bottomSheetSign.dart';
 import 'package:bananokeeper/ui/message_signing/message_sign_verification.dart';
 import 'package:bananokeeper/ui/representative_pages/manual_rep_change.dart';

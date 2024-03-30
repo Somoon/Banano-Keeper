@@ -1,7 +1,9 @@
 // import 'dart:async';
 
+import 'dart:math';
 import 'dart:ui';
 import 'package:bananokeeper/providers/user_data.dart';
+import 'package:decimal/decimal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -28,7 +30,10 @@ class HomeBody extends StatefulWidget with GetItStatefulWidgetMixin {
 }
 
 class HomeBodyState extends State<HomeBody>
-    with WidgetsBindingObserver, GetItStateMixin {
+    with
+        WidgetsBindingObserver,
+        GetItStateMixin,
+        SingleTickerProviderStateMixin {
   final ScrollController controller = ScrollController();
   bool returnToTopButton = false;
   late Account _acc;
@@ -36,10 +41,15 @@ class HomeBodyState extends State<HomeBody>
   bool firstBoot = true;
   TextEditingController nameController = TextEditingController();
   bool bottomLoadingIcon = false;
-
+  var items = <Item>[];
+  var started = false;
+  int _receivablesAmount = 19;
+  late AnimationController animationController;
   @override
   void initState() {
     controller.addListener(_scrollListener);
+    animationController =
+        AnimationController(vsync: this, duration: Duration(seconds: 10));
 
     super.initState();
   }
@@ -73,9 +83,9 @@ class HomeBodyState extends State<HomeBody>
     if (firstBoot) {
       await _acc.getHistory();
       firstBoot = false;
-      if (kDebugMode) {
-        print('firstBoot $firstBoot');
-      }
+      // if (kDebugMode) {
+      //   print('firstBoot $firstBoot');
+      // }
     }
   }
 
@@ -100,7 +110,7 @@ class HomeBodyState extends State<HomeBody>
     bool hasReceivables =
         watchOnly((Account x) => x.hasReceivables, instanceName: accOrgName);
     int receivablesCount =
-        watchOnly((Account x) => x.receivables, instanceName: accOrgName);
+        watchOnly((Account x) => x.receivablesCount, instanceName: accOrgName);
     try {
       if (_acc.getAddress() != account.getAddress()) {
         firstBoot = true;
@@ -120,7 +130,14 @@ class HomeBodyState extends State<HomeBody>
 
     bool completed =
         watchOnly((Account x) => x.completed, instanceName: accOrgName);
+    _receivablesAmount = watchOnly((Account x) => x.receivablesAmount.toInt(),
+        instanceName: accOrgName);
 
+    bool _receiving =
+        watchOnly((Account x) => x.receiving, instanceName: accOrgName);
+    if (_receiving) {
+      makeItems();
+    }
     if (!account.doneovR && !completed) {
       services<QueueService>().add(account.getOverview(true));
     }
@@ -131,230 +148,240 @@ class HomeBodyState extends State<HomeBody>
         maxHeight: height,
         maxWidth: width,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          // ActiveAccount(),
+      child: Stack(
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              // ActiveAccount(),
 
-          //-------
+              //-------
 
-          displayActiveCard(currentTheme, width, currentAccount, account,
-              wallet, !accountOpen),
+              displayActiveCard(currentTheme, width, currentAccount, account,
+                  wallet, !accountOpen),
 
-          //-------
-          // FutureBuilder(
-          //   future: account.getOverview(true),
-          //   //account.getOverview(true),
-          //   builder: (context, snapshot) {
-          //     if (snapshot.connectionState == ConnectionState.waiting) {
-          //       if (!accountOpen) {
-          //         return displayActiveCard(currentTheme, width, currentAccount,
-          //             account, wallet, true);
-          //       }
-          //     } else if (snapshot.connectionState == ConnectionState.done) {
-          //       account.handleOverviewResponse(true);
-          //       // If we got an error
-          //       if (snapshot.hasError) {
-          //         return displayActiveCard(currentTheme, width, currentAccount,
-          //             account, wallet, true);
-          //       }
-          //     }
-          //     if (!accountOpen) {
-          //       return displayActiveCard(
-          //           currentTheme, width, currentAccount, account, wallet, true);
-          //     } else {
-          //       return displayActiveCard(currentTheme, width, currentAccount,
-          //           account, wallet, false);
-          //     }
-          //   },
-          // ),
-          // -------------TRANSACTIONS TEXT
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.transactions,
-                  textDirection: TextDirection.ltr,
-                  style: TextStyle(color: currentTheme.text, fontSize: 24),
-                ),
-                const Gap(5),
-                if (hasReceivables) ...[
-                  Container(
-                    height: 30,
-                    alignment: Alignment.center,
-                    child: TextButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          currentTheme.secondary,
-                          // Colors.green,
-                        ),
-                        padding: MaterialStateProperty.all(
-                          const EdgeInsets.all(5),
-                        ),
-                        minimumSize:
-                            MaterialStateProperty.all(const Size(50, 20)),
-                        // tapTargetSize: MaterialTapTargetSize.shrinkWrapped,
+              //-------
+              // FutureBuilder(
+              //   future: account.getOverview(true),
+              //   //account.getOverview(true),
+              //   builder: (context, snapshot) {
+              //     if (snapshot.connectionState == ConnectionState.waiting) {
+              //       if (!accountOpen) {
+              //         return displayActiveCard(currentTheme, width, currentAccount,
+              //             account, wallet, true);
+              //       }
+              //     } else if (snapshot.connectionState == ConnectionState.done) {
+              //       account.handleOverviewResponse(true);
+              //       // If we got an error
+              //       if (snapshot.hasError) {
+              //         return displayActiveCard(currentTheme, width, currentAccount,
+              //             account, wallet, true);
+              //       }
+              //     }
+              //     if (!accountOpen) {
+              //       return displayActiveCard(
+              //           currentTheme, width, currentAccount, account, wallet, true);
+              //     } else {
+              //       return displayActiveCard(currentTheme, width, currentAccount,
+              //           account, wallet, false);
+              //     }
+              //   },
+              // ),
+              // -------------TRANSACTIONS TEXT
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.transactions,
+                      textDirection: TextDirection.ltr,
+                      style: TextStyle(color: currentTheme.text, fontSize: 24),
+                    ),
+                    const Gap(5),
+                    if (hasReceivables) ...[
+                      Container(
+                        height: 30,
                         alignment: Alignment.center,
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            side: const BorderSide(color: Colors.black38),
+                        child: TextButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                              currentTheme.secondary,
+                              // Colors.green,
+                            ),
+                            padding: MaterialStateProperty.all(
+                              const EdgeInsets.all(5),
+                            ),
+                            minimumSize:
+                                MaterialStateProperty.all(const Size(50, 20)),
+                            // tapTargetSize: MaterialTapTargetSize.shrinkWrapped,
+                            alignment: Alignment.center,
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                side: const BorderSide(color: Colors.black38),
+                              ),
+                            ),
+                          ),
+                          // splashRadius: 9,
+                          onPressed: () {
+                            setState(() {
+                              _acc.receiveTransactions();
+                              // Future.delayed(
+                              //     const Duration(
+                              //       seconds: 5,
+                              //     ), () {
+                              //   makeItems();
+                              // });
+                            });
+                          },
+                          child: AutoSizeText(
+                            AppLocalizations.of(context)!
+                                .newRxTextButton(receivablesCount),
+                            maxLines: 1,
+                            maxFontSize: currentTheme.fontSize - 5,
+                            style: TextStyle(
+                              color: currentTheme.textSecondary,
+                              // fontSize: currentTheme.fontSize - 5,
+                            ),
                           ),
                         ),
                       ),
-                      // splashRadius: 9,
-                      onPressed: () {
-                        if (kDebugMode) {
-                          print("i am supposed to be doing magic");
-                        }
-                        setState(() {
-                          _acc.receiveTransactions();
-                        });
-                      },
-                      child: AutoSizeText(
-                        "new ($receivablesCount)",
-                        maxLines: 1,
-                        maxFontSize: currentTheme.fontSize - 5,
-                        style: TextStyle(
-                          color: currentTheme.textSecondary,
-                          // fontSize: currentTheme.fontSize - 5,
-                        ),
-                      ),
-                    ),
-                  ),
-                ]
-              ],
-            ),
-          ),
-
-          // transactionsBody(),
-
-          Expanded(
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              floatingActionButton: AnimatedOpacity(
-                duration:
-                    const Duration(milliseconds: 500), //show/hide animation
-                opacity: returnToTopButton ? 1.0 : 0.0,
-                child: FloatingActionButton(
-                  onPressed: () {
-                    controller.animateTo(
-                        //go to top of scroll
-                        0, //scroll offset to go
-                        duration: const Duration(
-                            milliseconds: 250), //duration of scroll
-                        curve: Curves.fastOutSlowIn //scroll type
-                        );
-                  },
-                  child: const Icon(Icons.arrow_upward),
-                ),
-              ),
-              body: Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  CustomMaterialIndicator(
-                    edgeOffset: 50,
-                    onRefresh: () => addItemToList(account),
-                    // onStateChanged: (change) {
-                    //   if (change.didChange(to: IndicatorState.complete)) {
-                    //     _renderCompleteState = true;
-                    //   } else if (change.didChange(to: IndicatorState.idle)) {
-                    //     _renderCompleteState = false;
-                    //   }
-                    // },
-                    withRotation: false,
-                    // durations: const RefreshIndicatorDurations(
-                    //   completeDuration: Duration(seconds: 2),
-                    // ),
-                    indicatorBuilder:
-                        (BuildContext context, IndicatorController controller) {
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 150),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: currentTheme.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child:
-                            // _renderCompleteState
-                            //     ? const Icon(
-                            //         Icons.check,
-                            //         color: Colors.white,
-                            //       )
-                            //     :
-                            SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: currentTheme.text,
-                            value: controller.isDragging || controller.isArmed
-                                ? controller.value.clamp(0.0, 1.0)
-                                : null,
-                          ),
-                        ),
-                      );
-                    },
-                    child: ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(context).copyWith(
-                        dragDevices: {
-                          PointerDeviceKind.touch,
-                          PointerDeviceKind.mouse,
-                        },
-                      ),
-                      child: FutureBuilder(
-                        future: getFuture(),
-                        // _acc.getHistory(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            if (history.isEmpty) {
-                              return TransactionsPlaceholder();
-                            }
-                          } else if (snapshot.connectionState ==
-                              ConnectionState.done) {
-                            if (snapshot.hasError) {
-                              return TransactionsPlaceholder();
-                            }
-                          }
-                          if (history.isEmpty) {
-                            return unopenedCard();
-                          } else {
-                            return _transListViewBuilder(account);
-                          }
-                          // else if (snapshot.hasData) {
-                          //   return _transListViewBuilder();
-                          // } else {
-                          //   return const Text("No data available");
-                          // }
-                        },
-                      ),
-                    ),
-                  ),
-                  if (bottomLoadingIcon) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Container(
-                        height: 20,
-                        width: 20,
-                        decoration: BoxDecoration(
-                          color: currentTheme.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: CircularProgressIndicator(
-                          backgroundColor: currentTheme.primary,
-                        ),
-                      ),
-                    )
+                    ]
                   ],
-                ],
+                ),
               ),
-            ),
+
+              // transactionsBody(),
+
+              Expanded(
+                child: Scaffold(
+                  backgroundColor: Colors.transparent,
+                  floatingActionButton: AnimatedOpacity(
+                    duration:
+                        const Duration(milliseconds: 500), //show/hide animation
+                    opacity: returnToTopButton ? 1.0 : 0.0,
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        controller.animateTo(
+                            //go to top of scroll
+                            0, //scroll offset to go
+                            duration: const Duration(
+                                milliseconds: 250), //duration of scroll
+                            curve: Curves.fastOutSlowIn //scroll type
+                            );
+                      },
+                      child: const Icon(Icons.arrow_upward),
+                    ),
+                  ),
+                  body: Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      CustomMaterialIndicator(
+                        edgeOffset: 50,
+                        onRefresh: () => addItemToList(account),
+                        // onStateChanged: (change) {
+                        //   if (change.didChange(to: IndicatorState.complete)) {
+                        //     _renderCompleteState = true;
+                        //   } else if (change.didChange(to: IndicatorState.idle)) {
+                        //     _renderCompleteState = false;
+                        //   }
+                        // },
+                        withRotation: false,
+                        // durations: const RefreshIndicatorDurations(
+                        //   completeDuration: Duration(seconds: 2),
+                        // ),
+                        indicatorBuilder: (BuildContext context,
+                            IndicatorController controller) {
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: currentTheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child:
+                                // _renderCompleteState
+                                //     ? const Icon(
+                                //         Icons.check,
+                                //         color: Colors.white,
+                                //       )
+                                //     :
+                                SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: currentTheme.text,
+                                value:
+                                    controller.isDragging || controller.isArmed
+                                        ? controller.value.clamp(0.0, 1.0)
+                                        : null,
+                              ),
+                            ),
+                          );
+                        },
+                        child: ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(context).copyWith(
+                            dragDevices: {
+                              PointerDeviceKind.touch,
+                              PointerDeviceKind.mouse,
+                            },
+                          ),
+                          child: FutureBuilder(
+                            future: getFuture(),
+                            // _acc.getHistory(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                if (history.isEmpty) {
+                                  return TransactionsPlaceholder();
+                                }
+                              } else if (snapshot.connectionState ==
+                                  ConnectionState.done) {
+                                if (snapshot.hasError) {
+                                  return TransactionsPlaceholder();
+                                }
+                              }
+                              if (history.isEmpty) {
+                                return unopenedCard();
+                              } else {
+                                return _transListViewBuilder(account);
+                              }
+                              // else if (snapshot.hasData) {
+                              //   return _transListViewBuilder();
+                              // } else {
+                              //   return const Text("No data available");
+                              // }
+                            },
+                          ),
+                        ),
+                      ),
+                      if (bottomLoadingIcon) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Container(
+                            height: 20,
+                            width: 20,
+                            decoration: BoxDecoration(
+                              color: currentTheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: CircularProgressIndicator(
+                              backgroundColor: currentTheme.primary,
+                            ),
+                          ),
+                        )
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
+          ...buildItems(),
         ],
       ),
     );
@@ -449,7 +476,9 @@ class HomeBodyState extends State<HomeBody>
                             getTState(historyItem.type, context),
                             if (historyItem.type != 'change') ...[
                               Text(
-                                "${historyItem.amount} BAN",
+                                "${Utils().displayNums(
+                                  historyItem.amountRaw.toString(),
+                                )} BAN",
                                 style: TextStyle(
                                   color: currentTheme.text,
                                 ),
@@ -772,5 +801,63 @@ class HomeBodyState extends State<HomeBody>
       ));
     }
     return ddmi;
+  }
+
+  void makeItems() {
+    setState(() {
+      items.clear();
+      if (_receivablesAmount == 0) _receivablesAmount = 1;
+      int numberOfItems = _receivablesAmount <= 19 ? _receivablesAmount : 19;
+      for (int i = 0; i < numberOfItems; i++) {
+        items.add(Item());
+      }
+    });
+    if (!animationController.isAnimating) {
+      animationController.reset();
+      animationController.forward();
+    }
+  }
+
+  List<Widget> buildItems() {
+    return items.map((item) {
+      var tween = Tween<Offset>(
+              begin: Offset(0, Random().nextDouble() * -1 - 1),
+              end: Offset(Random().nextDouble() * 0.5, 2))
+          .chain(CurveTween(curve: Curves.linear));
+      return SlideTransition(
+        position: animationController.drive(tween),
+        child: AnimatedAlign(
+          alignment: item._alignment,
+          duration: Duration(seconds: 10),
+          child: AnimatedContainer(
+            duration: Duration(seconds: 10),
+            width: item._size,
+            height: item._size,
+            decoration:
+                BoxDecoration(color: item._color, shape: BoxShape.circle),
+            child: Image.asset(
+              width: 12,
+              'images/banano.png',
+            ),
+          ),
+        ),
+      );
+    }).toList();
+  }
+}
+
+class Item {
+  static final random = Random();
+  late double _size;
+  late Color _color;
+
+  late Alignment _alignment;
+
+  Item() {
+    _color = Color.fromARGB(random.nextInt(255), random.nextInt(255),
+        random.nextInt(255), random.nextInt(255));
+    _alignment =
+        Alignment(random.nextDouble() * 2 - 1, random.nextDouble() * 2 - 1);
+    _size = random.nextDouble() * 40 + 1;
   }
 }
