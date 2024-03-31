@@ -23,7 +23,7 @@ class AdvancedDialogState extends State<AdvancedDialog> with GetItStateMixin {
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     bool authOnBootStatus = watchOnly((UserData x) => x.getAuthOnBoot());
-    bool authForSmallTx = watchOnly((UserData x) => x.getAuthForSmallTx());
+    bool authForSmallTx = watchOnly((UserData x) => x.getNoAuthForSmallTx());
 
     return Container(
       constraints: const BoxConstraints(
@@ -41,7 +41,7 @@ class AdvancedDialogState extends State<AdvancedDialog> with GetItStateMixin {
           children: <Widget>[
             Column(
               children: [
-                createAuthOnStartUp(
+                createNoAuthOnSmallTxButton(
                     currentTheme, authForSmallTx, authOnBootStatus),
               ],
             ),
@@ -65,10 +65,10 @@ class AdvancedDialogState extends State<AdvancedDialog> with GetItStateMixin {
     );
   }
 
-  Padding createAuthOnStartUp(
+  Padding createNoAuthOnSmallTxButton(
       BaseTheme currentTheme, bool authForSmallTx, bool authOnBootStatus) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0.0),
+      padding: const EdgeInsets.fromLTRB(20, 0, 0, 0.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -76,8 +76,10 @@ class AdvancedDialogState extends State<AdvancedDialog> with GetItStateMixin {
             AppLocalizations.of(context)!.advancedSettingsnoAuthSmallTxText,
             style: TextStyle(
               color: currentTheme.text,
-              fontSize: 16,
+              fontSize: 14,
             ),
+            maxLines: 1,
+            maxFontSize: 14,
           ),
           Switch(
             value: authForSmallTx,
@@ -141,7 +143,8 @@ class AdvancedDialogState extends State<AdvancedDialog> with GetItStateMixin {
                                   false;
                             } else {
                               verified = await BiometricUtil().authenticate(
-                                  appLocalizations.authMsgWalletDel);
+                                  appLocalizations
+                                      .advancedSettingsnoAuthSmallTxAuthMsg);
                             }
 
                             if (verified != null && verified) {
@@ -196,8 +199,8 @@ class AdvancedDialogState extends State<AdvancedDialog> with GetItStateMixin {
 
   changeSmallTxAuthValue(bool value) {
     setState(() {
-      services<UserData>().setAuthForSmallTx(value);
-      services<SharedPrefsModel>().saveAuthForSmallTx(value);
+      services<UserData>().setNoAuthForSmallTx(value);
+      services<SharedPrefsModel>().saveNoAuthForSmallTx(value);
     });
   }
 }

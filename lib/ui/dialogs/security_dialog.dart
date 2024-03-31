@@ -22,7 +22,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     bool authOnBootStatus = watchOnly((UserData x) => x.getAuthOnBoot());
-    bool authForSmallTx = watchOnly((UserData x) => x.getAuthForSmallTx());
+    bool noAuthForSmallTx = watchOnly((UserData x) => x.getNoAuthForSmallTx());
 
     return Container(
       constraints: const BoxConstraints(
@@ -45,7 +45,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
                   thickness: 1,
                 ),
                 createAuthOnStartUp(
-                    currentTheme, authOnBootStatus, authForSmallTx)
+                    currentTheme, authOnBootStatus, noAuthForSmallTx)
               ],
             ),
             const Gap(15),
@@ -69,7 +69,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
   }
 
   Padding createAuthOnStartUp(
-      BaseTheme currentTheme, bool authOnBootStatus, bool authForSmallTx) {
+      BaseTheme currentTheme, bool authOnBootStatus, bool noAuthForSmallTx) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 0.0),
       child: Row(
@@ -90,7 +90,7 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
             inactiveThumbColor: currentTheme.textDisabled,
 
             onChanged: (bool value) {
-              if (authForSmallTx && !value) {
+              if (noAuthForSmallTx && !value) {
                 changeSmallTxAuthValue(false);
               }
               changeAuthValue(value);
@@ -103,8 +103,8 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
 
   changeSmallTxAuthValue(bool value) {
     setState(() {
-      services<UserData>().setAuthForSmallTx(value);
-      services<SharedPrefsModel>().saveAuthForSmallTx(value);
+      services<UserData>().setNoAuthForSmallTx(value);
+      services<SharedPrefsModel>().saveNoAuthForSmallTx(value);
     });
   }
 

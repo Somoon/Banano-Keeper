@@ -23,7 +23,7 @@ class UserData extends ChangeNotifier {
   String pin = "";
   late int lockoutTime = 0;
   late bool authOnBoot = false;
-  late bool authForSmallTx = true;
+  late bool noAuthForSmallTx = false;
   late String currency = "USD";
   late bool autoReceive = true;
   late double minToReceive = 0.01;
@@ -44,14 +44,14 @@ class UserData extends ChangeNotifier {
     return autoReceive;
   }
 
-  setAuthForSmallTx(bool state) {
-    authForSmallTx = state;
+  setNoAuthForSmallTx(bool state) {
+    noAuthForSmallTx = state;
 
     notifyListeners();
   }
 
-  bool getAuthForSmallTx() {
-    return authForSmallTx;
+  bool getNoAuthForSmallTx() {
+    return noAuthForSmallTx;
   }
 
   setNumOfAllowedRx(int state) {
