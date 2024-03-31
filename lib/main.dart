@@ -3,6 +3,7 @@ import 'package:bananokeeper/api/currency_conversion.dart';
 import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/db/dbManager.dart';
 import 'package:bananokeeper/initial_pages/initial_page_one.dart';
+import 'package:bananokeeper/providers/data_source.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/localization_service.dart';
 import 'package:bananokeeper/providers/pow/node_selector.dart';
@@ -25,7 +26,6 @@ import 'main_app_logic.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 //for debug prints kDebugMode
 import 'package:flutter/foundation.dart';
-// void main() => runApp(const MyApp());
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 bool isNewUser = false;
@@ -48,7 +48,8 @@ populateUserData(userValues) async {
   services<UserData>().setAutoReceive(userValues[13]);
   services<UserData>().setMinToReceive(userValues[14]);
   services<UserData>().setNumOfAllowedRx(userValues[15]);
-  services<UserData>().setAuthForSmallTx(userValues[16]);
+  services<UserData>().setNoAuthForSmallTx(userValues[16]);
+  services<DataSource>().setAPI(userValues[17]);
 }
 
 Future<void> setupUserData() async {
@@ -69,7 +70,6 @@ Future<void> setupUserData() async {
     isNewUser = true;
     String masterKey = Utils().getRandString(64);
     services<SharedPrefsModel>().bioStorageSaveKey(masterKey);
-    // send user to firsttime page v
   } else {
     if (kDebugMode) {
       // print("main.dart: not new user: $userValues");
@@ -78,7 +78,8 @@ Future<void> setupUserData() async {
     //set theme and language
     await populateUserData(userValues);
 
-    //get active wallet and index
+    //check if data source is online
+//....
 
     //used for creation and import new wallets
     if (kDebugMode) {
@@ -91,13 +92,6 @@ Future<void> setupUserData() async {
     int activeAccountIndex = userValues[4];
 
     await loadWalletsFromDB(activeWalletName, activeAccountIndex);
-
-    // services<WalletsService>()
-    //     .wallets[userValues[3]]
-    //     .setActiveIndex(userValues[4]);
-    // ---- for testing purposed, import from encyrpted storage in prod
-
-    //set active wallet after creating / loading the wallet(s)
   }
 }
 
@@ -169,14 +163,6 @@ void main() async {
     registerProtocol('banverify');
   }
 
-  /* if (Platform.isWindows) {
-    runApp(const MyApp());
-    // setup window size for PC/Desktop platforms
-    initWindowsSize();
-    //remove splash ready to start
-    FlutterNativeSplash.remove();
-  } else {
-    */
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(
@@ -190,22 +176,21 @@ void main() async {
 
     FlutterNativeSplash.remove();
   });
-  // }
 }
 
 void initWindowsSize() {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     // if (Platform.isWindows) {
     // await DesktopWindow.setMinWindowSize(const Size(400, 400));
-    // doWhenWindowReady(() {
-    final win = appWindow;
-    const initialSize = Size(600, 850);
-    win.minSize = initialSize;
-    win.size = initialSize;
-    win.alignment = Alignment.center;
-    win.title = "Banano Keeper";
-    win.show();
-    // });
+    doWhenWindowReady(() {
+      final win = appWindow;
+      const initialSize = Size(600, 850);
+      win.minSize = initialSize;
+      win.size = initialSize;
+      win.alignment = Alignment.center;
+      win.title = "Banano Keeper";
+      win.show();
+    });
   }
 }
 
@@ -222,15 +207,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       routerConfig: appRouter.config(
         deepLinkBuilder: (deepLink) {
-          if (deepLink.path.startsWith('/products')) {
-            // continute with the platfrom link
-            return deepLink;
-          } else {
-            // return DeepLink.defaultPath;
-            // or DeepLink.path('/')
-            print('we here');
-            return DeepLink([HomeRoute()]);
-          }
+          // if (deepLink.path.startsWith('/products')) {
+          //   // continute with the platfrom link
+          //   return deepLink;
+          // } else {
+          // return DeepLink.defaultPath;
+          // or DeepLink.path('/')
+          print('we here');
+          return DeepLink([HomeRoute()]);
+          // }
         },
       ),
       // routeInformationParser: appRouter.defaultRouteParser(),

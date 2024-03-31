@@ -4,10 +4,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/db/dbtest.dart';
 import 'package:bananokeeper/initial_pages/initial_page_one.dart';
+import 'package:bananokeeper/providers/data_source.dart';
 import 'package:bananokeeper/providers/pow/node_selector.dart';
 import 'package:bananokeeper/providers/shared_prefs_service.dart';
 import 'package:bananokeeper/ui/dialogs/advanced_dialog.dart';
 import 'package:bananokeeper/ui/dialogs/currency_diag.dart';
+import 'package:bananokeeper/ui/dialogs/datasource_dialog.dart';
 import 'package:bananokeeper/ui/dialogs/node_dialog.dart';
 import 'package:bananokeeper/ui/dialogs/receive_dialog.dart';
 import 'package:bananokeeper/ui/message_signing/bottomSheetSign.dart';
@@ -90,6 +92,7 @@ class _SideDrawer extends State<SideDrawer>
     var statusBarHeight = MediaQuery.of(context).viewPadding.top;
     String selectedPoWName = watchOnly((PoWSource x) => x.getAPIName());
     String selectedNodeName = watchOnly((NodeSelector x) => x.getNodeName());
+    String selectedDataSource = watchOnly((DataSource x) => x.getAPIName());
     bool autoReceiveStatus = watchOnly((UserData x) => x.getAutoReceive());
     String receiveStr = AppLocalizations.of(context)!.autoReceiveStatusMessage(
         (autoReceiveStatus == true
@@ -251,6 +254,13 @@ class _SideDrawer extends State<SideDrawer>
                 AppLocalizations.of(context)!.nodeTextButton,
                 selectedNodeName,
                 NodeDialog(),
+              ),
+
+              //Data source
+              createDialogButton(
+                AppLocalizations.of(context)!.dataSourceTextButton,
+                selectedDataSource,
+                DataSourceDialog(),
               ),
 
               createDialogButton(

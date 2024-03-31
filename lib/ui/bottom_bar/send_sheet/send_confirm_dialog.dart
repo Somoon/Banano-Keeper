@@ -157,11 +157,12 @@ class SendConfirmDialogState extends State<SendConfirmDialog>
                     ),
                   ),
                   onPressed: () async {
-                    bool authForSmallTx =
-                        watchOnly((UserData x) => x.getAuthForSmallTx());
+                    bool noAuthForSmallTx =
+                        watchOnly((UserData x) => x.getNoAuthForSmallTx());
                     Decimal amount = Decimal.parse(widget.inputAmount);
                     bool? verified = false;
-                    if (authForSmallTx && amount <= Decimal.parse("10")) {
+                    //                                              hardcoded, maybe make it user changable?
+                    if (noAuthForSmallTx && amount <= Decimal.parse("10")) {
                       verified = true;
                     } else {
                       bool canauth = await BiometricUtil().canAuth();

@@ -225,5 +225,10 @@
   "noAuthSmallTxConfirmTitle": "Confirm disabling authentication",
   "noAuthSmallTxConfirmText": "Enabling this will disable authentication for sending values less than and equal to 10 BAN.\nAuth on startup must be enabled to use this feature.\n\nClick confirm to enable.",
   "noAuthOnBootSmallTxSnackBar": "Auth on startup need to be enabled first.",
-  "advancedSettingsnoAuthSmallTxText": "No auth on send (<=10BAN):"
+  "advancedSettingsnoAuthSmallTxText": "No auth on send (<=10BAN):",
+  "advancedSettingsnoAuthSmallTxAuthMsg": "Authenticate to enable.",
+  "dataSourceTextButton": "Data Source",
+  "dataSourceDialogHeader": "Select the data source used to fetch your accounts transactions.",
+  "nodeDialogHeader": "Select the node a transaction block will be processed at."
+
 }

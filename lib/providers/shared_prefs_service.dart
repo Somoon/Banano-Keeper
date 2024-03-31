@@ -127,6 +127,15 @@ class SharedPrefsModel {
     sharedPref.setString('nodeName', powSource);
   }
 
+  getDataSource() async {
+    String sourceName = sharedPref.getString('dataSource') ?? "Moonano";
+    return sourceName;
+  }
+
+  void saveDataSource(String sourceName) async {
+    sharedPref.setString('dataSource', sourceName);
+  }
+
   getThreadCount() async {
     int poWThreadCount = sharedPref.getInt('PoWThreadCount') ?? 3;
     return poWThreadCount;
@@ -213,12 +222,12 @@ class SharedPrefsModel {
     sharedPref.setBool('autoReceive', newStatus);
   }
 
-  getAuthForSmallTx() async {
+  getNoAuthForSmallTx() async {
     bool status = sharedPref.getBool('authForSmallTx') ?? true;
     return status;
   }
 
-  void saveAuthForSmallTx(bool newStatus) async {
+  void saveNoAuthForSmallTx(bool newStatus) async {
     sharedPref.setBool('authForSmallTx', newStatus);
   }
 
@@ -249,7 +258,8 @@ class SharedPrefsModel {
     bool autoReceive = true;
     double minToReceive = 0.01;
     int numOfAllowedReceivables = 10;
-    bool authForSmallTx = true;
+    bool noAuthForSmallTx = false;
+    String dataSource = "Moonano";
     if (isInit) {
       lang = await getLang();
       theme = await getTheme();
@@ -266,6 +276,8 @@ class SharedPrefsModel {
       autoReceive = await getAutoReceive();
       minToReceive = await getMinToReceive();
       numOfAllowedReceivables = await getNumOfAllowedRx();
+      noAuthForSmallTx = await getNoAuthForSmallTx();
+      dataSource = await getDataSource();
     }
 
     return [
@@ -285,7 +297,8 @@ class SharedPrefsModel {
       autoReceive, //13
       minToReceive, //14
       numOfAllowedReceivables, //15
-      authForSmallTx, //16
+      noAuthForSmallTx, //16
+      dataSource, //17
     ];
   }
 
@@ -336,9 +349,10 @@ class SharedPrefsModel {
       if (sharedPref.containsKey("numOfAllowedReceivables")) {
         sharedPref.remove("numOfAllowedReceivables");
       }
-      if (sharedPref.containsKey("authForSmallTx")) {
-        sharedPref.remove("authForSmallTx");
+      if (sharedPref.containsKey("noAuthForSmallTx")) {
+        sharedPref.remove("noAuthForSmallTx");
       }
+      if (sharedPref.containsKey("dataSource")) sharedPref.remove("dataSource");
     }
   }
 }

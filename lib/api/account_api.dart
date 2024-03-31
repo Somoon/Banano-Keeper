@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:async/async.dart';
 import 'package:bananokeeper/api/state_block.dart';
+import 'package:bananokeeper/providers/data_source.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
 import 'package:bananokeeper/providers/pow/local_work.dart';
 import 'package:bananokeeper/providers/pow/node_selector.dart';
@@ -11,68 +12,103 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AccountAPI {
+  final int timeoutSecs = 10;
   getHistory(String address, [int size = 25, offset = 0]) async {
-    String apiURL = '$currentDataSource/v2/account/confirmed-transactions';
+    String source = services<DataSource>().getAPIURL();
+    String apiURL = '$source/v2/account/confirmed-transactions';
     http.Response response;
-    try {
-      response = await http.post(
-        Uri.parse(apiURL),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, dynamic>{
-          'address': address,
-          "includeChange": true,
-          "includeReceive": true,
-          "includeSend": true,
-          "offset": offset,
-          "size": size
-        }),
-      );
-    } catch (e) {
-      getNextDataSource();
-      response = getHistory(address, size, offset);
-    }
+    response = await http
+        .post(
+      Uri.parse(apiURL),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'address': address,
+        "includeChange": true,
+        "includeReceive": true,
+        "includeSend": true,
+        "offset": offset,
+        "size": size
+      }),
+    )
+        .timeout(Duration(seconds: timeoutSecs), onTimeout: () async {
+      services<DataSource>().switchNode();
+
+      response = await getHistory(address, size, offset);
+      return response;
+    });
+
     return response;
   }
 
   getOverview(String address) async {
     // print('ACCOUNT_API: GETOVERVIEW:');
 
-    String apiURL = '$currentDataSource/v1/account/overview/$address';
+    String source = services<DataSource>().getAPIURL();
+    String apiURL = '$source/v1/account/overview/$address';
     http.Response response;
-    try {
-      response = await http.get(
-        Uri.parse(apiURL),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-    } catch (e) {
-      getNextDataSource();
-      response = getOverview(address);
-    }
+    // try {
+    response = await http.get(
+      Uri.parse(apiURL),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    ).timeout(Duration(seconds: timeoutSecs), onTimeout: () async {
+      services<DataSource>().switchNode();
+      response = await getOverview(address);
+      return response;
+      //= http.Response('Error', 408)
+    });
+    // } catch (e) {
+    //   services<DataSource>().switchNode();
+    //   print('current data source $source');
+    //
+    //   response = await getOverview(address);
+    // }
     return response;
   }
 
   getReceivables(String address, [size = 10]) async {
-    String apiURL = '$currentDataSource/v1/account/receivable-transactions';
+    String source = services<DataSource>().getAPIURL();
+    String apiURL = '$source/v1/account/receivable-transactions';
     http.Response response;
-    try {
-      response = await http.post(
-        Uri.parse(apiURL),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, dynamic>{
-          'address': address,
-          'size': size,
-        }),
-      );
-    } catch (e) {
-      getNextDataSource();
-      response = getReceivables(address, size = 10)();
-    }
+    response = await http
+        .post(
+      Uri.parse(apiURL),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'address': address,
+        'size': size,
+      }),
+    )
+        .timeout(Duration(seconds: timeoutSecs), onTimeout: () async {
+      services<DataSource>().switchNode();
+
+      response = await getReceivables(address, size)();
+      return response;
+    });
+
+    return response;
+  }
+
+  getRepresentatives() async {
+    String source = services<DataSource>().getAPIURL();
+    String apiURL = '$source/v1/representatives/scores';
+    http.Response response;
+    response = await http.get(
+      Uri.parse(apiURL),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    ).timeout(Duration(seconds: timeoutSecs), onTimeout: () async {
+      services<DataSource>().switchNode();
+      response = await getRepresentatives();
+      return response;
+    });
+
     return response;
   }
 
@@ -88,11 +124,6 @@ class AccountAPI {
     {
       nodeURL = services<NodeSelector>().getNodeURL();
     }
-    /*
-    if powType local OR bpow
-    -> get node from node_selector
-       nodeURL
-     */
 
     Map<String, dynamic> request = {};
     if (powType == 'Local PoW') {
@@ -150,39 +181,4 @@ class AccountAPI {
     // }
     return response.body;
   }
-
-  getRepresentatives() async {
-    String apiURL = '${currentDataSource}v1/representatives/scores';
-    http.Response response;
-    try {
-      response = await http.get(
-        Uri.parse(apiURL),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-    } catch (e) {
-      getNextDataSource();
-      response = getRepresentatives();
-    }
-
-    return response;
-  }
-
-  String currentDataSource = "https://api.creeper.banano.cc/banano";
-  getNextDataSource() {
-    int idx = dataSources.indexOf(currentDataSource);
-    if (idx == 2) {
-      currentDataSource = dataSources[0];
-    } else {
-      currentDataSource = dataSources[idx + 1];
-    }
-    return currentDataSource;
-  }
-
-  var dataSources = [
-    "https://api.creeper.banano.cc/banano",
-    "https://api.spyglass.pw/banano",
-    "https://spyglass.banano.trade/banano"
-  ];
 }

@@ -1,3 +1,4 @@
+import 'package:bananokeeper/providers/data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/pow/node_selector.dart';
@@ -9,38 +10,33 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:gap/gap.dart';
 
-class NodeDialog extends StatefulWidget with GetItStatefulWidgetMixin {
-  NodeDialog({super.key});
+class DataSourceDialog extends StatefulWidget with GetItStatefulWidgetMixin {
+  DataSourceDialog({super.key});
 
   @override
-  NodeialogState createState() => NodeialogState();
+  DataSourceDialogState createState() => DataSourceDialogState();
 }
 
-class NodeialogState extends State<NodeDialog> with GetItStateMixin {
+class DataSourceDialogState extends State<DataSourceDialog>
+    with GetItStateMixin {
   @override
   Widget build(BuildContext context) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-    List<String> sources = get<NodeSelector>().listOfNodes.keys.toList();
+    List<String> sources = get<DataSource>().listOfAPIs.keys.toList();
 
     List<Widget> nodeWidgets = [];
     nodeWidgets.add(
       Padding(
         padding: const EdgeInsets.all(15.0),
         child: AutoSizeText(
-          AppLocalizations.of(context)!.nodeDialogHeader,
+          AppLocalizations.of(context)!.dataSourceDialogHeader,
           style: currentTheme.textStyle,
           maxFontSize: 12,
         ),
       ),
     );
     for (String item in sources) {
-      // if (item == 'Local PoW') {
-      //   if (!Platform.isWindows) {
-      //     powWidgets.add(createLangButton(item, AppLocalizations.of(context)));
-      //   }
-      // } else {
       nodeWidgets.add(createNodeButton(item, AppLocalizations.of(context)));
-      // }
     }
 
     return Container(
@@ -82,12 +78,12 @@ class NodeialogState extends State<NodeDialog> with GetItStateMixin {
 
   Widget createNodeButton(String label, appLocalizations) {
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
-    var currentSource = watchOnly((NodeSelector x) => x.getNodeName());
+    var currentSource = watchOnly((DataSource x) => x.getAPIName());
     return SizedBox(
       width: double.infinity,
       child: TextButton(
         style: currentTheme.btnStyleNoBorder,
-        onPressed: (services<NodeSelector>().getNodeName() == label)
+        onPressed: (services<DataSource>().getAPIName() == label)
             ? null
             : () async {
                 _setSource(label);
@@ -107,8 +103,8 @@ class NodeialogState extends State<NodeDialog> with GetItStateMixin {
 
   void _setSource(String nodeName) {
     setState(() {
-      services<NodeSelector>().setNode(nodeName);
-      services<SharedPrefsModel>().saveNode(nodeName);
+      services<DataSource>().setAPI(nodeName);
+      services<SharedPrefsModel>().saveDataSource(nodeName);
     });
   }
 }
