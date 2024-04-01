@@ -214,6 +214,7 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
 
     return MaterialApp(
       theme: ThemeData(
+        // useMaterial3: true,
         canvasColor: currentTheme.primary,
         primarySwatch: currentTheme.materialColor,
         floatingActionButtonTheme: FloatingActionButtonThemeData(

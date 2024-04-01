@@ -87,9 +87,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                     child: receiveTextButton(
                         currentTheme, context, height, width, account)),
               ),
-              const SizedBox(
-                width: 25,
-              ),
+              const Gap(25),
               //Send button --------
 
               ConstrainedBox(
