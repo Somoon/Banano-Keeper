@@ -437,7 +437,7 @@ class BottomBarAppState extends State<BottomBarApp> with GetItStateMixin {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const Icon(Icons.arrow_upward_rounded),
+              const Icon(Icons.arrow_downward_rounded),
             ]),
       ),
     );

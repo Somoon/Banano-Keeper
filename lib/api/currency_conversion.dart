@@ -6,13 +6,15 @@ import 'dart:convert';
 class CurrencyAPI {
   getData() async {
     String apiURL = 'https://moonano.net/assets/data/prices.json';
-    http.Response response = await http.get(
-      Uri.parse(apiURL),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-    return jsonDecode(response.body);
+    try {
+      http.Response response = await http.get(
+        Uri.parse(apiURL),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      return jsonDecode(response.body);
+    } catch (e) {}
   }
 }
 
@@ -29,7 +31,6 @@ class CurrencyConversion extends ChangeNotifier {
     "XNO": "Ӿ",
     "BTC": "฿"
   };
-
 
   updateData(data) {
     Map<String, double> _price = {
