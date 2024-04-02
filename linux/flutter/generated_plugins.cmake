@@ -3,8 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  biometric_storage
   bitsdojo_window_linux
-  platform_device_id_linux
   smart_auth
 )
 

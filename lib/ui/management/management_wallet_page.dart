@@ -421,9 +421,9 @@ class WalletManagementPageState extends State<WalletManagementPage>
                     bool? verified = false;
 
                     if (!canauth) {
-                      verified =
-                          await services<AppRouter>().push(VerifyPINRoute()) ??
-                              false;
+                      verified = await services<AppRouter>()
+                              .push(VerifyPINRoute(header: '')) ??
+                          false;
                     } else {
                       verified = await BiometricUtil()
                           .authenticate(appLocalizations.authMsgWalletDel);
@@ -467,7 +467,8 @@ class WalletManagementPageState extends State<WalletManagementPage>
     bool? verified = false;
     var appLocalizations = AppLocalizations.of(context);
     if (!canauth) {
-      verified = await services<AppRouter>().push<bool>(VerifyPINRoute());
+      verified =
+          await services<AppRouter>().push<bool>(VerifyPINRoute(header: ''));
     } else {
       verified = await BiometricUtil()
           .authenticate(appLocalizations!.authMsgWalletBackup);

@@ -125,7 +125,8 @@ class SecurityDialogState extends State<SecurityDialog> with GetItStateMixin {
           bool? verified = false;
 
           if (!canauth) {
-            verified = await services<AppRouter>().push<bool>(VerifyPINRoute());
+            verified = await services<AppRouter>()
+                .push<bool>(VerifyPINRoute(header: ''));
           } else {
             verified = await BiometricUtil()
                 .authenticate(AppLocalizations.of(context)!.authMsgChangePIN);

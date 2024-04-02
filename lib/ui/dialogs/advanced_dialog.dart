@@ -138,8 +138,9 @@ class AdvancedDialogState extends State<AdvancedDialog> with GetItStateMixin {
                             bool? verified = false;
 
                             if (!canauth) {
-                              verified = await services<AppRouter>()
-                                      .push(VerifyPINRoute()) ??
+                              verified = await services<AppRouter>().push(
+                                      VerifyPINRoute(
+                                          header: "Authenticate to enable")) ??
                                   false;
                             } else {
                               verified = await BiometricUtil().authenticate(

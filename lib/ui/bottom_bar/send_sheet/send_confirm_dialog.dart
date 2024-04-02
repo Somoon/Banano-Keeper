@@ -169,7 +169,7 @@ class SendConfirmDialogState extends State<SendConfirmDialog>
 
                       if (!canauth) {
                         verified = await services<AppRouter>()
-                            .push<bool>(VerifyPINRoute());
+                            .push<bool>(VerifyPINRoute(header: ''));
                       } else {
                         verified = await BiometricUtil().authenticate(
                             appLocalization

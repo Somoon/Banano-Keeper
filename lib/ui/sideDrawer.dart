@@ -402,7 +402,7 @@ class _SideDrawer extends State<SideDrawer>
 
                         if (!canauth) {
                           verified = await services<AppRouter>()
-                                  .push(VerifyPINRoute()) ??
+                                  .push(VerifyPINRoute(header: '')) ??
                               false;
                         } else {
                           verified = await BiometricUtil()

@@ -14,7 +14,8 @@ import 'package:pinput/pinput.dart';
 
 @RoutePage<bool>(name: "VerifyPINRoute")
 class VerifyPIN extends StatefulWidget with GetItStatefulWidgetMixin {
-  VerifyPIN({super.key});
+  final String header;
+  VerifyPIN({super.key, this.header = ""});
 
   @override
   VerifyPINState createState() => VerifyPINState();
@@ -44,6 +45,10 @@ class VerifyPINState extends State<VerifyPIN> with GetItStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    String header = (widget.header != "")
+        ? widget.header
+        : AppLocalizations.of(context)!.verifyPIN;
+
     var currentTheme = watchOnly((ThemeModel x) => x.curTheme);
     return SafeArea(
       child: ScaffoldMessenger(
@@ -57,13 +62,39 @@ class VerifyPINState extends State<VerifyPIN> with GetItStateMixin {
             ),
             child: Column(
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10, top: 10),
+                      child: SizedBox(
+                        child: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              // Navigator.of(context).pop(false);
+                              services<AppRouter>().pop(false);
+                            });
+                          },
+                          style: ButtonStyle(
+                            foregroundColor: MaterialStatePropertyAll<Color>(
+                                currentTheme.textDisabled),
+                            // backgroundColor:
+                            //     MaterialStatePropertyAll<
+                            //         Color>(primary),
+                          ),
+                          child: const Icon(Icons.close),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
                 Padding(
                   padding: EdgeInsets.only(
                     top: 50,
                     bottom: 50,
                   ),
                   child: AutoSizeText(
-                    AppLocalizations.of(context)!.verifyPIN,
+                    header,
                     style: TextStyle(
                       color: currentTheme.text,
                       fontSize: 34,

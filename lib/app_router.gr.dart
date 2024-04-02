@@ -85,11 +85,13 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     VerifyPINRoute.name: (routeData) {
-      final args = routeData.argsAs<VerifyPINRouteArgs>(
-          orElse: () => const VerifyPINRouteArgs());
+      final args = routeData.argsAs<VerifyPINRouteArgs>();
       return AutoRoutePage<bool>(
         routeData: routeData,
-        child: VerifyPIN(key: args.key),
+        child: VerifyPIN(
+          key: args.key,
+          header: args.header,
+        ),
       );
     },
   };
@@ -353,10 +355,14 @@ class SetupPinRouteArgs {
 class VerifyPINRoute extends PageRouteInfo<VerifyPINRouteArgs> {
   VerifyPINRoute({
     Key? key,
+    required String header,
     List<PageRouteInfo>? children,
   }) : super(
           VerifyPINRoute.name,
-          args: VerifyPINRouteArgs(key: key),
+          args: VerifyPINRouteArgs(
+            key: key,
+            header: header,
+          ),
           initialChildren: children,
         );
 
@@ -367,12 +373,17 @@ class VerifyPINRoute extends PageRouteInfo<VerifyPINRouteArgs> {
 }
 
 class VerifyPINRouteArgs {
-  const VerifyPINRouteArgs({this.key});
+  const VerifyPINRouteArgs({
+    this.key,
+    required this.header,
+  });
 
   final Key? key;
 
+  final String header;
+
   @override
   String toString() {
-    return 'VerifyPINRouteArgs{key: $key}';
+    return 'VerifyPINRouteArgs{key: $key, header: $header}';
   }
 }

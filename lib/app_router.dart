@@ -72,7 +72,7 @@ class AuthUserOnStartup extends AutoRouteGuard {
       } else {
         bool? aa = await router.push(LockedBootupRoute());
         resolver.next(aa!);
-        print("in AuthUserOnSterup after loock route");
+        // print("in AuthUserOnSterup after loock route");
       }
     } else {
       resolver.next(true);
@@ -84,7 +84,9 @@ class AuthUserOnStartup extends AutoRouteGuard {
     bool? verified = false;
 
     if (!canauth) {
-      verified = await services<AppRouter>().push<bool>(VerifyPINRoute());
+      verified = await services<AppRouter>().push<bool>(
+        VerifyPINRoute(header: "Authenticate to unlock"),
+      );
     } else {
       verified = await BiometricUtil().authenticate("Authenticate");
       //AppLocalizations.of(context)!.authMsgChangeRep

@@ -421,6 +421,8 @@ class MsgSignPage {
                     setState(() {
                       if (messageController.text != null &&
                           messageController.text != "") {
+                        print("full message");
+                        print(messageController.text);
                         signMessage(context, wallet, account, setState);
                       } else {
                         errMsg = appLocalizations!.signPageErrorMessage;
@@ -488,8 +490,8 @@ class MsgSignPage {
     String privateKey = wallet.getPrivateKey(account.index);
 
     //Message
-    // String message = "Test test 123";
-    String message = messageController.text;
+    String message = "Test \n\n\ntest 123";
+    // String message = messageController.text;
 
     var messageBytes = //NanoHelpers.hexToBytes(message);
         NanoHelpers.stringToBytesUtf8(message);
@@ -552,112 +554,118 @@ class MsgSignPage {
 
   final messageController = TextEditingController();
   FocusNode messageControllerFocusNode = FocusNode();
-  TextFormField messageTextField(
+  ScrollController messageScrollController = ScrollController();
+  Scrollbar messageTextField(
       BaseTheme currentTheme, BuildContext context, StateSetter setState) {
-    return TextFormField(
-      maxLines: 3,
-      minLines: 1,
-      textAlign: TextAlign.center,
-      focusNode: messageControllerFocusNode,
-      controller: messageController,
-      autofocus: false,
-      textAlignVertical: TextAlignVertical.center,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        filled: true,
-        fillColor: currentTheme.secondary,
-        isDense: false,
-        isCollapsed: false,
-        contentPadding: const EdgeInsets.all(10),
-        hintText: AppLocalizations.of(context)!.enterMessageHint,
-        hintStyle: TextStyle(color: currentTheme.textDisabled),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        // hintText: tempName, //activeWalletName,
-        // hintStyle:
-        //     TextStyle(color: currentTheme.textDisabled),
-
-        suffixIcon: IconButton(
-          splashRadius: 1,
-          onPressed: () async {
-            ClipboardData? cdata =
-                await Clipboard.getData(Clipboard.kTextPlain);
-            String copiedText = cdata?.text ?? "";
-
-            setState(() {
-              messageController.text = copiedText;
-            });
-          },
-          icon: const Icon(
-            Icons.paste_outlined,
+    return Scrollbar(
+      controller: messageScrollController,
+      interactive: true,
+      child: TextFormField(
+        scrollController: messageScrollController,
+        maxLines: 10,
+        minLines: 1,
+        textAlign: TextAlign.center,
+        focusNode: messageControllerFocusNode,
+        controller: messageController,
+        autofocus: false,
+        textAlignVertical: TextAlignVertical.center,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          color: currentTheme.textDisabled,
-        ),
+          filled: true,
+          fillColor: currentTheme.secondary,
+          isDense: false,
+          isCollapsed: false,
+          contentPadding: const EdgeInsets.all(10),
+          hintText: AppLocalizations.of(context)!.enterMessageHint,
+          hintStyle: TextStyle(color: currentTheme.textDisabled),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          // hintText: tempName, //activeWalletName,
+          // hintStyle:
+          //     TextStyle(color: currentTheme.textDisabled),
 
-        prefixIcon: IconButton(
-          splashRadius: 1,
-          onPressed: () async {
-            if (!Platform.isWindows) {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Scaffold(
-                      body: Stack(
-                        children: [
-                          QRCodeDartScanView(
-                            scanInvertedQRCode: true,
-                            typeScan: TypeScan.live,
-                            formats: const [BarcodeFormat.QR_CODE],
-                            resolutionPreset:
-                                QRCodeDartScanResolutionPreset.high,
-                            onCapture: (Result result) {
-                              // print(result.text);
-                              if (result is String) {
-                                messageController.text = result.text;
+          suffixIcon: IconButton(
+            splashRadius: 1,
+            onPressed: () async {
+              ClipboardData? cdata =
+                  await Clipboard.getData(Clipboard.kTextPlain);
+              String copiedText = cdata?.text ?? "";
 
-                                Navigator.of(context).pop();
-                              }
-                            },
-                          ),
-                          QRScannerOverlay(
-                            overlayColor: Colors.black.withOpacity(0.9),
-                          ),
-                        ],
+              setState(() {
+                messageController.text = copiedText;
+              });
+            },
+            icon: const Icon(
+              Icons.paste_outlined,
+            ),
+            color: currentTheme.textDisabled,
+          ),
+
+          prefixIcon: IconButton(
+            splashRadius: 1,
+            onPressed: () async {
+              if (!Platform.isWindows) {
+                await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Scaffold(
+                        body: Stack(
+                          children: [
+                            QRCodeDartScanView(
+                              scanInvertedQRCode: true,
+                              typeScan: TypeScan.live,
+                              formats: const [BarcodeFormat.QR_CODE],
+                              resolutionPreset:
+                                  QRCodeDartScanResolutionPreset.high,
+                              onCapture: (Result result) {
+                                // print(result.text);
+                                if (result is String) {
+                                  messageController.text = result.text;
+
+                                  Navigator.of(context).pop();
+                                }
+                              },
+                            ),
+                            QRScannerOverlay(
+                              overlayColor: Colors.black.withOpacity(0.9),
+                            ),
+                          ],
+                        ),
                       ),
+                    ));
+                setState(() {});
+              } else {
+                var snackBar = SnackBar(
+                  content: Text(
+                    AppLocalizations.of(context)!.qrNotSupported,
+                    style: TextStyle(
+                      color: currentTheme.textDisabled,
                     ),
-                  ));
-              setState(() {});
-            } else {
-              var snackBar = SnackBar(
-                content: Text(
-                  AppLocalizations.of(context)!.qrNotSupported,
-                  style: TextStyle(
-                    color: currentTheme.textDisabled,
                   ),
-                ),
-              );
-              scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
-            }
-          },
-          icon: const Icon(Icons.qr_code_scanner_rounded),
-          color: currentTheme.textDisabled,
+                );
+                scaffoldMessengerKey.currentState?.showSnackBar(snackBar);
+              }
+            },
+            icon: const Icon(Icons.qr_code_scanner_rounded),
+            color: currentTheme.textDisabled,
+          ),
         ),
+        style: TextStyle(
+          color: currentTheme.text,
+          // fontFamily: 'monospace',
+          fontSize: 13,
+        ),
+        autovalidateMode: AutovalidateMode.always,
+        validator: (value) {
+          if (value != null) {
+            errMsg = '';
+          }
+          return null;
+        },
       ),
-      style: TextStyle(
-        color: currentTheme.text,
-        // fontFamily: 'monospace',
-        fontSize: 13,
-      ),
-      autovalidateMode: AutovalidateMode.always,
-      validator: (value) {
-        if (value != null) {
-          errMsg = '';
-        }
-        return null;
-      },
     );
   }
 

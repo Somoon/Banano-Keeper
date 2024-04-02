@@ -47,8 +47,8 @@ class LockedBootupState extends State<LockedBootup> with GetItStateMixin {
                 bool? verified = false;
 
                 if (!canauth) {
-                  verified =
-                      await services<AppRouter>().push<bool>(VerifyPINRoute());
+                  verified = await services<AppRouter>().push<bool>(
+                      VerifyPINRoute(header: "Authenticate to unlock"));
                 } else {
                   verified = await BiometricUtil().authenticate("Authenticate");
                   //AppLocalizations.of(context)!.authMsgChangeRep
