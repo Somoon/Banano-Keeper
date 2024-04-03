@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:ui';
 import 'package:http/http.dart' as http;
 
 import 'package:auto_route/annotations.dart';
@@ -34,6 +35,8 @@ class MsgSignPage {
   int selectedIndex = -1;
   bool showSign = false;
   Map<String, String?> deepLinkData = {};
+  final ScrollController pageController = ScrollController();
+
   late GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
   factory MsgSignPage() {
     return _singleton;
@@ -87,159 +90,186 @@ class MsgSignPage {
               //     services<Account>(instanceName: accOrgName).getName();
 
               var account = services<Account>(instanceName: accOrgName);
-              return GestureDetector(
-                onTap: () {
-                  FocusScope.of(context).unfocus();
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
+              return ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                  dragDevices: {
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.mouse,
+                  },
+                ),
+                child: GestureDetector(
+                  onTap: () {
+                    FocusScope.of(context).unfocus();
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: currentTheme.primary,
+                      ),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
                       color: currentTheme.primary,
                     ),
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    color: currentTheme.primary,
-                  ),
-                  child: SizedBox(
-                    height: height / 1.25,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0),
-                      child: ScaffoldMessenger(
-                        key: scaffoldMessengerKey,
-                        child: Scaffold(
-                          resizeToAvoidBottomInset: false,
-                          backgroundColor: currentTheme.primary,
-                          body: Center(
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(top: 10),
-                                  height: 5,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.15,
-                                  decoration: BoxDecoration(
-                                    color: currentTheme.secondary,
-                                    borderRadius: BorderRadius.circular(100.0),
-                                  ),
-                                ),
-                                Row(
-                                  //was end
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 10,
-                                      ),
-                                      child: SizedBox(
-                                        child: TextButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              InfoDialog().show(
-                                                  context,
-                                                  AppLocalizations.of(context)!
-                                                      .messageSingingInfoDialogTitle,
-                                                  AppLocalizations.of(context)!
-                                                      .messageSingingInfoDialogExplanation,
-                                                  currentTheme);
-                                            });
-                                          },
-                                          style: ButtonStyle(
-                                            foregroundColor:
-                                                MaterialStatePropertyAll<Color>(
-                                                    currentTheme.textDisabled),
-                                            // backgroundColor:
-                                            //     MaterialStatePropertyAll<
-                                            //         Color>(primary),
-                                          ),
-                                          child: const Icon(
-                                              Icons.info_outline_rounded),
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 10,
-                                      ),
-                                      child: SizedBox(
-                                        child: TextButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              // addressController.clear();
-                                              Navigator.of(context).pop(false);
-                                            });
-                                          },
-                                          style: ButtonStyle(
-                                            foregroundColor:
-                                                MaterialStatePropertyAll<Color>(
-                                                    currentTheme.textDisabled),
-                                            // backgroundColor:
-                                            //     MaterialStatePropertyAll<
-                                            //         Color>(primary),
-                                          ),
-                                          child: const Icon(Icons.close),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 15, right: 15),
-                                  child: Column(
+                    child: SizedBox(
+                      height: height / 1.25,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20.0),
+                        child: ScaffoldMessenger(
+                          key: scaffoldMessengerKey,
+                          child: Scaffold(
+                            resizeToAvoidBottomInset: false,
+                            backgroundColor: currentTheme.primary,
+                            body: Center(
+                              child: ListView(
+                                scrollDirection: Axis.vertical,
+                                children: [
+                                  Column(
                                     children: [
-                                      AutoSizeText(
-                                        AppLocalizations.of(context)!
-                                            .messageSigningTitle,
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                          fontSize: 28,
-                                          fontWeight: FontWeight.bold,
-                                          color: currentTheme.text,
+                                      Container(
+                                        margin: const EdgeInsets.only(top: 10),
+                                        height: 5,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.15,
+                                        decoration: BoxDecoration(
+                                          color: currentTheme.secondary,
+                                          borderRadius:
+                                              BorderRadius.circular(100.0),
                                         ),
                                       ),
-                                      const Gap(40),
-                                      createPopupMenuMethod(
-                                          context,
-                                          currentTheme,
-                                          account,
-                                          setState,
-                                          wallet),
-                                      const Gap(30),
+                                      Row(
+                                        //was end
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 10,
+                                            ),
+                                            child: SizedBox(
+                                              child: TextButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    InfoDialog().show(
+                                                        context,
+                                                        AppLocalizations.of(
+                                                                context)!
+                                                            .messageSingingInfoDialogTitle,
+                                                        AppLocalizations.of(
+                                                                context)!
+                                                            .messageSingingInfoDialogExplanation,
+                                                        currentTheme);
+                                                  });
+                                                },
+                                                style: ButtonStyle(
+                                                  foregroundColor:
+                                                      MaterialStatePropertyAll<
+                                                              Color>(
+                                                          currentTheme
+                                                              .textDisabled),
+                                                  // backgroundColor:
+                                                  //     MaterialStatePropertyAll<
+                                                  //         Color>(primary),
+                                                ),
+                                                child: const Icon(
+                                                    Icons.info_outline_rounded),
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              right: 10,
+                                            ),
+                                            child: SizedBox(
+                                              child: TextButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    // addressController.clear();
+                                                    Navigator.of(context)
+                                                        .pop(false);
+                                                  });
+                                                },
+                                                style: ButtonStyle(
+                                                  foregroundColor:
+                                                      MaterialStatePropertyAll<
+                                                              Color>(
+                                                          currentTheme
+                                                              .textDisabled),
+                                                  // backgroundColor:
+                                                  //     MaterialStatePropertyAll<
+                                                  //         Color>(primary),
+                                                ),
+                                                child: const Icon(Icons.close),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                       Padding(
                                         padding: const EdgeInsets.only(
-                                          left: 25.0,
-                                          right: 25.0,
-                                        ),
+                                            left: 15, right: 15),
                                         child: Column(
                                           children: [
-                                            messageTextField(currentTheme,
-                                                context, setState),
-                                            if (showSign) ...[
-                                              const Gap(30),
-                                              signTextField(currentTheme,
-                                                  context, setState),
+                                            AutoSizeText(
+                                              AppLocalizations.of(context)!
+                                                  .messageSigningTitle,
+                                              maxLines: 1,
+                                              style: TextStyle(
+                                                fontSize: 28,
+                                                fontWeight: FontWeight.bold,
+                                                color: currentTheme.text,
+                                              ),
+                                            ),
+                                            const Gap(40),
+                                            createPopupMenuMethod(
+                                                context,
+                                                currentTheme,
+                                                account,
+                                                setState,
+                                                wallet),
+                                            const Gap(30),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 25.0,
+                                                right: 25.0,
+                                              ),
+                                              child: Column(
+                                                children: [
+                                                  messageTextField(currentTheme,
+                                                      context, setState),
+                                                  if (showSign) ...[
+                                                    const Gap(30),
+                                                    signTextField(currentTheme,
+                                                        context, setState),
+                                                  ]
+                                                ],
+                                              ),
+                                            ),
+                                            if (errMsg != '') ...[
+                                              const Gap(20),
+                                              AutoSizeText(
+                                                errMsg,
+                                                style: const TextStyle(
+                                                  color: Colors.red,
+                                                ),
+                                                maxLines: 1,
+                                              ),
                                             ]
                                           ],
                                         ),
                                       ),
-                                      if (errMsg != '') ...[
-                                        const Gap(20),
-                                        AutoSizeText(
-                                          errMsg,
-                                          style: const TextStyle(
-                                            color: Colors.red,
-                                          ),
-                                          maxLines: 1,
-                                        ),
-                                      ]
                                     ],
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
+                            bottomNavigationBar: displayButtons(
+                                context,
+                                setState,
+                                currentTheme,
+                                height,
+                                wallet,
+                                account),
                           ),
-                          bottomNavigationBar: displayButtons(context, setState,
-                              currentTheme, height, wallet, account),
                         ),
                       ),
                     ),
@@ -507,12 +537,13 @@ class MsgSignPage {
     print('SENDER VERIFICATION');
     print(response.statusCode);
     print(response.body);
-    services<AppRouter>().pop(true);
+    // services<AppRouter>().pop(true);
   }
 
   final messageController = TextEditingController();
   FocusNode messageControllerFocusNode = FocusNode();
   ScrollController messageScrollController = ScrollController();
+
   Scrollbar messageTextField(
       BaseTheme currentTheme, BuildContext context, StateSetter setState) {
     return Scrollbar(

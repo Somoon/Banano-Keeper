@@ -155,17 +155,12 @@ class Utils {
   }
 
   String displayNums(String number) {
-    return amountFromRaw(number).toString().replaceAllMapped(
-        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+    return amountFromRaw(number).toStringAsFixed(2);
   }
 
   String preciseValue(Decimal value) {
     RegExp regex = RegExp(r'([.]*0)(?!.*\d)');
-    String amountNoTrail = value
-        .toStringAsPrecision(3)
-        .replaceAll(regex, '')
-        .replaceAllMapped(
-            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+    String amountNoTrail = value.toStringAsPrecision(3).replaceAll(regex, '');
     return amountNoTrail;
   }
 
@@ -175,6 +170,13 @@ class Utils {
     Decimal convertedPrice = Decimal.parse(
             services<CurrencyConversion>().price[userCurrency]!.toString()) *
         amountFromRaw(activeAccountBalance);
+    /*
+    Decimal convertedPrice = Decimal.parse(
+            services<CurrencyConversion>().price[userCurrency]!.toString()) *
+        amountFromRaw(activeAccountBalance);
+    String textC =
+        "${services<CurrencyConversion>().symbol[userCurrency]}${convertedPrice.toStringAsFixed(2)}";
+     */
 
     String pValue = preciseValue(convertedPrice);
     String textC =
