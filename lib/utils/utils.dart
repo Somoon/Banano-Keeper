@@ -235,7 +235,7 @@ class Utils {
   dissectDeepLink(String? value) {
     Map<String, String?> deepLinkData = {};
     if (value != null) {
-      value = value.toLowerCase();
+      // value = value.toLowerCase();
       Uri? uri = Uri.tryParse(value);
       if (uri != null) {
         switch (uri.scheme) {
@@ -248,7 +248,15 @@ class Utils {
                 NanoAccounts.findAccountInString(NanoAccountType.BANANO, value);
             break;
           case 'bansign':
-            deepLinkData['message'] = Uri.decodeFull(uri.path);
+            Map<String, String> splitQueries = Uri.splitQueryString(uri.path);
+
+            deepLinkData['address'] = splitQueries['address'];
+
+            deepLinkData['callback'] = splitQueries['url'];
+            deepLinkData['url'] = splitQueries['url'];
+
+            deepLinkData['message'] = splitQueries['message'];
+
             break;
           case 'banverify':
             deepLinkData['message'] = uri.queryParameters['message'];

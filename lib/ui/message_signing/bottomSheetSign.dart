@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:ffi';
+import 'package:http/http.dart' as http;
 
 import 'package:auto_route/annotations.dart';
 import 'package:bananokeeper/api/representative_json.dart';
@@ -31,7 +33,7 @@ class MsgSignPage {
   bool isDisplayed = false;
   int selectedIndex = -1;
   bool showSign = false;
-
+  Map<String, String?> deepLinkData = {};
   late GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
   factory MsgSignPage() {
     return _singleton;
@@ -230,45 +232,6 @@ class MsgSignPage {
                                           maxLines: 1,
                                         ),
                                       ]
-
-                                      // Padding(
-                                      //   padding: const EdgeInsets.only(
-                                      //     left: 35.0,
-                                      //     right: 35.0,
-                                      //   ),
-                                      //   child: Container(
-                                      //     constraints: const BoxConstraints(
-                                      //       minHeight: 80,
-                                      //       maxWidth: double.infinity,
-                                      //     ),
-                                      //     decoration: BoxDecoration(
-                                      //       color: currentTheme.secondary,
-                                      //       borderRadius:
-                                      //           BorderRadius.circular(12),
-                                      //     ),
-                                      //     child: Padding(
-                                      //       padding:
-                                      //           const EdgeInsets.fromLTRB(
-                                      //               10.0, 15.0, 10.0, 15.0),
-                                      //       child: Column(
-                                      //         mainAxisAlignment:
-                                      //             MainAxisAlignment
-                                      //                 .spaceEvenly,
-                                      //         children: [
-                                      //           AutoSizeText(
-                                      //             "aaaaaaaaaaaqqqqqqqqqqqqaaaaaaaaaaaaaaaaameow",
-                                      //             maxLines: 3,
-                                      //             style: TextStyle(
-                                      //               fontSize: 14,
-                                      //               color: currentTheme.text,
-                                      //               fontFamily: 'monospace',
-                                      //             ),
-                                      //           ),
-                                      //         ],
-                                      //       ),
-                                      //     ),
-                                      //   ),
-                                      // ),
                                     ],
                                   ),
                                 ),
@@ -421,8 +384,6 @@ class MsgSignPage {
                     setState(() {
                       if (messageController.text != null &&
                           messageController.text != "") {
-                        print("full message");
-                        print(messageController.text);
                         signMessage(context, wallet, account, setState);
                       } else {
                         errMsg = appLocalizations!.signPageErrorMessage;
@@ -490,8 +451,7 @@ class MsgSignPage {
     String privateKey = wallet.getPrivateKey(account.index);
 
     //Message
-    String message = "Test \n\n\ntest 123";
-    // String message = messageController.text;
+    String message = messageController.text;
 
     var messageBytes = //NanoHelpers.hexToBytes(message);
         NanoHelpers.stringToBytesUtf8(message);
@@ -506,11 +466,8 @@ class MsgSignPage {
         bananoMessagePreambleBytes, 0, bananoMessagePreambleBytes.length);
     blake2b.update(messageBytes, 0, messageBytes.length);
     blake2b.doFinal(out, 0);
-    print(out);
 
     String rep = NanoHelpers.byteToHex(out);
-    print(rep);
-    //32053372FA739D07633392896BB0B592451ADB74F09A654AF773A2910C51C461
 
     String calculatedHash = Utils().getDummyBlockHash(
       account.address,
@@ -520,36 +477,37 @@ class MsgSignPage {
     String sign = NanoSignatures.signBlock(calculatedHash, privateKey);
 
     signController.text = sign;
-    print("MSG $message");
-    print("SIGN $sign");
 
     showSign = true;
-    /////////////////////////////////
 
-    String messageToBeChecked = messageController.text;
-    print(messageToBeChecked);
-    String givenAddr =
-        'ban_1fcyrps8j5uokeah34ud531nuu9wkqrb9xkkadk8qinefx11c6oxeia5utbk';
-    String extractedKey = NanoAccounts.extractPublicKey(givenAddr);
+    if (deepLinkData['callback'] != null && deepLinkData['callback'] != '') {
+      print('SEND  VERIFICATION');
 
-    Uint8List extractedKeyBytes = NanoHelpers.hexToBytes(extractedKey);
+      sendVerification();
+    }
 
-    String givenSign = signController.text;
-    Uint8List givenSignBytes = NanoHelpers.hexToBytes(givenSign);
+    setState(() {});
+  }
 
-    var blockBytes =
-        Utils().getDumBlockHashBytes(extractedKeyBytes, messageToBeChecked);
+  sendVerification() async {
+    String cbURL = deepLinkData['callback']!;
+    http.Response response;
 
-    bool verify =
-        Utils().detachedVerify(blockBytes, givenSignBytes, extractedKeyBytes);
-    print("verify ok? $verify");
-
-    // String pubKey =
-    setState(() {
-      // if (result != null && result) {
-      //   Navigator.of(context).pop(true);
-      // }
-    });
+    response = await http.put(
+      Uri.parse(cbURL),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'signature': signController.text,
+        'banano_address': deepLinkData['address'],
+        'message': deepLinkData['message'],
+      }),
+    );
+    print('SENDER VERIFICATION');
+    print(response.statusCode);
+    print(response.body);
+    services<AppRouter>().pop(true);
   }
 
   final messageController = TextEditingController();
@@ -562,7 +520,7 @@ class MsgSignPage {
       interactive: true,
       child: TextFormField(
         scrollController: messageScrollController,
-        maxLines: 10,
+        maxLines: 5,
         minLines: 1,
         textAlign: TextAlign.center,
         focusNode: messageControllerFocusNode,
@@ -615,28 +573,44 @@ class MsgSignPage {
                         body: Stack(
                           children: [
                             QRCodeDartScanView(
-                              scanInvertedQRCode: true,
                               typeScan: TypeScan.live,
-                              formats: const [BarcodeFormat.QR_CODE],
-                              resolutionPreset:
-                                  QRCodeDartScanResolutionPreset.high,
+                              scanInvertedQRCode: true,
                               onCapture: (Result result) {
-                                // print(result.text);
-                                if (result is String) {
-                                  messageController.text = result.text;
+                                setState(() {
+                                  try {
+                                    if (result.text != "") {
+                                      Uri? uri = Uri.tryParse(result.text);
+                                      String? scheme = uri?.scheme;
+                                      if (scheme == 'bansign') {
+                                        Map<String, String?> data =
+                                            uri!.queryParameters;
 
-                                  Navigator.of(context).pop();
-                                }
+                                        messageController.text =
+                                            data['message'] ?? "";
+
+                                        deepLinkData['callback'] =
+                                            data['url'] ?? "";
+                                        deepLinkData['url'] = data['url'] ?? "";
+                                        deepLinkData['address'] =
+                                            data['address'] ?? "";
+
+                                        Navigator.of(context).pop(true);
+                                      }
+                                    }
+                                  } catch (_) {}
+                                });
                               },
                             ),
                             QRScannerOverlay(
                               overlayColor: Colors.black.withOpacity(0.9),
+                              scanAreaWidth: 250.0,
+                              scanAreaHeight: 300.0,
                             ),
                           ],
                         ),
                       ),
                     ));
-                setState(() {});
+                // setState(() {});
               } else {
                 var snackBar = SnackBar(
                   content: Text(

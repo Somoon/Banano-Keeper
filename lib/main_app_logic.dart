@@ -178,6 +178,10 @@ class _MainAppLogic extends State<MainAppLogic> with GetItStateMixin {
         }
         msgSignPage.show(context, services<ThemeModel>().curTheme);
         msgSignPage.messageController.text = deepLinkData['message'] ?? "";
+        msgSignPage.deepLinkData['address'] = deepLinkData['address'] ?? "";
+        msgSignPage.deepLinkData['callback'] = deepLinkData['url'] ?? "";
+        // print(deepLinkData);
+
         break;
       case 'banverify':
         final msgSignVerifyPage = MsgSignVerifyPage();
