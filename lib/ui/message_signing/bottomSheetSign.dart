@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:ui';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:auto_route/annotations.dart';
@@ -414,7 +415,8 @@ class MsgSignPage {
                     setState(() {
                       if (messageController.text != null &&
                           messageController.text != "") {
-                        signMessage(context, wallet, account, setState);
+                        signMessage(
+                            context, wallet, account, setState, currentTheme);
                       } else {
                         errMsg = appLocalizations!.signPageErrorMessage;
                       }
@@ -477,7 +479,7 @@ class MsgSignPage {
 
   String errMsg = '';
   signMessage(BuildContext context, WalletService wallet, Account account,
-      StateSetter setState) {
+      StateSetter setState, BaseTheme currentTheme) {
     String privateKey = wallet.getPrivateKey(account.index);
 
     //Message
@@ -513,13 +515,14 @@ class MsgSignPage {
     if (deepLinkData['callback'] != null && deepLinkData['callback'] != '') {
       print('SEND  VERIFICATION');
 
-      sendVerification();
+      sendVerification(currentTheme);
+      deepLinkData['callback'] = ""; //to avoid spam
     }
 
     setState(() {});
   }
 
-  sendVerification() async {
+  sendVerification(BaseTheme currentTheme) async {
     String cbURL = deepLinkData['callback']!;
     http.Response response;
 
@@ -534,6 +537,30 @@ class MsgSignPage {
         'message': deepLinkData['message'],
       }),
     );
+
+    if (response.statusCode == 200) {
+      var rData = jsonDecode(response.body);
+      String message = 'Message signature sent.';
+      if (rData['success'] != null && rData['success']) {
+        message = 'Message signature verified successfully';
+      }
+
+      EasyLoading.instance
+        ..toastPosition = EasyLoadingToastPosition.center
+        ..displayDuration = const Duration(seconds: 8)
+        ..loadingStyle = EasyLoadingStyle.dark
+        ..indicatorSize = 45.0
+        ..radius = 10.0
+        ..backgroundColor = Colors.green
+        ..indicatorColor = Colors.yellow
+        ..textColor = Colors.yellow
+        ..maskColor = Colors.blue.withOpacity(0.5)
+        ..userInteractions = true
+        ..dismissOnTap = true;
+      EasyLoading.showSuccess(
+        message,
+      );
+    }
     print('SENDER VERIFICATION');
     print(response.statusCode);
     print(response.body);
@@ -730,6 +757,7 @@ class MsgSignPage {
     messageController.clear();
     signController.clear();
     errMsg = '';
+    deepLinkData = {};
     isDisplayed = false;
   }
 

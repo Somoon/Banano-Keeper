@@ -27,6 +27,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 //for debug prints kDebugMode
 import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 bool isNewUser = false;
 
@@ -205,6 +206,7 @@ class MyApp extends StatelessWidget {
     // print("MAIN.DART: is new user? $isNewUser");
     final appRouter = services<AppRouter>();
     return MaterialApp.router(
+      builder: EasyLoading.init(),
       routerConfig: appRouter.config(
         deepLinkBuilder: (deepLink) {
           // if (deepLink.path.startsWith('/products')) {
