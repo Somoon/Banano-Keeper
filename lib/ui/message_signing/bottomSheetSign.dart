@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:ui';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:flutter/services.dart';
 
-import 'package:auto_route/annotations.dart';
 import 'package:bananokeeper/api/representative_json.dart';
 import 'package:bananokeeper/app_router.dart';
 import 'package:bananokeeper/providers/get_it_main.dart';
@@ -13,20 +14,19 @@ import 'package:bananokeeper/providers/wallets_service.dart';
 import 'package:bananokeeper/themes.dart';
 import 'package:bananokeeper/ui/dialogs/info_dialog.dart';
 import 'package:bananokeeper/ui/message_signing/message_sign_verification.dart';
-import 'package:flutter/material.dart';
-
-import 'package:auto_size_text/auto_size_text.dart';
+import 'package:bananokeeper/ui/loading_widget.dart';
 import 'package:bananokeeper/providers/account.dart';
 import 'package:bananokeeper/utils/utils.dart';
-import 'package:flutter/services.dart';
+
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gap/gap.dart';
 import 'package:nanodart/nanodart.dart';
 // import 'package:nanodart/src/crypto/tweetnacl_blake2b.dart';
 import 'package:pointycastle/digests/blake2b.dart';
 import 'package:qr_code_dart_scan/qr_code_dart_scan.dart';
-import 'dart:io';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:auto_route/annotations.dart';
 
 // @RoutePage<bool>(name: "MsgSignRoute")
 class MsgSignPage {
@@ -544,22 +544,33 @@ class MsgSignPage {
       if (rData['success'] != null && rData['success']) {
         message = 'Message signature verified successfully';
       }
+      LoadingIndicatorDialog()
+        ..status = WidgetStatus.success
+        ..dismissible = true
+        ..cancelable = false
+        ..show(
+          _context,
+          text: message,
+          // AppLocalizations.of(_context)!.loadingWidgetSendMsg,
+          theme: currentTheme,
+        )
+        ..delayedDismiss(5);
 
-      EasyLoading.instance
-        ..toastPosition = EasyLoadingToastPosition.center
-        ..displayDuration = const Duration(seconds: 8)
-        ..loadingStyle = EasyLoadingStyle.dark
-        ..indicatorSize = 45.0
-        ..radius = 10.0
-        ..backgroundColor = Colors.green
-        ..indicatorColor = Colors.yellow
-        ..textColor = Colors.yellow
-        ..maskColor = Colors.blue.withOpacity(0.5)
-        ..userInteractions = true
-        ..dismissOnTap = true;
-      EasyLoading.showSuccess(
-        message,
-      );
+      // EasyLoading.instance
+      //   ..toastPosition = EasyLoadingToastPosition.center
+      //   ..displayDuration = const Duration(seconds: 8)
+      //   ..loadingStyle = EasyLoadingStyle.dark
+      //   ..indicatorSize = 45.0
+      //   ..radius = 10.0
+      //   ..backgroundColor = Colors.green
+      //   ..indicatorColor = Colors.yellow
+      //   ..textColor = Colors.yellow
+      //   ..maskColor = Colors.blue.withOpacity(0.5)
+      //   ..userInteractions = true
+      //   ..dismissOnTap = true;
+      // EasyLoading.showSuccess(
+      //   message,
+      // );
     }
     print('SENDER VERIFICATION');
     print(response.statusCode);

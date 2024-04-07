@@ -78,7 +78,6 @@ dependencies:
     git:
       url: https://github.com/Somoon/biometric_storage.git
       ref: main # branch name
-  flutter_easyloading: ^3.0.5
   flutter_inappwebview: ^6.0.0
   custom_refresh_indicator: ^3.0.0
   async: ^2.11.0

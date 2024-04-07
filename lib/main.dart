@@ -116,12 +116,6 @@ Future<void> loadWalletsFromDB(
       services<WalletsService>().activeWallet = walletslen;
     }
 
-    // if (kDebugMode) {
-    //   print("done loading wallet ${walletData['name']}");
-    // }
-
-    //load the wallet data from its table $original_name
-
     var walletIndices =
         await services<DBManager>().getWalletData(original_name);
     for (var row in walletIndices) {

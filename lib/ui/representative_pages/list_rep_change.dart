@@ -260,9 +260,13 @@ class ListRepChange {
       }
 
       if (verified) {
-        LoadingIndicatorDialog().show(context,
-            text: AppLocalizations.of(context)!.loadingWidgetChangeRepMsg,
-            theme: currentTheme);
+        LoadingIndicatorDialog()
+          ..status = WidgetStatus.loading
+          ..dismissible = false
+          ..cancelable = true
+          ..show(context,
+              text: AppLocalizations.of(context)!.loadingWidgetChangeRepMsg,
+              theme: currentTheme);
 
         bool result = await account.changeRepresentative(repAddress);
 

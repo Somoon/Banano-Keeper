@@ -177,95 +177,8 @@ class SendConfirmDialogState extends State<SendConfirmDialog>
                       }
                     }
 
-                    if (verified != null && verified) {
-                      LoadingIndicatorDialog().show(context,
-                          text: appLocalization.loadingWidgetSendMsg,
-                          theme: currentTheme);
-
-                      await services<QueueService>()
-                          .add(widget.account.getOverview(true));
-                      await services<QueueService>()
-                          .add(widget.account.handleOverviewResponse(true));
-
-                      String sendAmountRaw =
-                          Utils().rawFromAmount(widget.inputAmount);
-                      String destAddress = (widget.inputAddress);
-                      var hist = await AccountAPI()
-                          .getHistory(widget.account.address, 1);
-                      var historyData = jsonDecode(hist.body);
-                      String previous = historyData[0]['hash'];
-
-                      var newRaw = (BigInt.parse(widget.account.getBalance()) -
-                              BigInt.parse(sendAmountRaw))
-                          .toString();
-
-                      int accountType = NanoAccountType.BANANO;
-                      String calculatedHash = NanoBlocks.computeStateHash(
-                          accountType,
-                          widget.account.address,
-                          previous,
-                          widget.account.representative,
-                          BigInt.parse(newRaw),
-                          destAddress);
-                      int activeWallet =
-                          services<WalletsService>().activeWallet;
-                      String walletName =
-                          services<WalletsService>().walletsList[activeWallet];
-
-                      String privateKey =
-                          services<WalletService>(instanceName: walletName)
-                              .getPrivateKey(widget.account.index);
-                      // Signing a block
-                      String sign =
-                          NanoSignatures.signBlock(calculatedHash, privateKey);
-
-                      StateBlock sendBlock = StateBlock(
-                          widget.account.address,
-                          previous,
-                          widget.account.representative,
-                          newRaw,
-                          destAddress,
-                          sign);
-
-                      var sendHash =
-                          await AccountAPI().processRequest(sendBlock, "send");
-                      FocusScope.of(context).unfocus();
-                      LoadingIndicatorDialog().dismiss();
-
-                      //if
-                      //{"error":"Invalid block balance for given subtype"}
-                      //else
-                      if (jsonDecode(sendHash)['hash'] != null &&
-                          NanoHelpers.isHexString(
-                              jsonDecode(sendHash)['hash'])) {
-                        await widget.account.setBalance(newRaw);
-                        await services<QueueService>()
-                            .add(widget.account.onRefreshUpdateHistory());
-
-                        //have wallet walletName
-                        //need accountOrgName
-
-                        int accountIndex =
-                            services<WalletService>(instanceName: walletName)
-                                .activeIndex;
-                        String accountOrgName =
-                            services<WalletService>(instanceName: walletName)
-                                .accountsList[accountIndex];
-                        var account2 =
-                            services<Account>(instanceName: accountOrgName);
-                        await account2.setBalance(newRaw);
-                        await services<QueueService>()
-                            .add(account2.onRefreshUpdateHistory());
-
-                        // Navigator.of(context).pop(true);
-                        services<AppRouter>().pop(true);
-                      } else {
-                        //ERR?
-                        if (kDebugMode) {
-                          print(sendHash);
-                        }
-                      }
-                    }
+                    await sendTransaction(
+                        verified, context, appLocalization, currentTheme);
                   },
                   child: Text(
                     AppLocalizations.of(context)!.confirm,
@@ -281,5 +194,84 @@ class SendConfirmDialogState extends State<SendConfirmDialog>
         ),
       ),
     );
+  }
+
+  Future<void> sendTransaction(bool? verified, BuildContext context,
+      AppLocalizations appLocalization, BaseTheme currentTheme) async {
+    if (verified != null && verified) {
+      LoadingIndicatorDialog()
+        ..status = WidgetStatus.loading
+        ..dismissible = false
+        ..cancelable = true
+        ..show(context,
+            text: appLocalization.loadingWidgetSendMsg, theme: currentTheme);
+
+      await services<QueueService>().add(widget.account.getOverview(true));
+      await services<QueueService>()
+          .add(widget.account.handleOverviewResponse(true));
+
+      String sendAmountRaw = Utils().rawFromAmount(widget.inputAmount);
+      String destAddress = (widget.inputAddress);
+      var hist = await AccountAPI().getHistory(widget.account.address, 1);
+      var historyData = jsonDecode(hist.body);
+      String previous = historyData[0]['hash'];
+
+      var newRaw = (BigInt.parse(widget.account.getBalance()) -
+              BigInt.parse(sendAmountRaw))
+          .toString();
+
+      int accountType = NanoAccountType.BANANO;
+      String calculatedHash = NanoBlocks.computeStateHash(
+          accountType,
+          widget.account.address,
+          previous,
+          widget.account.representative,
+          BigInt.parse(newRaw),
+          destAddress);
+      int activeWallet = services<WalletsService>().activeWallet;
+      String walletName = services<WalletsService>().walletsList[activeWallet];
+
+      String privateKey = services<WalletService>(instanceName: walletName)
+          .getPrivateKey(widget.account.index);
+      // Signing a block
+      String sign = NanoSignatures.signBlock(calculatedHash, privateKey);
+
+      StateBlock sendBlock = StateBlock(widget.account.address, previous,
+          widget.account.representative, newRaw, destAddress, sign);
+
+      var sendHash = await AccountAPI().processRequest(sendBlock, "send");
+      FocusScope.of(context).unfocus();
+      LoadingIndicatorDialog().dismiss();
+
+      //if
+      //{"error":"Invalid block balance for given subtype"}
+      //else
+      if (jsonDecode(sendHash)['hash'] != null &&
+          NanoHelpers.isHexString(jsonDecode(sendHash)['hash'])) {
+        await widget.account.setBalance(newRaw);
+        await services<QueueService>()
+            .add(widget.account.onRefreshUpdateHistory());
+
+        //have wallet walletName
+        //need accountOrgName
+
+        int accountIndex =
+            services<WalletService>(instanceName: walletName).activeIndex;
+        String accountOrgName =
+            services<WalletService>(instanceName: walletName)
+                .accountsList[accountIndex];
+        var account2 = services<Account>(instanceName: accountOrgName);
+        await account2.setBalance(newRaw);
+        await services<QueueService>().add(account2.onRefreshUpdateHistory());
+
+        // Navigator.of(context).pop(true);
+        services<AppRouter>().pop(true);
+      } else {
+        //ERR?
+        if (kDebugMode) {
+          print(sendHash);
+        }
+      }
+    }
   }
 }
