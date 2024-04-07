@@ -251,17 +251,20 @@ class Utils {
             break;
           case 'bansign':
             Map<String, String> splitQueries = Uri.splitQueryString(uri.path);
-            if (splitQueries.isEmpty) {
+            if (splitQueries.isEmpty || splitQueries['message'] == null) {
               splitQueries = uri.queryParameters;
             }
-            print(splitQueries);
 
             deepLinkData['address'] = splitQueries['address'];
 
             deepLinkData['callback'] = splitQueries['url'];
             deepLinkData['url'] = splitQueries['url'];
 
-            deepLinkData['message'] = splitQueries['message'];
+            if (splitQueries['message'] == null) {
+              deepLinkData['message'] = Uri.decodeFull(uri.path);
+            } else {
+              deepLinkData['message'] = splitQueries['message'];
+            }
 
             break;
           case 'banverify':
