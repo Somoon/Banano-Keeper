@@ -251,6 +251,10 @@ class Utils {
             break;
           case 'bansign':
             Map<String, String> splitQueries = Uri.splitQueryString(uri.path);
+            if (splitQueries.isEmpty) {
+              splitQueries = uri.queryParameters;
+            }
+            print(splitQueries);
 
             deepLinkData['address'] = splitQueries['address'];
 

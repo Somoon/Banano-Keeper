@@ -555,22 +555,6 @@ class MsgSignPage {
           theme: currentTheme,
         )
         ..delayedDismiss(5);
-
-      // EasyLoading.instance
-      //   ..toastPosition = EasyLoadingToastPosition.center
-      //   ..displayDuration = const Duration(seconds: 8)
-      //   ..loadingStyle = EasyLoadingStyle.dark
-      //   ..indicatorSize = 45.0
-      //   ..radius = 10.0
-      //   ..backgroundColor = Colors.green
-      //   ..indicatorColor = Colors.yellow
-      //   ..textColor = Colors.yellow
-      //   ..maskColor = Colors.blue.withOpacity(0.5)
-      //   ..userInteractions = true
-      //   ..dismissOnTap = true;
-      // EasyLoading.showSuccess(
-      //   message,
-      // );
     }
     print('SENDER VERIFICATION');
     print(response.statusCode);

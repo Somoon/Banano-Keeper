@@ -120,10 +120,16 @@ class LoadingIndicatorDialog {
     Widget widget;
     switch (status) {
       case WidgetStatus.success:
-        widget = Text("CHECK MARK");
+        widget = Image.asset(
+          width: 24,
+          'images/checkmark-green.png',
+        );
         break;
       case WidgetStatus.error:
-        widget = Text("ERROR MARK");
+        widget = widget = Image.asset(
+          width: 24,
+          'images/cross-red.png',
+        );
         break;
 
       case WidgetStatus.loading:

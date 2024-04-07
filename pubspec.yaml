@@ -117,6 +117,8 @@ flutter:
     - images/greymonkey.png
     - images/qrOptionFace.png
     - images/icon.png
+    - images/checkmark-green.png
+    - images/cross-red.png
     - assets/pow/multiThread.html
     - assets/pow/pow.js
     - assets/pow/pow.wasm
